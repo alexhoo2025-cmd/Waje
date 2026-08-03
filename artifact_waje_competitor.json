@@ -1,0 +1,291 @@
+{
+  "surface": "report",
+  "manifest": {
+    "version": 1,
+    "surface": "report",
+    "title": "Waje 对标 Nigerian iGaming 竞品分析",
+    "description": "面向产品、增长与商业化团队的 Waje 产品定位、玩法结构和竞品对标报告。公开数据截面：2026-07-31。",
+    "generatedAt": "2026-07-31T00:00:00+08:00",
+    "sources": [
+      {"id":"source_waje_site","label":"Waje 官方站点","href":"https://www.wajegame.com/"},
+      {"id":"source_waje_play","label":"Waje Casino - Google Play Nigeria","href":"https://play.google.com/store/apps/details?id=com.hfhy.waje.special&hl=en-gb&gl=ng"},
+      {"id":"source_public_play_store","label":"Google Play Nigeria 公开商店快照（Waje及竞品）","href":"https://play.google.com/store/"},
+      {"id":"source_sporty_help","label":"SportyBet Nigeria 官方帮助与条款","href":"https://www.sportybet.com/ng/help"},
+      {"id":"source_sporty_promo","label":"SportyBet Nigeria 官方活动页","href":"https://www.sportybet.com/ng/m/promotions"},
+      {"id":"source_bet9ja_play","label":"Bet9ja Sports Betting & Casino - Google Play Nigeria","href":"https://play.google.com/store/apps/details?gl=ng&hl=en-gb&id=com.bet9ja.sportsbook.app"},
+      {"id":"source_betway_play","label":"Betway NG - Google Play Nigeria","href":"https://play.google.com/store/apps/details?gl=NG&hl=en&id=com.betway.ng"},
+      {"id":"source_1xbet_play","label":"1xBet Nigeria - Google Play","href":"https://play.google.com/store/apps/details?id=org.xbet.client.ng_ps"}
+    ],
+    "cards": [
+      {
+        "id": "card_waje_downloads",
+        "dataset": "executive_metrics",
+        "sourceId": "source_public_play_store",
+        "metrics": [
+          {"label":"Waje Play 下载量下限","field":"waje_downloads_min_m","format":"number","unit":"M+"}
+        ]
+      },
+      {
+        "id": "card_sporty_downloads",
+        "dataset": "executive_metrics",
+        "sourceId": "source_public_play_store",
+        "metrics": [
+          {"label":"SportyBet Play 下载量下限","field":"sporty_downloads_min_m","format":"number","unit":"M+"}
+        ]
+      },
+      {
+        "id": "card_waje_sections",
+        "dataset": "executive_metrics",
+        "sourceId": "source_waje_site",
+        "metrics": [
+          {"label":"Waje 首页可见玩法分区","field":"waje_game_sections","format":"number","unit":"个"}
+        ]
+      },
+      {
+        "id": "card_waje_rating",
+        "dataset": "executive_metrics",
+        "sourceId": "source_waje_play",
+        "metrics": [
+          {"label":"Waje Google Play 评分","field":"waje_rating","format":"number","unit":"★"}
+        ]
+      }
+    ],
+    "charts": [
+      {
+        "id":"chart_download_scale",
+        "title":"Google Play 下载量下限",
+        "subtitle":"商店展示的是累计下载量级，不等同于月活或收入。",
+        "type":"bar",
+        "dataset":"store_metrics",
+        "sourceId":"source_public_play_store",
+        "encodings":{
+          "x":{"field":"product","type":"nominal"},
+          "y":{"field":"downloads_min_m","type":"quantitative","format":"number","unit":"M+"},
+          "tooltip":[{"field":"rating","type":"quantitative","format":"number","unit":"★"},{"field":"reviews_k","type":"quantitative","format":"number","unit":"K reviews"}]
+        },
+        "xAxisTitle":"下载量下限（百万）",
+        "yAxisTitle":"产品"
+      },
+      {
+        "id":"chart_review_density",
+        "title":"评论量 / 下载量下限",
+        "subtitle":"仅作商店反馈密度信号，受品类、地区、版本与下载量四舍五入影响。",
+        "type":"bar",
+        "dataset":"store_metrics",
+        "sourceId":"source_public_play_store",
+        "encodings":{
+          "x":{"field":"product","type":"nominal"},
+          "y":{"field":"review_density","type":"quantitative","format":"percent"},
+          "tooltip":[{"field":"reviews_k","type":"quantitative","format":"number","unit":"K"},{"field":"downloads_min_m","type":"quantitative","format":"number","unit":"M+"}]
+        },
+        "xAxisTitle":"评论量 / 下载量下限",
+        "yAxisTitle":"产品",
+        "valueFormat":"percent"
+      },
+      {
+        "id":"chart_feature_average",
+        "title":"公开能力覆盖均分",
+        "subtitle":"0–4 分的公开能力编码均值；均值不替代对单项能力的判断。",
+        "type":"bar",
+        "dataset":"feature_average",
+        "sourceId":"source_public_play_store",
+        "encodings":{
+          "x":{"field":"product","type":"nominal"},
+          "y":{"field":"average_score","type":"quantitative","format":"number"},
+          "tooltip":[{"field":"local_edge","type":"quantitative","format":"number"},{"field":"sports_edge","type":"quantitative","format":"number"}]
+        },
+        "xAxisTitle":"产品",
+        "yAxisTitle":"公开能力覆盖均分（0–4）"
+      }
+    ],
+    "tables": [
+      {
+        "id":"table_store_metrics",
+        "title":"商店公开规模信号",
+        "subtitle":"截至 2026-07-31 可见的 Google Play Nigeria 页面数据；下载量为下限档位。",
+        "dataset":"store_metrics",
+        "sourceId":"source_public_play_store",
+        "defaultSort":{"field":"downloads_min_m","direction":"desc"},
+        "columns":[
+          {"field":"product","label":"产品","type":"text"},
+          {"field":"downloads_min_m","label":"下载量下限（M+）","type":"number","format":"number"},
+          {"field":"rating","label":"评分","type":"number","format":"number","unit":"★"},
+          {"field":"reviews_k","label":"评论量（K）","type":"number","format":"number"},
+          {"field":"category_rank","label":"商店分类信号","type":"text"},
+          {"field":"updated","label":"最近更新","type":"date"}
+        ]
+      },
+      {
+        "id":"table_product_playbook",
+        "title":"产品玩法与商业化对照",
+        "subtitle":"把公开功能翻译成用户循环、变现杠杆与可借鉴动作。",
+        "dataset":"product_playbook",
+        "sourceId":"source_public_play_store",
+        "defaultSort":{"field":"priority","direction":"asc"},
+        "columns":[
+          {"field":"product","label":"产品","type":"text"},
+          {"field":"core_loop","label":"核心循环","type":"text"},
+          {"field":"casino_hook","label":"赌场/即时玩法抓手","type":"text"},
+          {"field":"sports_hook","label":"体育/事件抓手","type":"text"},
+          {"field":"promo_engine","label":"促活与促付费","type":"text"},
+          {"field":"payment_trust","label":"支付/信任卖点","type":"text"},
+          {"field":"priority","label":"对 Waje 的借鉴优先级","type":"number"}
+        ]
+      },
+      {
+        "id":"table_feature_matrix",
+        "title":"玩法与产品能力编码明细",
+        "subtitle":"0–4 级公开能力编码；用于审计均分图，不代表真实性能或用户满意度。",
+        "dataset":"feature_matrix",
+        "sourceId":"source_public_play_store",
+        "defaultSort":{"field":"product","direction":"asc"},
+        "columns":[
+          {"field":"product","label":"产品","type":"text"},
+          {"field":"feature","label":"能力维度","type":"text"},
+          {"field":"score","label":"评分（0–4）","type":"number","format":"number"},
+          {"field":"evidence","label":"公开证据摘要","type":"text"}
+        ]
+      }
+    ],
+    "blocks": [
+      {"id":"title","type":"markdown","body":"# Waje 对标 Nigerian iGaming 竞品分析\n\n**定位：**面向产品、增长、商业化与风控团队的深度产品分析。\n\n**数据截面：**2026 年 7 月 31 日；以 Waje 官方站点、Waje Google Play Nigeria 商品页，以及 SportyBet、Bet9ja、Betway NG、1xBet 的公开商品页/官方帮助页为主要证据。\n\n**一句话结论：**Waje 已经拥有“本地化卡牌 + 即时赌场 + CoinGames + 本地支付”的差异化底座，但头部竞品用体育内容、直播/实时赔率、Cash Out、清晰的资金规则和高频促销把用户循环做得更深。Waje 下一阶段不应继续单纯堆游戏，而应把“本地玩法特色”包装成可连续回访、可解释、可安全提现的产品系统。"},
+      {"id":"executive_summary","type":"markdown","body":"## Executive Summary\n\n**规模判断：**SportyBet 是公开商店规模信号最强的对手（10M+ 下载、4.5★、257K 评论），约为 Waje 5M+ 下载的 2 倍；Waje 仍明显领先 Betway NG 的 500K+，与 Bet9ja/1xBet 的 1M+档位相比具备较大安装基础。下载量只是累计下限，不能直接当作 MAU。\n\n**产品判断：**Waje 的差异化不在单一爆款，而在“Whot/本地卡牌、Fish、Slots、Crash、QuickGames、CoinGames、PpGame”多入口组合；官方站点可见至少 11 个玩法分区，Google Play 也明确强调本地 Whot、捕鱼、Slots、Roulette、Baccarat 和 Opay/PalmPay 支付。\n\n**商业化判断：**竞品的主循环是“内容/事件 → 下注或投注 → 即时结果/实时反馈 → Cash Out/奖励 → 再下注”；Waje 当前更像“注册送筹码 → 多玩法试用 → 充值解锁提现/更多游戏 → 任务与礼包促复购”。后者的付费触发点更强，但必须先把 Cash/BonusCash/免费玩家资产上限等规则讲清楚，否则会把奖励转化成信任成本。\n\n**优先行动：**90 天内优先做三件事：①用一个“本地玩法旗舰”（建议 Whot + Fish）建立内容心智；②上线可解释的资金/奖金/提现状态链路，并把责任博彩控制前置；③用任务、连胜、赛季排行和可控 Cash Out 把单局游戏升级为可持续循环。"},
+      {"id":"headline_metrics","type":"metric-strip","cardIds":["card_waje_downloads","card_sporty_downloads","card_waje_sections","card_waje_rating"]},
+      {"id":"waje_product_thesis","type":"markdown","sourceId":"source_waje_site","body":"## Waje 的产品本质：一个“本地内容 + 即时结果 + 资金账户”的多玩法入口\n\nWaje 官方站点把产品组织成 TopGame、Exclusives、CoinGames、New、TopPicks、Slots、Fish、Crash、QuickGames、TaDa、PpGame 等至少 11 个分区；首页同时出现 Whot、Limbo、CoinFlip、Keno、NairaSlots、Roulette、BottleSpin、Fish、ColorDice、Aviator、Mines、Plinko、BlackJack 等不同心智的游戏。\n\n这是一种“聚合器 + 自研/独家内容”的架构：\n\n- **内容层：**本地 Whot/BaccaWhot、Fishing、WajeSpin/NairaSlots 等自有或强品牌游戏，负责建立识别度。\n- **刺激层：**Limbo、Keno、BottleSpin、Mines、Plinko、Aviator 等低学习成本、短回合玩法，负责提高尝试频次。\n- **供给层：**PpGame 的 Gates of Olympus、Sweet Bonanza、Sugar Rush 等成熟 slot，负责扩大内容 SKU 与用户熟悉度。\n- **资金层：**Opay、PalmPay、PayStack、Visa 等入口把充值、下注、奖金和提现串成可交易账户。\n\n**关键推论：**多分区本身不是护城河；护城河来自“本地玩法的内容资产 + 低延迟支付 + 可持续任务/社交/赛事”。如果没有跨游戏的进度与身份体系，11 个分区更容易变成货架，而不是留存系统。"},
+      {"id":"chart_download_scale_block","type":"chart","chartId":"chart_download_scale"},
+      {"id":"scale_finding","type":"markdown","sourceId":"source_public_play_store","body":"## 规模信号：Waje 有安装基础，但体育平台占据更强的日常触达\n\nWaje Play 页面显示 5M+ 下载、4.3★、13K 评论，并列为“Top free card”榜单信号；SportyBet 为 10M+、4.5★、257K 评论并列“#1 top free sports”。Bet9ja 与 1xBet 均为 1M+档位，Betway NG 为 500K+。\n\n**解释：**体育产品的赛事日历、直播、实时赔率和 Cash Out 让用户有更明确的“今天为什么回来”；Waje 的回访更多依赖活动、余额与游戏刺激。如果 Waje 要争夺同一批用户的时间，不需要复制完整 sportsbook，但需要把“回访理由”产品化，例如每日本地 Whot 赛季、Fish 房间榜、Crash 任务和未完成奖励。\n\n**可操作基准：**把 Waje 的目标从“新增更多游戏”改成三项可测的漏斗：首次注册到首局、首局到第二天回访、首笔充值到 7 日复购；每项都应按玩法分区和资金状态拆分。"},
+      {"id":"chart_review_density_block","type":"chart","chartId":"chart_review_density"},
+      {"id":"feedback_signal","type":"markdown","sourceId":"source_public_play_store","body":"## 商店反馈信号：评论密度提示“资金与稳定性”是共同的信任战场\n\n按评论量除以 Google Play 展示的下载量下限计算，Betway NG 约 6.0%、Bet9ja 约 3.7%、SportyBet 约 2.6%、1xBet 约 1.0%、Waje 约 0.3%。这个比值不能当作参与率，但能帮助识别商店反馈是否活跃。\n\nWaje 公开评论中出现了提现加载、断线扣款、奖励未到账、Coin wallet 只能用于游戏等问题；Betway 评论中出现加载慢、提现争议；SportyBet 评论中出现市场组织、Cash Out 和网络稳定性问题；1xBet 评论中出现市场查找困难。**共同点不是“游戏少”，而是结果、资金和状态解释不够稳定。**\n\n**对 Waje 的启示：**把“每一笔资金变动为何发生、能否提现、什么时候到账、断线如何结算”做成可查询的交易状态，而不是只放在条款或客服里。"},
+      {"id":"table_store_metrics_block","type":"table","tableId":"table_store_metrics"},
+      {"id":"play_design","type":"markdown","sourceId":"source_public_play_store","body":"## 玩法对标：Waje 的本地特色最强，竞品的事件与反馈循环更深\n\n评分采用 0–4 级定性编码：0=公开页面未见明确能力，4=产品公开信息中形成强主张或核心入口。评分不是用户满意度，也不是对真实玩法质量的审计。\n\n**Waje：本地化宽度领先。**Whot/BaccaWhot、Fish、CoinGames 与即时 Crash/QuickGames 的组合，覆盖“社交/熟悉感—短局刺激—成熟 slot”的多种动机。\n\n**SportyBet：体育回访循环领先。**官方商品页把足球聚焦、丰富市场、实时下注、直播、In-house casino、责任博彩工具放在同一价值主张中；帮助页还公开了 Cash Out、Auto Cashout、免费提现、充值/提现限额等规则。\n\n**Bet9ja：玩法工具化领先。**400+ 赛前市场、betBOOM、Cash Out、Multiple Builder、Cut1、Book A Bet、Zoom Virtuals、Bet9ja Rewards 与 Casino Lobby 把投注过程做成可组合的策略工具。\n\n**Betway：内容与大奖叙事领先。**Aviator、slots、live dealer、Betway 独家小游戏、NaiJackpots、Lucky Numbers、Betgames 和 Esports 形成“赛事 + 赌场 + 大奖”的宽供给。\n\n**1xBet：供给与促销上限领先。**商品页强调数千个赛前/滚球选项、电竞、直播、Slots/Live dealer/Crash，以及 300% 首存奖励、价格提升、串关保险、Cashback、挑战任务。代价是信息架构更复杂，公开评论明确反馈市场难找、排序混乱。"},
+      {"id":"chart_feature_average_block","type":"chart","chartId":"chart_feature_average"},
+      {"id":"feature_matrix_table_block","type":"table","tableId":"table_feature_matrix"},
+      {"id":"monetization","type":"markdown","sourceId":"source_sporty_help","body":"## 商业化逻辑：从“首次充值”竞争，转向“可解释的循环价值”竞争\n\n### 1. Waje 当前的变现链路\n\n注册/登录奖励降低首次体验门槛；多玩法货架制造尝试；充值页把“Unlock Withdrawal Access / Unlock more Games / Play Without Limits”作为付费触发；Super Sale、7-day mission、分享与签到把奖励绑定到后续行为。这个链路的优势是转化直接，风险是用户会把免费筹码、Cash、BonusCash 和可提现余额混在一起理解。\n\n### 2. 竞品的四类成熟杠杆\n\n- **事件杠杆：**SportyBet/Bet9ja/1xBet 用足球赛事、直播、实时赔率、Cash Out 创造高频触达。\n- **概率与组合杠杆：**Bet9ja 用 betBOOM、Multiple Builder、Cut1、Rewards 把单次下注升级成策略与惊喜。\n- **大奖与独家内容：**Betway 用 NaiJackpots、独家 Kick/Dribble 等内容提升品牌记忆点。\n- **奖金与忠诚杠杆：**1xBet 的首存 300%、Cashback、挑战任务；SportyBet 的 Free Spins、Aviator missions、Cash Gifts 与动态 multibet bonus。\n\n### 3. Waje 应优先建立的“第二层经济”\n\n第一层是充值与下注，第二层应该是**可持续的回访资产**：跨玩法 XP、每日/周任务、Whot/Fish 赛季、连胜或段位、可解释的 BonusChip/Coin 消耗、可控的自动退出与止损。只有当用户有未完成目标、有清晰的奖励状态、有可复用的身份资产时，优惠才不会变成一次性补贴。"},
+      {"id":"table_product_playbook_block","type":"table","tableId":"table_product_playbook"},
+      {"id":"gap","type":"markdown","sourceId":"source_waje_play","body":"## Waje 的可赢空间：不追求“最多”，而追求“最像 Waje”\n\n**机会一：把 Whot / Fish 做成旗舰内容。**竞品在商店页都把 sportsbook 作为主入口，Waje 可以用本地 Whot、Fish、BaccaWhot 做独特内容心智，再用赛季、房间、排行榜、好友挑战把内容变成回访。\n\n**机会二：把 CoinGames 变成新手友好的低门槛层。**BottleSpin、CoinFlip 等短局玩法适合承接注册奖励，但必须明确 Coin wallet 与 Cash wallet 的差异、BonusChip 的去向和可提现条件。\n\n**机会三：做“游戏结果 + 资金状态”的透明体验。**将下注前的可赢/不可赢资金、结算状态、网络中断处理、提现资格、费用和预计到账时间统一展示；用状态时间线替代“联系客服”。\n\n**机会四：建立可控的即时玩法。**Limbo/Keno/Mines/Crash 的目标倍率、风险、上限应提供概率/赔率解释、单局限额、冷静期与自我排除，形成“刺激但有边界”的品牌。\n\n**机会五：用本地支付速度做信任资产。**Waje 已公开强调 Opay/PalmPay 等本地支付；应把成功率、平均到账时间、失败重试与银行账户校验做成可见的产品能力，而不是营销口号。"},
+      {"id":"recommendations","type":"markdown","body":"## 90 天产品与商业化路线图\n\n### 0–30 天：先修信任与可读性\n\n1. 统一 Cash、BonusCash、Coin、BonusChip、Withdrawable Balance 的字段与颜色；在充值、下注、提现和客服入口重复解释同一规则。\n2. 在首屏弹窗中合并注册成功、首局引导、超级促销、提现限制说明，改成一个可跳过的“新手任务中心”。\n3. 增加交易状态时间线：充值中、已入账、下注锁定、结算、可提现、提现处理中、成功/失败。\n4. 对断线、奖励未到账、提现加载等高风险事件提供自动补偿/工单编号和可追踪状态。\n\n### 31–60 天：把本地玩法变成内容系统\n\n1. 选择 Whot + Fish 做两个“旗舰频道”：每日赛、周榜、连胜、好友邀请、复盘/战绩。\n2. 用统一 XP/任务系统跨接 CoinGames、Crash、Slots；让用户离开单个游戏后仍有下一步。\n3. 将 7-day mission 改造成分阶段目标：首局、第二天回访、首次充值、完成三种玩法、负责任博彩设置。\n\n### 61–90 天：做可控的复购与差异化\n\n1. 引入基于用户价值与风险等级的奖励预算，而不是全量高额赠送。\n2. 为即时玩法提供自动退出、单日预算、冷静期和自我排除；把责任博彩控制放到下注前。\n3. 建立产品看板：注册→首局、首局→D1、首充→D7、充值成功率、结算时延、提现成功率、客服工单率、奖励成本/净收入。\n4. 用 A/B 测试验证“本地旗舰内容 + 任务”是否优于“新增更多 slot”对 D7 和首充转化的提升。"},
+      {"id":"open_questions","type":"markdown","body":"## Further Questions\n\n- Waje 的真实 DAU、D1/D7 留存、首充率、提现成功率、游戏级 RTP、净收入与渠道成本是多少？这些内部数据会显著改变竞品优先级。\n- Waje 用户在 Whot、Fish、Crash、Slots、CoinGames 之间的迁移路径如何？目前公开页面只能确认供给，不能确认使用结构。\n- “充值解锁提现/更多游戏”对首充的增量是多少？是否导致提现投诉、退款或长期留存下降？\n- 哪些本地支付通道的成功率和到账时延最稳定？是否可以把稳定性作为产品品牌承诺？\n- 商店评论中的奖励未到账、断线扣款和提现加载问题，在内部工单中占比多少？修复后是否能拉动评分与评论密度？\n- SportyBet 的体育入口是否是 Waje 的真实替代品，还是用户在不同场景下并行使用？建议用用户访谈和支付/设备共现数据验证。"},
+      {"id":"caveats","type":"markdown","body":"## Caveats and Assumptions\n\n- **公开数据边界：**下载量、评分、评论量和更新时间取自 Google Play Nigeria 页面展示值；下载量为档位下限，不能反推 DAU、收入或市场份额。\n- **评分口径：**玩法能力评分是基于官方公开商品描述的 0–4 定性编码，不是实测 RTP、胜率或用户满意度。\n- **样本选择：**竞品按尼日利亚公开可见、同时覆盖体育/赌场/即时玩法且商店规模较大的产品选择；没有把纯 slot 社交赌场或未验证的第三方 APK 作为主竞品。\n- **商业化推断：**Waje 的注册奖励、充值解锁、任务与促销来自官方公开页面和此前测试体验；具体门槛、奖金可提现条件与实时活动可能随版本变化。\n- **责任博彩：**所有产品均涉及真实货币或付费竞赛；报告只做产品与商业化分析，不构成投资、赌博或合规意见。上线前应由尼日利亚当地法律与风控团队复核 NLRC、州级牌照、KYC/AML、支付和广告要求。"},
+      {"id":"sources","type":"markdown","body":"## Sources and Method\n\n**官方产品与商店页面**\n\n- [Waje 官方站点](https://www.wajegame.com/)：玩法分区、游戏 SKU、支付标识、18+ 与 NLRC 信息。\n- [Waje Casino - Google Play Nigeria](https://play.google.com/store/apps/details?id=com.hfhy.waje.special&hl=en-gb&gl=ng)：5M+ 下载、4.3★、13K 评论、玩法/支付/奖励说明与评论样本。\n- [SportyBet - Google Play Nigeria](https://play.google.com/store/apps/details?gl=ng&hl=en_NG&id=com.sportybet.android.gp)：10M+ 下载、4.5★、257K 评论、体育/直播/赌场/责任博彩主张。\n- [Bet9ja - Google Play Nigeria](https://play.google.com/store/apps/details?gl=ng&hl=en-gb&id=com.bet9ja.sportsbook.app)：1M+ 下载、4.4★、37.1K 评论、400+ 市场、betBOOM、Cash Out、Rewards、Casino Lobby。\n- [Betway NG - Google Play Nigeria](https://play.google.com/store/apps/details?gl=NG&hl=en&id=com.betway.ng)：500K+ 下载、4.3★、约 30K 评论、赌场/直播赌场、NaiJackpots、Betgames、Esports。\n- [1xBet Nigeria - Google Play](https://play.google.com/store/apps/details?id=org.xbet.client.ng_ps)：1M+ 下载、4.1★、10.4K 评论、300% 首存、数千市场、电竞、赌场与挑战。\n\n**规则与活动**\n\n- [SportyBet 帮助/条款](https://www.sportybet.com/ng/help)：充值/提现限额、免费提现、Cash Out、Auto Cashout、实名银行账户等公开规则。\n- [SportyBet 活动页](https://www.sportybet.com/ng/m/promotions)：Free Spins、Aviator Missions、Cashback、JetX 礼包等活动类型。\n\n**方法：**将公开页面转为一个 2026-07-31 的人工审阅快照；按“商店规模信号、核心循环、玩法宽度、支付/信任、促活与促付费、责任博彩”统一编码，并将公开不可得的内部指标列为待补数据。"}
+    ]
+  },
+  "snapshot": {
+    "version": 1,
+    "generatedAt": "2026-07-31T00:00:00+08:00",
+    "status": "ready",
+    "datasets": {
+      "executive_metrics": [
+        {"waje_downloads_min_m":5,"sporty_downloads_min_m":10,"waje_game_sections":11,"waje_rating":4.3}
+      ],
+      "store_metrics": [
+        {"product":"SportyBet","downloads_min_m":10,"rating":4.5,"reviews_k":257,"review_density":0.0257,"category_rank":"#1 top free sports","updated":"2026-07-29"},
+        {"product":"Waje","downloads_min_m":5,"rating":4.3,"reviews_k":13,"review_density":0.0026,"category_rank":"#1 top free card","updated":"2026-07-07"},
+        {"product":"Bet9ja","downloads_min_m":1,"rating":4.4,"reviews_k":37.1,"review_density":0.0371,"category_rank":"#8 top free sports","updated":"2026-07-17"},
+        {"product":"1xBet","downloads_min_m":1,"rating":4.1,"reviews_k":10.4,"review_density":0.0104,"category_rank":"Sports category","updated":"2026-06-09"},
+        {"product":"Betway NG","downloads_min_m":0.5,"rating":4.3,"reviews_k":30,"review_density":0.06,"category_rank":"Sports category","updated":"2026-07-20"}
+      ],
+      "feature_matrix": [
+        {"product":"Waje","feature":"本地卡牌/文化","score":4,"evidence":"Whot、BaccaWhot、本地化 Casino 描述"},
+        {"product":"Waje","feature":"赌场/Live Casino","score":3,"evidence":"Slots、Roulette、Baccarat、PpGame"},
+        {"product":"Waje","feature":"Crash/即时短局","score":4,"evidence":"Limbo、Mines、Plinko、Aviator、BottleSpin"},
+        {"product":"Waje","feature":"体育/事件深度","score":1,"evidence":"官方定位含 sports betting，但公开商店页未展示市场深度"},
+        {"product":"Waje","feature":"本地支付/提现","score":3,"evidence":"Opay、PalmPay、PayStack、Visa"},
+        {"product":"Waje","feature":"任务/奖励/忠诚","score":4,"evidence":"600 Naira chips、分享奖励、7-day mission、Super Sale"},
+        {"product":"Waje","feature":"责任博彩/规则透明","score":2,"evidence":"18+、NLRC、Responsible Gambling 链接；资金状态仍需强化"},
+        {"product":"SportyBet","feature":"本地卡牌/文化","score":0,"evidence":"公开页面聚焦足球和体育市场"},
+        {"product":"SportyBet","feature":"赌场/Live Casino","score":3,"evidence":"In-house casino、slots、blackjack、roulette"},
+        {"product":"SportyBet","feature":"Crash/即时短局","score":2,"evidence":"活动页出现 JetX/Aviator；非主入口"},
+        {"product":"SportyBet","feature":"体育/事件深度","score":4,"evidence":"足球聚焦、赛前/滚球、直播、丰富市场"},
+        {"product":"SportyBet","feature":"本地支付/提现","score":4,"evidence":"官方帮助公开银行列表、Opay、PalmPay、免费提现"},
+        {"product":"SportyBet","feature":"任务/奖励/忠诚","score":3,"evidence":"Free Spins、Aviator missions、Cashback、动态 multibet bonus"},
+        {"product":"SportyBet","feature":"责任博彩/规则透明","score":4,"evidence":"限额、自评、责任博彩工具、提现规则公开"},
+        {"product":"Bet9ja","feature":"本地卡牌/文化","score":1,"evidence":"尼日利亚足球品牌心智强，但商店页未突出本地卡牌"},
+        {"product":"Bet9ja","feature":"赌场/Live Casino","score":4,"evidence":"Casino Lobby、Spin & Win、Aviator、slots、Blackjack、Roulette"},
+        {"product":"Bet9ja","feature":"Crash/即时短局","score":2,"evidence":"Aviator 等即时游戏在 Casino Lobby 中"},
+        {"product":"Bet9ja","feature":"体育/事件深度","score":4,"evidence":"400+ markets、in-play、Zoom Virtuals、Cash Out"},
+        {"product":"Bet9ja","feature":"本地支付/提现","score":3,"evidence":"公开页强调 secure deposits & fast payments，未列出完整通道"},
+        {"product":"Bet9ja","feature":"任务/奖励/忠诚","score":4,"evidence":"betBOOM、Rewards、My Bonuses、Cut1、Multiple Builder"},
+        {"product":"Bet9ja","feature":"责任博彩/规则透明","score":2,"evidence":"18+、GambleAlert、24/7 support；资金规则细节较少"},
+        {"product":"Betway NG","feature":"本地卡牌/文化","score":0,"evidence":"公开页面聚焦 sportsbook 与 casino"},
+        {"product":"Betway NG","feature":"赌场/Live Casino","score":4,"evidence":"slots、table、live dealer、Aviator、Roulette、Blackjack"},
+        {"product":"Betway NG","feature":"Crash/即时短局","score":3,"evidence":"Aviator、Betgames、独家快节奏游戏"},
+        {"product":"Betway NG","feature":"体育/事件深度","score":4,"evidence":"pre-match、live in-play、stats、streaming、Esports"},
+        {"product":"Betway NG","feature":"本地支付/提现","score":3,"evidence":"安全支付与 banking support，未列完整 NGN 通道"},
+        {"product":"Betway NG","feature":"任务/奖励/忠诚","score":3,"evidence":"weekly/monthly promotions、free bets、NaiJackpots"},
+        {"product":"Betway NG","feature":"责任博彩/规则透明","score":3,"evidence":"18+、责任博彩、Lagos license、支付加密主张"},
+        {"product":"1xBet","feature":"本地卡牌/文化","score":0,"evidence":"公开页面聚焦体育、电竞与赌场"},
+        {"product":"1xBet","feature":"赌场/Live Casino","score":4,"evidence":"Slots、live dealer blackjack/roulette/baccarat"},
+        {"product":"1xBet","feature":"Crash/即时短局","score":4,"evidence":"instant and crash titles"},
+        {"product":"1xBet","feature":"体育/事件深度","score":4,"evidence":"thousands of pre-match/in-play options、电竞、直播"},
+        {"product":"1xBet","feature":"本地支付/提现","score":3,"evidence":"NGN payments、encrypted payments、24/7 support"},
+        {"product":"1xBet","feature":"任务/奖励/忠诚","score":4,"evidence":"300% first deposit、Cashback、挑战、价格提升、串关保险"},
+        {"product":"1xBet","feature":"责任博彩/规则透明","score":3,"evidence":"18+、responsible play tools、GambleAlert"}
+      ],
+      "feature_average": [
+        {"product":"1xBet","average_score":3.14,"local_edge":0,"sports_edge":4},
+        {"product":"Waje","average_score":3.00,"local_edge":4,"sports_edge":1},
+        {"product":"SportyBet","average_score":2.86,"local_edge":0,"sports_edge":4},
+        {"product":"Bet9ja","average_score":2.86,"local_edge":1,"sports_edge":4},
+        {"product":"Betway NG","average_score":2.86,"local_edge":0,"sports_edge":4}
+      ],
+      "product_playbook": [
+        {"product":"Waje","core_loop":"注册奖励→多玩法试用→充值解锁→任务/礼包回访","casino_hook":"Whot、Fish、Slots、Crash、CoinGames","sports_hook":"站点定位含 sports；公开页未见 sportsbook 深度","promo_engine":"600 chips、7-day mission、Super Sale、分享/签到","payment_trust":"Opay、PalmPay、PayStack、Visa；提现规则需更清晰","priority":1},
+        {"product":"SportyBet","core_loop":"赛事/直播→赛前或滚球→Cash Out→奖金/促销→下一场","casino_hook":"In-house casino、slots、blackjack、roulette","sports_hook":"足球聚焦、直播、丰富市场、实时赔率","promo_engine":"Free Spins、Aviator missions、Cashback、dynamic multibet bonus","payment_trust":"银行/Opay/PalmPay、免费提现、公开限额与实名规则","priority":2},
+        {"product":"Bet9ja","core_loop":"足球市场→组合策略→betBOOM/Cash Out→Rewards→再投注","casino_hook":"Casino Lobby、Spin & Win、Aviator、live casino","sports_hook":"400+ markets、Zoom Virtuals、Cut1、Multiple Builder","promo_engine":"betBOOM、Rewards、My Bonuses、free bets、sweepstakes","payment_trust":"secure deposits & fast payments；具体通道需进一步核验","priority":2},
+        {"product":"Betway NG","core_loop":"体育/赌场入口→即时结果→大奖/促销→跨品类切换","casino_hook":"live dealer、Aviator、Betway 独家 Kick/Dribble","sports_hook":"pre-match、live、stats、streaming、Esports","promo_engine":"NaiJackpots、Lucky Numbers、Betgames、weekly/monthly promos","payment_trust":"banking support、支付加密、Lagos license","priority":3},
+        {"product":"1xBet","core_loop":"大市场→赔率/串关→直播/即时结果→首存/返现/挑战","casino_hook":"slots、live dealer、instant/crash","sports_hook":"thousands of markets、电竞、match streaming","promo_engine":"300% first deposit、price boosts、accumulator insurance、cashback","payment_trust":"NGN deposit、encrypted payments、24/7 support","priority":3}
+      ]
+    }
+  },
+  "sources": [
+    {
+      "id":"source_waje_site",
+      "label":"Waje 官方站点",
+      "href":"https://www.wajegame.com/",
+      "query":{"engine":"curated_web_snapshot","sql":"SELECT waje_game_sections FROM public_web.waje_homepage_snapshot WHERE captured_at = '2026-07-31';","description":"人工审阅 Waje 官方首页的玩法分区、游戏 SKU、支付标识和合规提示。","language":"sql","executed_at":"2026-07-31","tables_used":["public_web.waje_homepage_snapshot"],"filters":["首页公开内容；抓取/审阅日期 2026-07-31"]}
+    },
+    {
+      "id":"source_waje_play",
+      "label":"Waje Casino - Google Play Nigeria",
+      "href":"https://play.google.com/store/apps/details?id=com.hfhy.waje.special&hl=en-gb&gl=ng",
+      "query":{"engine":"curated_web_snapshot","sql":"SELECT product, downloads_min_m, rating, reviews_k FROM public_web.google_play_listing_snapshot WHERE product = 'Waje' AND region = 'NG' AND captured_at = '2026-07-31';","description":"人工审阅 Waje Google Play Nigeria 商品页的下载量、评分、评论、更新日期、玩法与奖励描述。","language":"sql","executed_at":"2026-07-31","tables_used":["public_web.google_play_listing_snapshot"],"filters":["Google Play 区域 NG；商品页公开字段；抓取/审阅日期 2026-07-31"]}
+    },
+    {
+      "id":"source_public_play_store",
+      "label":"Google Play Nigeria 公开商店快照（Waje及竞品）",
+      "href":"https://play.google.com/store/",
+      "query":{"engine":"curated_web_snapshot","sql":"SELECT product, downloads_min_m, rating, reviews_k, category_rank, updated FROM public_web.google_play_listing_snapshot WHERE region = 'NG' AND captured_at = '2026-07-31';","description":"对 Waje、SportyBet、Bet9ja、Betway NG、1xBet 商品页的公开字段做统一口径整理。下载量使用商店展示的下限档位；review_density = reviews_k / (downloads_min_m * 1000)。","language":"sql","executed_at":"2026-07-31","tables_used":["public_web.google_play_listing_snapshot"],"filters":["region = NG","captured_at = 2026-07-31","downloads are lower-bound store buckets","review_density is a directional signal, not engagement"]}
+    },
+    {
+      "id":"source_sporty_help",
+      "label":"SportyBet Nigeria 官方帮助与条款",
+      "href":"https://www.sportybet.com/ng/help",
+      "query":{"engine":"curated_web_snapshot","description":"人工审阅 SportyBet Nigeria 公开帮助/条款中的充值、提现、Cash Out、Auto Cashout、限额和实名银行规则。","language":"web","executed_at":"2026-07-31","filters":["SportyBet Nigeria 官方帮助页；抓取/审阅日期 2026-07-31"]}
+    },
+    {
+      "id":"source_sporty_promo",
+      "label":"SportyBet Nigeria 官方活动页",
+      "href":"https://www.sportybet.com/ng/m/promotions",
+      "query":{"engine":"curated_web_snapshot","description":"人工审阅 SportyBet 公开促销类型，包括 Free Spins、Aviator missions、Cashback、JetX free bet gifts。","language":"web","executed_at":"2026-07-31","filters":["公开活动页；抓取/审阅日期 2026-07-31"]}
+    },
+    {
+      "id":"source_bet9ja_play",
+      "label":"Bet9ja Sports Betting & Casino - Google Play Nigeria",
+      "href":"https://play.google.com/store/apps/details?gl=ng&hl=en-gb&id=com.bet9ja.sportsbook.app",
+      "query":{"engine":"curated_web_snapshot","description":"人工审阅 Bet9ja Google Play Nigeria 商品页的规模信号、400+ 市场、betBOOM、Cash Out、Rewards 与 Casino Lobby。","language":"web","executed_at":"2026-07-31","filters":["Google Play 区域 NG；商品页公开字段"]}
+    },
+    {
+      "id":"source_betway_play",
+      "label":"Betway NG - Google Play Nigeria",
+      "href":"https://play.google.com/store/apps/details?gl=NG&hl=en&id=com.betway.ng",
+      "query":{"engine":"curated_web_snapshot","description":"人工审阅 Betway NG Google Play 商品页的赌场、Jackpots、Betgames、Esports、促销与牌照主张。","language":"web","executed_at":"2026-07-31","filters":["Google Play 区域 NG；商品页公开字段"]}
+    },
+    {
+      "id":"source_1xbet_play",
+      "label":"1xBet Nigeria - Google Play",
+      "href":"https://play.google.com/store/apps/details?id=org.xbet.client.ng_ps",
+      "query":{"engine":"curated_web_snapshot","description":"人工审阅 1xBet Nigeria Google Play 商品页的首存奖励、市场宽度、电竞、赌场、直播与忠诚机制。","language":"web","executed_at":"2026-07-31","filters":["Google Play Nigeria 商品页公开字段"]}
+    }
+  ],
+  "package_info": {"source":"manual_public_web_research","readOnly":true}
+}

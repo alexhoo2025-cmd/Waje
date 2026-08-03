@@ -1,0 +1,18 @@
+{
+  "collapse-filter": false,
+  "search": "path:knowledge",
+  "showTags": true,
+  "showAttachments": false,
+  "showOrphans": true,
+  "text fade multiplier": 0,
+  "node size multiplier": 1,
+  "line size multiplier": 1,
+  "collapse-display": false,
+  "colorGroups": [
+    {"query": "path:knowledge/01-产品", "color": {"a": 1, "rgb": 4521983}},
+    {"query": "path:knowledge/02-数据", "color": {"a": 1, "rgb": 16753920}},
+    {"query": "path:knowledge/03-竞品", "color": {"a": 1, "rgb": 10944511}},
+    {"query": "path:knowledge/05-运行", "color": {"a": 1, "rgb": 5635925}},
+    {"query": "path:knowledge/_generated", "color": {"a": 1, "rgb": 8947848}}
+  ]
+}

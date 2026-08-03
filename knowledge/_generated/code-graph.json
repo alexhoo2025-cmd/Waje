@@ -1,0 +1,278 @@
+{
+  "generated_at": "2026-08-03T10:12:52+08:00",
+  "root": "/Users/robin/Documents/wajetan_analyst",
+  "nodes": [
+    {
+      "id": ".vscode/settings.json",
+      "label": ".vscode/settings.json",
+      "kind": "asset"
+    },
+    {
+      "id": "artifact_waje_competitor.json",
+      "label": "artifact_waje_competitor.json",
+      "kind": "asset"
+    },
+    {
+      "id": "knowledge/00-索引/Obsidian配置与维护.md",
+      "label": "knowledge/00-索引/Obsidian配置与维护.md",
+      "kind": "knowledge"
+    },
+    {
+      "id": "knowledge/00-索引/知识地图.md",
+      "label": "knowledge/00-索引/知识地图.md",
+      "kind": "knowledge"
+    },
+    {
+      "id": "knowledge/00-索引/资产地图.md",
+      "label": "knowledge/00-索引/资产地图.md",
+      "kind": "knowledge"
+    },
+    {
+      "id": "knowledge/00-索引/项目首页.md",
+      "label": "knowledge/00-索引/项目首页.md",
+      "kind": "knowledge"
+    },
+    {
+      "id": "knowledge/01-产品/Waje产品总览.md",
+      "label": "knowledge/01-产品/Waje产品总览.md",
+      "kind": "knowledge"
+    },
+    {
+      "id": "knowledge/02-数据/埋点与数据上报地图.md",
+      "label": "knowledge/02-数据/埋点与数据上报地图.md",
+      "kind": "knowledge"
+    },
+    {
+      "id": "knowledge/02-数据/数据平台与报表.md",
+      "label": "knowledge/02-数据/数据平台与报表.md",
+      "kind": "knowledge"
+    },
+    {
+      "id": "knowledge/03-竞品/Waje竞品分析.md",
+      "label": "knowledge/03-竞品/Waje竞品分析.md",
+      "kind": "knowledge"
+    },
+    {
+      "id": "knowledge/04-方法/分析方法与证据规范.md",
+      "label": "knowledge/04-方法/分析方法与证据规范.md",
+      "kind": "knowledge"
+    },
+    {
+      "id": "knowledge/05-运行/工作日志.md",
+      "label": "knowledge/05-运行/工作日志.md",
+      "kind": "knowledge"
+    },
+    {
+      "id": "knowledge/90-模板/主题笔记模板.md",
+      "label": "knowledge/90-模板/主题笔记模板.md",
+      "kind": "knowledge"
+    },
+    {
+      "id": "knowledge/90-模板/工作日志模板.md",
+      "label": "knowledge/90-模板/工作日志模板.md",
+      "kind": "knowledge"
+    },
+    {
+      "id": "knowledge/90-模板/数据指标模板.md",
+      "label": "knowledge/90-模板/数据指标模板.md",
+      "kind": "knowledge"
+    },
+    {
+      "id": "knowledge/README.md",
+      "label": "knowledge/README.md",
+      "kind": "knowledge"
+    },
+    {
+      "id": "knowledge_README_updated.md",
+      "label": "knowledge_README_updated.md",
+      "kind": "asset"
+    },
+    {
+      "id": "tools/README.md",
+      "label": "tools/README.md",
+      "kind": "asset"
+    },
+    {
+      "id": "tools/build_graph.py",
+      "label": "tools/build_graph.py",
+      "kind": "asset"
+    },
+    {
+      "id": "waje-competitor-analysis.html",
+      "label": "waje-competitor-analysis.html",
+      "kind": "asset"
+    },
+    {
+      "id": "waje_data/欢迎.md",
+      "label": "waje_data/欢迎.md",
+      "kind": "asset"
+    }
+  ],
+  "edges": [
+    {
+      "source": "knowledge/00-索引/知识地图.md",
+      "target": "knowledge/01-产品/Waje产品总览.md",
+      "type": "wikilink"
+    },
+    {
+      "source": "knowledge/00-索引/知识地图.md",
+      "target": "knowledge/02-数据/数据平台与报表.md",
+      "type": "wikilink"
+    },
+    {
+      "source": "knowledge/00-索引/知识地图.md",
+      "target": "knowledge/03-竞品/Waje竞品分析.md",
+      "type": "wikilink"
+    },
+    {
+      "source": "knowledge/00-索引/知识地图.md",
+      "target": "knowledge/04-方法/分析方法与证据规范.md",
+      "type": "wikilink"
+    },
+    {
+      "source": "knowledge/00-索引/知识地图.md",
+      "target": "knowledge/05-运行/工作日志.md",
+      "type": "wikilink"
+    },
+    {
+      "source": "knowledge/00-索引/资产地图.md",
+      "target": "artifact_waje_competitor.json",
+      "type": "link"
+    },
+    {
+      "source": "knowledge/00-索引/资产地图.md",
+      "target": "knowledge/00-索引/项目首页.md",
+      "type": "wikilink"
+    },
+    {
+      "source": "knowledge/00-索引/资产地图.md",
+      "target": "knowledge_README_updated.md",
+      "type": "link"
+    },
+    {
+      "source": "knowledge/00-索引/资产地图.md",
+      "target": "waje-competitor-analysis.html",
+      "type": "link"
+    },
+    {
+      "source": "knowledge/00-索引/项目首页.md",
+      "target": "knowledge/00-索引/Obsidian配置与维护.md",
+      "type": "wikilink"
+    },
+    {
+      "source": "knowledge/00-索引/项目首页.md",
+      "target": "knowledge/00-索引/资产地图.md",
+      "type": "wikilink"
+    },
+    {
+      "source": "knowledge/00-索引/项目首页.md",
+      "target": "knowledge/01-产品/Waje产品总览.md",
+      "type": "wikilink"
+    },
+    {
+      "source": "knowledge/00-索引/项目首页.md",
+      "target": "knowledge/02-数据/埋点与数据上报地图.md",
+      "type": "wikilink"
+    },
+    {
+      "source": "knowledge/00-索引/项目首页.md",
+      "target": "knowledge/02-数据/数据平台与报表.md",
+      "type": "wikilink"
+    },
+    {
+      "source": "knowledge/00-索引/项目首页.md",
+      "target": "knowledge/03-竞品/Waje竞品分析.md",
+      "type": "wikilink"
+    },
+    {
+      "source": "knowledge/00-索引/项目首页.md",
+      "target": "knowledge/04-方法/分析方法与证据规范.md",
+      "type": "wikilink"
+    },
+    {
+      "source": "knowledge/00-索引/项目首页.md",
+      "target": "knowledge/05-运行/工作日志.md",
+      "type": "wikilink"
+    },
+    {
+      "source": "knowledge/01-产品/Waje产品总览.md",
+      "target": "knowledge/02-数据/数据平台与报表.md",
+      "type": "wikilink"
+    },
+    {
+      "source": "knowledge/01-产品/Waje产品总览.md",
+      "target": "knowledge/03-竞品/Waje竞品分析.md",
+      "type": "wikilink"
+    },
+    {
+      "source": "knowledge/01-产品/Waje产品总览.md",
+      "target": "knowledge/04-方法/分析方法与证据规范.md",
+      "type": "wikilink"
+    },
+    {
+      "source": "knowledge/02-数据/埋点与数据上报地图.md",
+      "target": "knowledge/02-数据/数据平台与报表.md",
+      "type": "wikilink"
+    },
+    {
+      "source": "knowledge/02-数据/埋点与数据上报地图.md",
+      "target": "knowledge/04-方法/分析方法与证据规范.md",
+      "type": "wikilink"
+    },
+    {
+      "source": "knowledge/03-竞品/Waje竞品分析.md",
+      "target": "artifact_waje_competitor.json",
+      "type": "link"
+    },
+    {
+      "source": "knowledge/03-竞品/Waje竞品分析.md",
+      "target": "waje-competitor-analysis.html",
+      "type": "link"
+    },
+    {
+      "source": "knowledge/05-运行/工作日志.md",
+      "target": "knowledge/01-产品/Waje产品总览.md",
+      "type": "wikilink"
+    },
+    {
+      "source": "knowledge/05-运行/工作日志.md",
+      "target": "knowledge/02-数据/数据平台与报表.md",
+      "type": "wikilink"
+    },
+    {
+      "source": "knowledge/05-运行/工作日志.md",
+      "target": "knowledge/03-竞品/Waje竞品分析.md",
+      "type": "wikilink"
+    },
+    {
+      "source": "knowledge/README.md",
+      "target": "knowledge/00-索引/Obsidian配置与维护.md",
+      "type": "wikilink"
+    },
+    {
+      "source": "knowledge/README.md",
+      "target": "knowledge/00-索引/知识地图.md",
+      "type": "wikilink"
+    },
+    {
+      "source": "knowledge/README.md",
+      "target": "knowledge/00-索引/资产地图.md",
+      "type": "wikilink"
+    },
+    {
+      "source": "knowledge/README.md",
+      "target": "knowledge/00-索引/项目首页.md",
+      "type": "wikilink"
+    },
+    {
+      "source": "knowledge_README_updated.md",
+      "target": "artifact_waje_competitor.json",
+      "type": "link"
+    },
+    {
+      "source": "knowledge_README_updated.md",
+      "target": "waje-competitor-analysis.html",
+      "type": "link"
+    }
+  ]
+}

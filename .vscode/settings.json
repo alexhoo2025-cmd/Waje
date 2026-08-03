@@ -1,0 +1,14 @@
+{
+  "terminal.integrated.env.osx": {
+    "PATH": "/Users/robin/.local/bin:/Users/robin/.local/node/bin:${env:PATH}"
+  },
+  "python.defaultInterpreterPath": "/usr/bin/python3",
+  "editor.formatOnSave": false,
+  "files.exclude": {
+    "**/.DS_Store": true,
+    "**/__pycache__": true
+  },
+  "search.exclude": {
+    "**/knowledge/_generated/code-graph.json": true
+  }
+}
