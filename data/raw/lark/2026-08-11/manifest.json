@@ -1,0 +1,16 @@
+{
+  "source": "https://ksg964l11fam.sg.larksuite.com/wiki/K7dPwONzTi98z6kc2a9lV9xAgzb?fromScene=spaceOverview",
+  "space": "产品部门",
+  "captured_at": "2026-08-11",
+  "nodes": 844,
+  "text_nodes": 592,
+  "metadata_only_nodes": 252,
+  "artifacts": [
+    "product-department-crawl.json",
+    "product-department-index.json"
+  ],
+  "knowledge_outputs": [
+    "knowledge/01-产品/产品部门知识库总览-2026-08-11.md",
+    "knowledge/01-产品/产品部门文档索引-2026-08-11.md"
+  ]
+}
