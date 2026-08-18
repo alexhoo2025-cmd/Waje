@@ -1,0 +1,11 @@
+{
+  "name": "waje-analyst-play-reviews",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "collect:play-reviews": "node scripts/collect_play_reviews.mjs"
+  },
+  "dependencies": {
+    "playwright": "^1.55.0"
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "source_name": "Waje 线上数值新包配置工作簿",
+  "workbook_url": "https://ksg964l11fam.sg.larksuite.com/sheets/WWBBsLNl4hTFnbtI9arlmGsqgoc",
+  "identity": "user",
+  "schedule": {
+    "timezone": "Asia/Hong_Kong",
+    "frequency": "weekly",
+    "weekday": "FR",
+    "time": "15:00"
+  },
+  "storage": {
+    "processed_dir": "data/processed/waje_config",
+    "output_dir": "data/outputs/waje_config",
+    "knowledge_dir": "knowledge/02-数据",
+    "topic_dir": "knowledge/02-数据/Waje配置资料"
+  },
+  "policy": {
+    "read_hidden_sheets": true,
+    "retain_raw_snapshots": false,
+    "retain_structured_values": true,
+    "new_package_scope": "new_current_primary",
+    "old_package_scope": "old_historical_reference",
+    "require_server_validation_for_current_config": true
+  },
+  "read": {
+    "max_parallel_sheets": 2
+  }
+}

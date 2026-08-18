@@ -1,0 +1,1028 @@
+{
+  "source": {
+    "url": "https://ksg964l11fam.sg.larksuite.com/wiki/Im3wwm9GsiYCGakhJmGlfpuMg6k?from=from_copylink&sheet=1ujLBF",
+    "xlsx": "/Users/robin/Documents/wajetan_analyst/data/raw/lark/2026-08-14/H5游戏手机端加载时间测试记录_按机型分表-2026-08-14.xlsx"
+  },
+  "overall": {
+    "samples": 450.0,
+    "games": 13.0,
+    "devices": 7.0,
+    "cold_samples": 89.0,
+    "warm_samples": 361.0,
+    "p50_ms": 5524.0,
+    "p75_ms": 8794.5,
+    "p90_ms": 12374.400000000001,
+    "p95_ms": 16177.399999999998,
+    "max_ms": 60908.0,
+    "game_ready_p75_ms": 7092.5,
+    "game_ready_p90_ms": 10187.300000000001,
+    "single_run_over_6500_rate": 0.4222222222222222,
+    "single_run_over_10000_rate": 0.18666666666666668,
+    "filled_devices": 7,
+    "template_sheets": 10,
+    "blank_device_sheets": 3,
+    "unique_games": 13,
+    "unique_versions": [
+      "H5-V2.16.0"
+    ],
+    "unique_networks": [
+      "Wi-Fi"
+    ],
+    "unique_testers": [
+      "echo"
+    ],
+    "test_dates": [
+      "2026-07-24",
+      "2026-07-27",
+      "2026-07-28",
+      "2026-07-29",
+      "2026-07-30",
+      "2026-08-03",
+      "2026-08-04",
+      "2026-08-05",
+      "2026-08-06"
+    ]
+  },
+  "thresholds": {
+    "simple_game_ready_p75": 2000,
+    "simple_game_ready_p90": 3500,
+    "dynamic_game_ready_p75": 2800,
+    "dynamic_game_ready_p90": 4500,
+    "simple_bet_ready_p75": 3000,
+    "simple_bet_ready_p90": 5000,
+    "dynamic_bet_ready_p75": 4000,
+    "dynamic_bet_ready_p90": 6500
+  },
+  "stage_summary": [
+    {
+      "stage": "logo_resource_ms",
+      "stage_label": "Logo页资源加载",
+      "numeric_samples": 450,
+      "missing_samples": 0,
+      "p50_ms": 1914.5,
+      "p75_ms": 3433.25,
+      "p90_ms": 5212.200000000001,
+      "sum_share": 0.37471632647080183
+    },
+    {
+      "stage": "parse_connect_ms",
+      "stage_label": "解析/脚本/连接服务",
+      "numeric_samples": 380,
+      "missing_samples": 70,
+      "p50_ms": 2029.0,
+      "p75_ms": 2819.25,
+      "p90_ms": 4265.6,
+      "sum_share": 0.3218437855587397
+    },
+    {
+      "stage": "picture_to_playable_ms",
+      "stage_label": "游戏画面→可玩",
+      "numeric_samples": 450,
+      "missing_samples": 0,
+      "p50_ms": 825.5,
+      "p75_ms": 1583.75,
+      "p90_ms": 3407.3,
+      "sum_share": 0.17991527702209373
+    },
+    {
+      "stage": "logo_ms",
+      "stage_label": "首屏 Logo",
+      "numeric_samples": 450,
+      "missing_samples": 0,
+      "p50_ms": 303.5,
+      "p75_ms": 617.5,
+      "p90_ms": 1481.9,
+      "sum_share": 0.10173861132808269
+    },
+    {
+      "stage": "black_to_picture_ms",
+      "stage_label": "黑屏→游戏画面",
+      "numeric_samples": 100,
+      "missing_samples": 350,
+      "p50_ms": 358.5,
+      "p75_ms": 1007.75,
+      "p90_ms": 1588.2000000000016,
+      "sum_share": 0.021785999620282038
+    }
+  ],
+  "device_stage_diagnostics": [
+    {
+      "device_model": "Redmi Note 4X",
+      "logo_ms": 383.0,
+      "logo_resource_ms": 3337.0,
+      "parse_connect_ms": 3252.0,
+      "black_to_picture_ms": 692.0,
+      "picture_to_playable_ms": 1609.0,
+      "dominant_stage": "Logo页资源加载",
+      "dominant_stage_ms": 3337.0,
+      "p90_ms": 21003.600000000002
+    },
+    {
+      "device_model": "TECNO KG5j",
+      "logo_ms": 537.0,
+      "logo_resource_ms": 3584.5,
+      "parse_connect_ms": 2678.5,
+      "black_to_picture_ms": 1461.5,
+      "picture_to_playable_ms": 1234.0,
+      "dominant_stage": "Logo页资源加载",
+      "dominant_stage_ms": 3584.5,
+      "p90_ms": 13126.7
+    },
+    {
+      "device_model": "iPhone 7",
+      "logo_ms": 197.0,
+      "logo_resource_ms": 587.0,
+      "parse_connect_ms": 1936.0,
+      "black_to_picture_ms": 127.0,
+      "picture_to_playable_ms": 862.0,
+      "dominant_stage": "解析/脚本/连接服务",
+      "dominant_stage_ms": 1936.0,
+      "p90_ms": 12259.400000000001
+    },
+    {
+      "device_model": "MEIZU 16X",
+      "logo_ms": 274.0,
+      "logo_resource_ms": 1712.0,
+      "parse_connect_ms": 1964.0,
+      "black_to_picture_ms": 584.0,
+      "picture_to_playable_ms": 1128.0,
+      "dominant_stage": "解析/脚本/连接服务",
+      "dominant_stage_ms": 1964.0,
+      "p90_ms": 11449.2
+    },
+    {
+      "device_model": "OPPO A11",
+      "logo_ms": 283.0,
+      "logo_resource_ms": 1962.0,
+      "parse_connect_ms": 2058.0,
+      "black_to_picture_ms": 638.0,
+      "picture_to_playable_ms": 637.0,
+      "dominant_stage": "解析/脚本/连接服务",
+      "dominant_stage_ms": 2058.0,
+      "p90_ms": 9687.2
+    },
+    {
+      "device_model": "Pixel 6",
+      "logo_ms": 76.0,
+      "logo_resource_ms": 611.0,
+      "parse_connect_ms": 1226.0,
+      "black_to_picture_ms": 73.0,
+      "picture_to_playable_ms": 529.0,
+      "dominant_stage": "解析/脚本/连接服务",
+      "dominant_stage_ms": 1226.0,
+      "p90_ms": 6674.400000000001
+    },
+    {
+      "device_model": "iPhone XR",
+      "logo_ms": 302.0,
+      "logo_resource_ms": 657.0,
+      "parse_connect_ms": 938.0,
+      "black_to_picture_ms": 168.0,
+      "picture_to_playable_ms": 552.0,
+      "dominant_stage": "解析/脚本/连接服务",
+      "dominant_stage_ms": 938.0,
+      "p90_ms": 6359.000000000001
+    }
+  ],
+  "game_stage_diagnostics": [
+    {
+      "game": "FISH",
+      "logo_ms": 310.0,
+      "logo_resource_ms": 1797.0,
+      "parse_connect_ms": 7128.0,
+      "black_to_picture_ms": 74.0,
+      "picture_to_playable_ms": 604.0,
+      "dominant_stage": "解析/脚本/连接服务",
+      "dominant_stage_ms": 7128.0,
+      "p90_ms": 24010.900000000005
+    },
+    {
+      "game": "Red Green",
+      "logo_ms": 1572.0,
+      "logo_resource_ms": 1272.0,
+      "parse_connect_ms": NaN,
+      "black_to_picture_ms": NaN,
+      "picture_to_playable_ms": 3638.0,
+      "dominant_stage": "游戏画面→可玩",
+      "dominant_stage_ms": 3638.0,
+      "p90_ms": 14481.2
+    },
+    {
+      "game": "Bacca Whot",
+      "logo_ms": 296.0,
+      "logo_resource_ms": 1894.0,
+      "parse_connect_ms": 2536.0,
+      "black_to_picture_ms": NaN,
+      "picture_to_playable_ms": 1745.0,
+      "dominant_stage": "解析/脚本/连接服务",
+      "dominant_stage_ms": 2536.0,
+      "p90_ms": 14472.400000000003
+    },
+    {
+      "game": "Lucky Soccer",
+      "logo_ms": 1610.0,
+      "logo_resource_ms": 2846.0,
+      "parse_connect_ms": NaN,
+      "black_to_picture_ms": NaN,
+      "picture_to_playable_ms": 514.0,
+      "dominant_stage": "Logo页资源加载",
+      "dominant_stage_ms": 2846.0,
+      "p90_ms": 13059.800000000001
+    },
+    {
+      "game": "What Duel",
+      "logo_ms": 290.0,
+      "logo_resource_ms": 2140.0,
+      "parse_connect_ms": 2331.0,
+      "black_to_picture_ms": NaN,
+      "picture_to_playable_ms": 1980.0,
+      "dominant_stage": "解析/脚本/连接服务",
+      "dominant_stage_ms": 2331.0,
+      "p90_ms": 12607.800000000001
+    },
+    {
+      "game": "WHOT",
+      "logo_ms": 297.0,
+      "logo_resource_ms": 2084.0,
+      "parse_connect_ms": 2048.0,
+      "black_to_picture_ms": 1007.0,
+      "picture_to_playable_ms": 752.0,
+      "dominant_stage": "Logo页资源加载",
+      "dominant_stage_ms": 2084.0,
+      "p90_ms": 12136.2
+    },
+    {
+      "game": "Jacks or Better",
+      "logo_ms": 257.0,
+      "logo_resource_ms": 1858.0,
+      "parse_connect_ms": 2042.0,
+      "black_to_picture_ms": NaN,
+      "picture_to_playable_ms": 1693.0,
+      "dominant_stage": "解析/脚本/连接服务",
+      "dominant_stage_ms": 2042.0,
+      "p90_ms": 11774.000000000002
+    },
+    {
+      "game": "NAIRA SLOT",
+      "logo_ms": 260.0,
+      "logo_resource_ms": 1929.0,
+      "parse_connect_ms": 1738.0,
+      "black_to_picture_ms": NaN,
+      "picture_to_playable_ms": 1166.0,
+      "dominant_stage": "Logo页资源加载",
+      "dominant_stage_ms": 1929.0,
+      "p90_ms": 10844.4
+    },
+    {
+      "game": "Dice",
+      "logo_ms": 217.0,
+      "logo_resource_ms": 1919.0,
+      "parse_connect_ms": 1970.0,
+      "black_to_picture_ms": 627.0,
+      "picture_to_playable_ms": 638.0,
+      "dominant_stage": "解析/脚本/连接服务",
+      "dominant_stage_ms": 1970.0,
+      "p90_ms": 10790.200000000003
+    },
+    {
+      "game": "ROULETTE",
+      "logo_ms": 268.0,
+      "logo_resource_ms": 1892.0,
+      "parse_connect_ms": 2009.0,
+      "black_to_picture_ms": NaN,
+      "picture_to_playable_ms": 87.0,
+      "dominant_stage": "解析/脚本/连接服务",
+      "dominant_stage_ms": 2009.0,
+      "p90_ms": 9739.2
+    },
+    {
+      "game": "waje-spin",
+      "logo_ms": 237.0,
+      "logo_resource_ms": 1962.0,
+      "parse_connect_ms": 1600.0,
+      "black_to_picture_ms": NaN,
+      "picture_to_playable_ms": 302.0,
+      "dominant_stage": "Logo页资源加载",
+      "dominant_stage_ms": 1962.0,
+      "p90_ms": 9405.200000000003
+    },
+    {
+      "game": "Bottle-spin",
+      "logo_ms": 255.0,
+      "logo_resource_ms": 2183.0,
+      "parse_connect_ms": 1551.0,
+      "black_to_picture_ms": NaN,
+      "picture_to_playable_ms": 557.0,
+      "dominant_stage": "Logo页资源加载",
+      "dominant_stage_ms": 2183.0,
+      "p90_ms": 9163.200000000003
+    },
+    {
+      "game": "BlackJack",
+      "logo_ms": 262.0,
+      "logo_resource_ms": 2083.0,
+      "parse_connect_ms": 1561.0,
+      "black_to_picture_ms": NaN,
+      "picture_to_playable_ms": 1209.0,
+      "dominant_stage": "Logo页资源加载",
+      "dominant_stage_ms": 2083.0,
+      "p90_ms": 8786.2
+    }
+  ],
+  "device_summary": [
+    {
+      "device_model": "Redmi Note 4X",
+      "device_tier": "低端/老旧",
+      "os_version": "android 6",
+      "ram": "4GB",
+      "cpu": "十核 2.11GHz",
+      "browser": "Chrome",
+      "samples": 65.0,
+      "games": 13.0,
+      "devices": 1.0,
+      "cold_samples": 13.0,
+      "warm_samples": 52.0,
+      "p50_ms": 8883.0,
+      "p75_ms": 13121.0,
+      "p90_ms": 21003.600000000002,
+      "p95_ms": 23196.8,
+      "max_ms": 60908.0,
+      "game_ready_p75_ms": 11266.0,
+      "game_ready_p90_ms": 18922.2,
+      "single_run_over_6500_rate": 0.8461538461538461,
+      "single_run_over_10000_rate": 0.47692307692307695
+    },
+    {
+      "device_model": "TECNO KG5j",
+      "device_tier": "低端/入门",
+      "os_version": "Android 11",
+      "ram": "2GB+1GB",
+      "cpu": "Helio A22",
+      "browser": "Chrome",
+      "samples": 60.0,
+      "games": 12.0,
+      "devices": 1.0,
+      "cold_samples": 11.0,
+      "warm_samples": 49.0,
+      "p50_ms": 9190.5,
+      "p75_ms": 10618.0,
+      "p90_ms": 13126.7,
+      "p95_ms": 14854.249999999998,
+      "max_ms": 30227.0,
+      "game_ready_p75_ms": 8747.75,
+      "game_ready_p90_ms": 9912.3,
+      "single_run_over_6500_rate": 0.95,
+      "single_run_over_10000_rate": 0.36666666666666664
+    },
+    {
+      "device_model": "iPhone 7",
+      "device_tier": "低端/老旧",
+      "os_version": "IOS 15.7",
+      "ram": "2GB",
+      "cpu": "A10",
+      "browser": "Safari",
+      "samples": 65.0,
+      "games": 13.0,
+      "devices": 1.0,
+      "cold_samples": 13.0,
+      "warm_samples": 52.0,
+      "p50_ms": 3484.0,
+      "p75_ms": 5227.0,
+      "p90_ms": 12259.400000000001,
+      "p95_ms": 16366.599999999993,
+      "max_ms": 26125.0,
+      "game_ready_p75_ms": 4463.0,
+      "game_ready_p90_ms": 11617.2,
+      "single_run_over_6500_rate": 0.2153846153846154,
+      "single_run_over_10000_rate": 0.16923076923076924
+    },
+    {
+      "device_model": "MEIZU 16X",
+      "device_tier": "中端/老旧",
+      "os_version": "android 8.1",
+      "ram": "6GB",
+      "cpu": "骁龙 710",
+      "browser": "系统内置浏览器",
+      "samples": 65.0,
+      "games": 13.0,
+      "devices": 1.0,
+      "cold_samples": 13.0,
+      "warm_samples": 52.0,
+      "p50_ms": 5703.0,
+      "p75_ms": 8474.0,
+      "p90_ms": 11449.2,
+      "p95_ms": 12901.4,
+      "max_ms": 23776.0,
+      "game_ready_p75_ms": 7399.0,
+      "game_ready_p90_ms": 9771.800000000001,
+      "single_run_over_6500_rate": 0.3230769230769231,
+      "single_run_over_10000_rate": 0.15384615384615385
+    },
+    {
+      "device_model": "OPPO A11",
+      "device_tier": "中端偏低",
+      "os_version": "Android 11",
+      "ram": "8GB+3GB",
+      "cpu": "高通SM4250 八核",
+      "browser": "Chrome",
+      "samples": 65.0,
+      "games": 13.0,
+      "devices": 1.0,
+      "cold_samples": 13.0,
+      "warm_samples": 52.0,
+      "p50_ms": 5603.0,
+      "p75_ms": 7979.0,
+      "p90_ms": 9687.2,
+      "p95_ms": 10235.6,
+      "max_ms": 16208.0,
+      "game_ready_p75_ms": 6368.0,
+      "game_ready_p90_ms": 8478.400000000001,
+      "single_run_over_6500_rate": 0.4153846153846154,
+      "single_run_over_10000_rate": 0.07692307692307693
+    },
+    {
+      "device_model": "Pixel 6",
+      "device_tier": "高端对照",
+      "os_version": "android 15",
+      "ram": "8GB",
+      "cpu": "2x Cortex-X1",
+      "browser": "Chrome",
+      "samples": 65.0,
+      "games": 13.0,
+      "devices": 1.0,
+      "cold_samples": 13.0,
+      "warm_samples": 52.0,
+      "p50_ms": 2941.0,
+      "p75_ms": 4692.0,
+      "p90_ms": 6674.400000000001,
+      "p95_ms": 8056.999999999999,
+      "max_ms": 31235.0,
+      "game_ready_p75_ms": 4355.0,
+      "game_ready_p90_ms": 5897.0,
+      "single_run_over_6500_rate": 0.13846153846153847,
+      "single_run_over_10000_rate": 0.046153846153846156
+    },
+    {
+      "device_model": "iPhone XR",
+      "device_tier": "中端",
+      "os_version": "IOS 18.5",
+      "ram": "3GB",
+      "cpu": "A12",
+      "browser": "Safari",
+      "samples": 65.0,
+      "games": 13.0,
+      "devices": 1.0,
+      "cold_samples": 13.0,
+      "warm_samples": 52.0,
+      "p50_ms": 2727.0,
+      "p75_ms": 4786.0,
+      "p90_ms": 6359.000000000001,
+      "p95_ms": 7543.599999999999,
+      "max_ms": 52054.0,
+      "game_ready_p75_ms": 3700.0,
+      "game_ready_p90_ms": 4917.6,
+      "single_run_over_6500_rate": 0.1076923076923077,
+      "single_run_over_10000_rate": 0.03076923076923077
+    }
+  ],
+  "game_summary": [
+    {
+      "game": "FISH",
+      "game_family": "Fish/动效",
+      "samples": 30.0,
+      "games": 1.0,
+      "devices": 6.0,
+      "cold_samples": 6.0,
+      "warm_samples": 24.0,
+      "p50_ms": 9608.0,
+      "p75_ms": 15737.75,
+      "p90_ms": 24010.900000000005,
+      "p95_ms": 28935.499999999985,
+      "max_ms": 60908.0,
+      "game_ready_p75_ms": 14775.5,
+      "game_ready_p90_ms": 22638.100000000006,
+      "single_run_over_6500_rate": 0.6666666666666666,
+      "single_run_over_10000_rate": 0.4
+    },
+    {
+      "game": "Red Green",
+      "game_family": "Quick Game",
+      "samples": 35.0,
+      "games": 1.0,
+      "devices": 7.0,
+      "cold_samples": 7.0,
+      "warm_samples": 28.0,
+      "p50_ms": 6081.0,
+      "p75_ms": 8590.5,
+      "p90_ms": 14481.2,
+      "p95_ms": 17646.999999999993,
+      "max_ms": 30227.0,
+      "game_ready_p75_ms": 5215.5,
+      "game_ready_p90_ms": 9563.000000000002,
+      "single_run_over_6500_rate": 0.45714285714285713,
+      "single_run_over_10000_rate": 0.14285714285714285
+    },
+    {
+      "game": "Bacca Whot",
+      "game_family": "棋牌/对战",
+      "samples": 35.0,
+      "games": 1.0,
+      "devices": 7.0,
+      "cold_samples": 7.0,
+      "warm_samples": 28.0,
+      "p50_ms": 6538.0,
+      "p75_ms": 8727.0,
+      "p90_ms": 14472.400000000003,
+      "p95_ms": 17319.29999999999,
+      "max_ms": 20387.0,
+      "game_ready_p75_ms": 6278.5,
+      "game_ready_p90_ms": 8655.800000000001,
+      "single_run_over_6500_rate": 0.5142857142857142,
+      "single_run_over_10000_rate": 0.22857142857142856
+    },
+    {
+      "game": "Lucky Soccer",
+      "game_family": "体育轻游戏",
+      "samples": 35.0,
+      "games": 1.0,
+      "devices": 7.0,
+      "cold_samples": 7.0,
+      "warm_samples": 28.0,
+      "p50_ms": 3845.0,
+      "p75_ms": 8784.5,
+      "p90_ms": 13059.800000000001,
+      "p95_ms": 13742.299999999996,
+      "max_ms": 21196.0,
+      "game_ready_p75_ms": 7719.5,
+      "game_ready_p90_ms": 11897.200000000003,
+      "single_run_over_6500_rate": 0.3142857142857143,
+      "single_run_over_10000_rate": 0.2571428571428571
+    },
+    {
+      "game": "What Duel",
+      "game_family": "棋牌/对战",
+      "samples": 35.0,
+      "games": 1.0,
+      "devices": 7.0,
+      "cold_samples": 7.0,
+      "warm_samples": 28.0,
+      "p50_ms": 7053.0,
+      "p75_ms": 11416.0,
+      "p90_ms": 12607.800000000001,
+      "p95_ms": 13932.399999999996,
+      "max_ms": 20715.0,
+      "game_ready_p75_ms": 6723.5,
+      "game_ready_p90_ms": 9114.000000000002,
+      "single_run_over_6500_rate": 0.5428571428571428,
+      "single_run_over_10000_rate": 0.3142857142857143
+    },
+    {
+      "game": "WHOT",
+      "game_family": "棋牌/对战",
+      "samples": 35.0,
+      "games": 1.0,
+      "devices": 7.0,
+      "cold_samples": 7.0,
+      "warm_samples": 28.0,
+      "p50_ms": 5911.0,
+      "p75_ms": 9979.0,
+      "p90_ms": 12136.2,
+      "p95_ms": 14221.39999999999,
+      "max_ms": 52054.0,
+      "game_ready_p75_ms": 8902.5,
+      "game_ready_p90_ms": 10625.200000000003,
+      "single_run_over_6500_rate": 0.4857142857142857,
+      "single_run_over_10000_rate": 0.2571428571428571
+    },
+    {
+      "game": "Jacks or Better",
+      "game_family": "Quick Game",
+      "samples": 35.0,
+      "games": 1.0,
+      "devices": 7.0,
+      "cold_samples": 7.0,
+      "warm_samples": 28.0,
+      "p50_ms": 6161.0,
+      "p75_ms": 9251.5,
+      "p90_ms": 11774.000000000002,
+      "p95_ms": 13734.199999999997,
+      "max_ms": 22640.0,
+      "game_ready_p75_ms": 7163.5,
+      "game_ready_p90_ms": 10459.600000000002,
+      "single_run_over_6500_rate": 0.4857142857142857,
+      "single_run_over_10000_rate": 0.2
+    },
+    {
+      "game": "NAIRA SLOT",
+      "game_family": "Slot",
+      "samples": 35.0,
+      "games": 1.0,
+      "devices": 7.0,
+      "cold_samples": 7.0,
+      "warm_samples": 28.0,
+      "p50_ms": 5079.0,
+      "p75_ms": 8117.5,
+      "p90_ms": 10844.4,
+      "p95_ms": 11823.199999999997,
+      "max_ms": 20557.0,
+      "game_ready_p75_ms": 6781.5,
+      "game_ready_p90_ms": 9084.0,
+      "single_run_over_6500_rate": 0.37142857142857144,
+      "single_run_over_10000_rate": 0.2
+    },
+    {
+      "game": "Dice",
+      "game_family": "Quick Game",
+      "samples": 35.0,
+      "games": 1.0,
+      "devices": 7.0,
+      "cold_samples": 6.0,
+      "warm_samples": 29.0,
+      "p50_ms": 5199.0,
+      "p75_ms": 8348.5,
+      "p90_ms": 10790.200000000003,
+      "p95_ms": 11848.599999999997,
+      "max_ms": 29086.0,
+      "game_ready_p75_ms": 7182.0,
+      "game_ready_p90_ms": 9377.400000000001,
+      "single_run_over_6500_rate": 0.42857142857142855,
+      "single_run_over_10000_rate": 0.11428571428571428
+    },
+    {
+      "game": "ROULETTE",
+      "game_family": "Quick Game",
+      "samples": 35.0,
+      "games": 1.0,
+      "devices": 7.0,
+      "cold_samples": 7.0,
+      "warm_samples": 28.0,
+      "p50_ms": 4533.0,
+      "p75_ms": 6915.0,
+      "p90_ms": 9739.2,
+      "p95_ms": 14139.999999999967,
+      "max_ms": 25247.0,
+      "game_ready_p75_ms": 6830.5,
+      "game_ready_p90_ms": 9566.800000000001,
+      "single_run_over_6500_rate": 0.34285714285714286,
+      "single_run_over_10000_rate": 0.11428571428571428
+    },
+    {
+      "game": "waje-spin",
+      "game_family": "Quick Game",
+      "samples": 35.0,
+      "games": 1.0,
+      "devices": 7.0,
+      "cold_samples": 7.0,
+      "warm_samples": 28.0,
+      "p50_ms": 4246.0,
+      "p75_ms": 7159.5,
+      "p90_ms": 9405.200000000003,
+      "p95_ms": 11946.7,
+      "max_ms": 13231.0,
+      "game_ready_p75_ms": 7068.5,
+      "game_ready_p90_ms": 9165.400000000003,
+      "single_run_over_6500_rate": 0.2857142857142857,
+      "single_run_over_10000_rate": 0.11428571428571428
+    },
+    {
+      "game": "Bottle-spin",
+      "game_family": "Quick Game",
+      "samples": 35.0,
+      "games": 1.0,
+      "devices": 7.0,
+      "cold_samples": 7.0,
+      "warm_samples": 28.0,
+      "p50_ms": 4378.0,
+      "p75_ms": 6746.5,
+      "p90_ms": 9163.200000000003,
+      "p95_ms": 10392.499999999995,
+      "max_ms": 23336.0,
+      "game_ready_p75_ms": 6268.0,
+      "game_ready_p90_ms": 8439.800000000003,
+      "single_run_over_6500_rate": 0.34285714285714286,
+      "single_run_over_10000_rate": 0.05714285714285714
+    },
+    {
+      "game": "BlackJack",
+      "game_family": "Quick Game",
+      "samples": 35.0,
+      "games": 1.0,
+      "devices": 7.0,
+      "cold_samples": 7.0,
+      "warm_samples": 28.0,
+      "p50_ms": 4948.0,
+      "p75_ms": 7170.5,
+      "p90_ms": 8786.2,
+      "p95_ms": 10365.499999999996,
+      "max_ms": 12953.0,
+      "game_ready_p75_ms": 5820.0,
+      "game_ready_p90_ms": 7363.400000000001,
+      "single_run_over_6500_rate": 0.2857142857142857,
+      "single_run_over_10000_rate": 0.05714285714285714
+    }
+  ],
+  "cache_summary": [
+    {
+      "cache_type": "冷启动/无缓存",
+      "samples": 89.0,
+      "games": 13.0,
+      "devices": 7.0,
+      "cold_samples": 89.0,
+      "warm_samples": 0.0,
+      "p50_ms": 10788.0,
+      "p75_ms": 14827.0,
+      "p90_ms": 22779.2,
+      "p95_ms": 27901.599999999984,
+      "max_ms": 60908.0,
+      "game_ready_p75_ms": 12432.0,
+      "game_ready_p90_ms": 22052.600000000002,
+      "single_run_over_6500_rate": 0.8764044943820225,
+      "single_run_over_10000_rate": 0.5842696629213483
+    },
+    {
+      "cache_type": "热启动/有缓存",
+      "samples": 361.0,
+      "games": 13.0,
+      "devices": 7.0,
+      "cold_samples": 0.0,
+      "warm_samples": 361.0,
+      "p50_ms": 4735.0,
+      "p75_ms": 7178.0,
+      "p90_ms": 9674.0,
+      "p95_ms": 11418.0,
+      "max_ms": 21302.0,
+      "game_ready_p75_ms": 5814.0,
+      "game_ready_p90_ms": 8088.0,
+      "single_run_over_6500_rate": 0.31024930747922436,
+      "single_run_over_10000_rate": 0.0886426592797784
+    }
+  ],
+  "matched_summary": {
+    "combos": 89,
+    "median_saved_ms": 5589.0,
+    "median_saved_rate": 0.6007933645870898
+  },
+  "fps": {
+    "combo_coverage": 0.8222222222222222,
+    "combo_count": 74,
+    "low_fps_combo_count": 17,
+    "spearman": -0.7394468294389899
+  },
+  "data_quality": {
+    "record_count": 450,
+    "device_game_combos": 90,
+    "expected_device_game_combos": 91,
+    "cold_samples": 89,
+    "warm_samples": 361,
+    "matched_cold_warm_combos": 89,
+    "total_formula_cells": 450,
+    "cached_total_values_available": 0,
+    "formula_audit_issues": [
+      {
+        "sheet": "机型-01",
+        "cell": "D13",
+        "issue": "浏览器/容器列误引用 RAM 单元格 F3，应引用浏览器字段 L3"
+      },
+      {
+        "sheet": "机型-02",
+        "cell": "D14",
+        "issue": "浏览器/容器列误引用 RAM 单元格 F3，应引用浏览器字段 L3"
+      },
+      {
+        "sheet": "机型-02",
+        "cell": "G14",
+        "issue": "P95 范围截止第 76 行，漏掉实际数据至第 82 行"
+      },
+      {
+        "sheet": "机型-03",
+        "cell": "D15",
+        "issue": "浏览器/容器列误引用 RAM 单元格 F3，应引用浏览器字段 L3"
+      },
+      {
+        "sheet": "机型-03",
+        "cell": "G15",
+        "issue": "P95 范围截止第 76 行，漏掉实际数据至第 82 行"
+      },
+      {
+        "sheet": "机型-04",
+        "cell": "D16",
+        "issue": "浏览器/容器列误引用 RAM 单元格 F3，应引用浏览器字段 L3"
+      },
+      {
+        "sheet": "机型-04",
+        "cell": "H16",
+        "issue": "最小值误引用 K 列，不是可玩总耗时 N 列"
+      },
+      {
+        "sheet": "机型-04",
+        "cell": "G16",
+        "issue": "P95 范围截止第 76 行，漏掉实际数据至第 82 行"
+      },
+      {
+        "sheet": "机型-05",
+        "cell": "D17",
+        "issue": "浏览器/容器列误引用 RAM 单元格 F3，应引用浏览器字段 L3"
+      },
+      {
+        "sheet": "机型-05",
+        "cell": "F17",
+        "issue": "平均误引用 K 列，不是可玩总耗时 N 列"
+      },
+      {
+        "sheet": "机型-05",
+        "cell": "H17",
+        "issue": "最小值误引用 K 列，不是可玩总耗时 N 列"
+      },
+      {
+        "sheet": "机型-05",
+        "cell": "I17",
+        "issue": "最大值误引用 K 列，不是可玩总耗时 N 列"
+      },
+      {
+        "sheet": "机型-05",
+        "cell": "G17",
+        "issue": "P95 范围截止第 76 行，漏掉实际数据至第 82 行"
+      },
+      {
+        "sheet": "机型-06",
+        "cell": "D18",
+        "issue": "浏览器/容器列误引用 RAM 单元格 F3，应引用浏览器字段 L3"
+      },
+      {
+        "sheet": "机型-06",
+        "cell": "F18",
+        "issue": "平均误引用 K 列，不是可玩总耗时 N 列"
+      },
+      {
+        "sheet": "机型-06",
+        "cell": "H18",
+        "issue": "最小值误引用 K 列，不是可玩总耗时 N 列"
+      },
+      {
+        "sheet": "机型-06",
+        "cell": "I18",
+        "issue": "最大值误引用 K 列，不是可玩总耗时 N 列"
+      },
+      {
+        "sheet": "机型-06",
+        "cell": "G18",
+        "issue": "P95 范围截止第 76 行，漏掉实际数据至第 82 行"
+      },
+      {
+        "sheet": "机型-07",
+        "cell": "D19",
+        "issue": "浏览器/容器列误引用 RAM 单元格 F3，应引用浏览器字段 L3"
+      },
+      {
+        "sheet": "机型-07",
+        "cell": "F19",
+        "issue": "平均误引用 K 列，不是可玩总耗时 N 列"
+      },
+      {
+        "sheet": "机型-07",
+        "cell": "H19",
+        "issue": "最小值误引用 K 列，不是可玩总耗时 N 列"
+      },
+      {
+        "sheet": "机型-07",
+        "cell": "I19",
+        "issue": "最大值误引用 K 列，不是可玩总耗时 N 列"
+      },
+      {
+        "sheet": "机型-07",
+        "cell": "G19",
+        "issue": "P95 范围截止第 76 行，漏掉实际数据至第 82 行"
+      },
+      {
+        "sheet": "机型-08",
+        "cell": "D20",
+        "issue": "浏览器/容器列误引用 RAM 单元格 F3，应引用浏览器字段 L3"
+      },
+      {
+        "sheet": "机型-08",
+        "cell": "F20",
+        "issue": "平均误引用 K 列，不是可玩总耗时 N 列"
+      },
+      {
+        "sheet": "机型-08",
+        "cell": "H20",
+        "issue": "最小值误引用 K 列，不是可玩总耗时 N 列"
+      },
+      {
+        "sheet": "机型-08",
+        "cell": "I20",
+        "issue": "最大值误引用 K 列，不是可玩总耗时 N 列"
+      },
+      {
+        "sheet": "机型-09",
+        "cell": "D21",
+        "issue": "浏览器/容器列误引用 RAM 单元格 F3，应引用浏览器字段 L3"
+      },
+      {
+        "sheet": "机型-09",
+        "cell": "F21",
+        "issue": "平均误引用 K 列，不是可玩总耗时 N 列"
+      },
+      {
+        "sheet": "机型-09",
+        "cell": "H21",
+        "issue": "最小值误引用 K 列，不是可玩总耗时 N 列"
+      },
+      {
+        "sheet": "机型-09",
+        "cell": "I21",
+        "issue": "最大值误引用 K 列，不是可玩总耗时 N 列"
+      },
+      {
+        "sheet": "机型-10",
+        "cell": "D22",
+        "issue": "浏览器/容器列误引用 RAM 单元格 F3，应引用浏览器字段 L3"
+      },
+      {
+        "sheet": "机型-10",
+        "cell": "F22",
+        "issue": "平均误引用 K 列，不是可玩总耗时 N 列"
+      },
+      {
+        "sheet": "机型-10",
+        "cell": "H22",
+        "issue": "最小值误引用 K 列，不是可玩总耗时 N 列"
+      },
+      {
+        "sheet": "机型-10",
+        "cell": "I22",
+        "issue": "最大值误引用 K 列，不是可玩总耗时 N 列"
+      }
+    ],
+    "orphan_notes": [
+      {
+        "source_sheet": "机型-01",
+        "source_row": 78,
+        "fps": "31-45FPS",
+        "remark": "偶现掉帧19fps，有明显卡顿感",
+        "association": "未绑定具体游戏/轮次"
+      }
+    ],
+    "duplicate_key_rows": 0,
+    "fps_combo_coverage": 0.8222222222222222,
+    "fps_combo_count": 74,
+    "low_fps_combo_count": 17,
+    "fps_load_spearman": -0.7394468294389899
+  },
+  "recommendations": [
+    {
+      "priority": "P0",
+      "issue": "加载总耗时超门禁",
+      "evidence": "整体 P90 12.4s，较宽松的动效玩法 6.5s 红线高 5.9s；设备达标 1/7，游戏达标 0/13。",
+      "action": "对最慢3款游戏和低端/老旧设备做资源清单、关键请求瀑布、主线程长任务与游戏 ready 信号联合剖析；先压缩首屏依赖，再延迟非首局资源。",
+      "target": "下一版：动效类 bet_ready P75≤4.0s、P90≤6.5s；简单类映射确认后执行 P75≤3.0s、P90≤5.0s。",
+      "owner": "H5前端 + 游戏研发 + QA",
+      "window": "修复后 2 个构建；每环境≥10次冷启动"
+    },
+    {
+      "priority": "P0",
+      "issue": "Logo页资源加载为最大耗时来源",
+      "evidence": "该阶段占阶段和 37.5%，P75 3.4s、P90 5.2s。",
+      "action": "输出资源体积/请求数/缓存命中/压缩格式清单；采用分包、按需加载、WebP/AVIF、CDN长缓存和版本化资源；禁止首屏串行等待非关键资源。",
+      "target": "该阶段 P75 至少下降40%，同时整链路 P75进入对应玩法目标；资源大小同步满足简单≤200KB、动效≤300KB（到可下注前）。",
+      "owner": "H5前端 + CDN/基础设施",
+      "window": "1个迭代完成清单，2个迭代验收"
+    },
+    {
+      "priority": "P0",
+      "issue": "低端机与老旧系统风险",
+      "evidence": "最慢设备 Redmi Note 4X P90 21.0s，为最佳设备 iPhone XR 的 3.3 倍。",
+      "action": "以 TECNO KG5j、iPhone 7、Redmi Note 4X 为发布硬门禁；分别记录 JS 长任务、内存告警/页面重载、资源失败、游戏 ready 与最低FPS。",
+      "target": "每台门禁机游戏可玩成功率≥98%；P90不超过对应红线；建议最低FPS P10≥30、不可恢复白/黑屏=0。",
+      "owner": "QA + H5前端 + 游戏研发",
+      "window": "每次候选版本发布前"
+    },
+    {
+      "priority": "P0",
+      "issue": "测试矩阵不足以代表生产环境",
+      "evidence": "仅 Wi-Fi；冷启动 89 次，且每设备×游戏通常只有1次冷启动，未达到既定每环境10次标准。",
+      "action": "P0先做5款代表游戏×5类设备×3网络（Wi‑Fi/4G/标准弱网）×10冷+10热，共1,500次；记录失败样本，不能只记录到达可玩的成功样本。",
+      "target": "关键字段完整率≥99.5%，开始→终态关联≥98%，失败/超时/退出均有终态；弱网参数固定为1.5Mbps/750Kbps/RTT150ms/1%丢包。",
+      "owner": "QA + 数据产品 + 数据开发",
+      "window": "下一轮性能专项测试"
+    },
+    {
+      "priority": "P1",
+      "issue": "缓存收益不稳定",
+      "evidence": "89 个同设备同游戏组合可配对；中位节省 5.6s（60.1%），但设备间差异明显。",
+      "action": "拆分首访、二访、版本更新后首访和缓存失效；增加 cache_hit、transferSize、资源版本与 Service Worker 状态。",
+      "target": "二访 P75 较首访下降≥35%；发布后缓存失效率<2%；旧资源回退和资源404为0。",
+      "owner": "H5前端 + 数据开发",
+      "window": "上线后7个完整日"
+    },
+    {
+      "priority": "P1",
+      "issue": "FPS与主观备注无法形成稳定运行指标",
+      "evidence": "FPS仅覆盖 74/90 个设备×游戏组合（82.2%），低于30FPS的组合 17 个；相关性只能探索，不能解释因果。",
+      "action": "每轮自动采集帧时间、P50/P10 FPS、>50ms卡顿帧比例、最长Long Task和内存/重载；备注只作定性补充。",
+      "target": "FPS采集覆盖≥95%；建议P10≥30、P50≥45；>500ms Long Task=0；卡顿帧率按玩法建立基线。",
+      "owner": "游戏研发 + H5前端 + 数据",
+      "window": "2个迭代接入并并行核验"
+    }
+  ]
+}

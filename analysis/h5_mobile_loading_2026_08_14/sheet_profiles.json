@@ -1,0 +1,122 @@
+[
+  {
+    "source_sheet": "机型-01",
+    "status": "有数据",
+    "records": 60,
+    "device_model": "TECNO KG5j",
+    "metadata": {
+      "手机型号": "TECNO KG5j",
+      "系统/版本": "Android 11",
+      "RAM": "2GB+1GB",
+      "ROM": "64GB",
+      "CPU": "Helio A22",
+      "浏览器": "Chrome",
+      "浏览器版本": "120.0.6099.231"
+    }
+  },
+  {
+    "source_sheet": "机型-02",
+    "status": "有数据",
+    "records": 65,
+    "device_model": "OPPO A11",
+    "metadata": {
+      "手机型号": "OPPO A11",
+      "系统/版本": "Android 11",
+      "RAM": "8GB+3GB",
+      "ROM": "128GB",
+      "CPU": "高通SM4250 八核",
+      "浏览器": "Chrome",
+      "浏览器版本": "131.0.6778.135"
+    }
+  },
+  {
+    "source_sheet": "机型-03",
+    "status": "有数据",
+    "records": 65,
+    "device_model": "iPhone XR",
+    "metadata": {
+      "手机型号": "iPhone XR",
+      "系统/版本": "IOS 18.5",
+      "RAM": "3GB",
+      "ROM": "64GB",
+      "CPU": "A12",
+      "浏览器": "Safari",
+      "浏览器版本": "Safari 18"
+    }
+  },
+  {
+    "source_sheet": "机型-04",
+    "status": "有数据",
+    "records": 65,
+    "device_model": "iPhone 7",
+    "metadata": {
+      "手机型号": "iPhone 7",
+      "系统/版本": "IOS 15.7",
+      "RAM": "2GB",
+      "ROM": "32GB",
+      "CPU": "A10",
+      "浏览器": "Safari",
+      "浏览器版本": "Safari 15"
+    }
+  },
+  {
+    "source_sheet": "机型-05",
+    "status": "有数据",
+    "records": 65,
+    "device_model": "MEIZU 16X",
+    "metadata": {
+      "手机型号": "MEIZU 16X",
+      "系统/版本": "android 8.1",
+      "RAM": "6GB",
+      "ROM": "64GB",
+      "CPU": "骁龙 710",
+      "浏览器": "系统内置浏览器",
+      "浏览器版本": "12.10.0_L"
+    }
+  },
+  {
+    "source_sheet": "机型-06",
+    "status": "有数据",
+    "records": 65,
+    "device_model": "Pixel 6",
+    "metadata": {
+      "手机型号": "Pixel 6",
+      "系统/版本": "android 15",
+      "RAM": "8GB",
+      "ROM": "128GB",
+      "CPU": "2x Cortex-X1",
+      "浏览器": "Chrome",
+      "浏览器版本": "150.0.7871.186"
+    }
+  },
+  {
+    "source_sheet": "机型-07",
+    "status": "有数据",
+    "records": 65,
+    "device_model": "Redmi Note 4X",
+    "metadata": {
+      "手机型号": "Redmi Note 4X",
+      "系统/版本": "android 6",
+      "RAM": "4GB",
+      "ROM": "64GB",
+      "CPU": "十核 2.11GHz",
+      "浏览器": "Chrome",
+      "浏览器版本": "106.0.5249.126"
+    }
+  },
+  {
+    "source_sheet": "机型-08",
+    "status": "空模板",
+    "records": 0
+  },
+  {
+    "source_sheet": "机型-09",
+    "status": "空模板",
+    "records": 0
+  },
+  {
+    "source_sheet": "机型-10",
+    "status": "空模板",
+    "records": 0
+  }
+]

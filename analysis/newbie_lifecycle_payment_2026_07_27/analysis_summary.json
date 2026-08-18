@@ -1,0 +1,1080 @@
+{
+  "generated_at": "2026-08-03T08:01:07.681237+00:00",
+  "analysis_scope": {
+    "decision": "评估新包新用户的生命周期、留存与付费表现，并识别复购分析的可用边界。",
+    "timezone": "文件未标注；沿用项目默认 Asia/Hong_Kong，待源系统确认。",
+    "primary_source_precedence": [
+      "新包分析2026.7.27.xlsx（最新新包 cohort 导出）",
+      "新包生命周期V2 - 含联运2026.7.27.xlsx（GM 生命周期奖池分层汇总）",
+      "新包分析2026.7.6.xlsx（用于快照可变性核查）"
+    ]
+  },
+  "newcomer": {
+    "source_file": "新包分析2026.7.27.xlsx",
+    "as_of_date": "2026-07-27",
+    "channels": {
+      "WajeSpecial-facebook": {
+        "cohorts": 291,
+        "new_users": 776677,
+        "date_start": "2025-10-10",
+        "date_end": "2026-07-27"
+      },
+      "WajeSpecial-googleadwords_int": {
+        "cohorts": 291,
+        "new_users": 1123360,
+        "date_start": "2025-10-10",
+        "date_end": "2026-07-27"
+      },
+      "WajeSpecial-Google商店": {
+        "cohorts": 291,
+        "new_users": 1319378,
+        "date_start": "2025-10-10",
+        "date_end": "2026-07-27"
+      },
+      "PAWAJEIOS-AppStore商店": {
+        "cohorts": 291,
+        "new_users": 212628,
+        "date_start": "2025-10-10",
+        "date_end": "2026-07-27"
+      },
+      "PAWAJEBETH5": {
+        "cohorts": 270,
+        "new_users": 767124,
+        "date_start": "2025-10-31",
+        "date_end": "2026-07-27"
+      },
+      "pww": {
+        "cohorts": 173,
+        "new_users": 128326,
+        "date_start": "2026-01-21",
+        "date_end": "2026-07-27"
+      },
+      "wajeH5-fb": {
+        "cohorts": 193,
+        "new_users": 638982,
+        "date_start": "2026-01-16",
+        "date_end": "2026-07-27"
+      },
+      "wajeH5ga-google": {
+        "cohorts": 193,
+        "new_users": 325974,
+        "date_start": "2026-01-16",
+        "date_end": "2026-07-27"
+      }
+    },
+    "all_channels": {
+      "cohorts": 1993,
+      "new_users": 5292449,
+      "date_start": "2025-10-10",
+      "date_end": "2026-07-27",
+      "date_count": 291
+    },
+    "matured": {
+      "d1": {
+        "maturity_cutoff": "2026-07-26",
+        "cohorts": 1985,
+        "new_users": 5271653,
+        "retention": {
+          "value": 0.477035,
+          "cohorts": 1985,
+          "new_users": 5271653
+        },
+        "payment": {
+          "new_users": 5271653,
+          "cohorts": 1985,
+          "new_payment": {
+            "displayed_rate_weighted_by_new_users": 0.180527,
+            "reported_people": 728991,
+            "reported_people_per_new_user": 0.138285,
+            "inferred_denominator_total": 3994590.0,
+            "inferred_denominator_per_new_user": 0.757749,
+            "median_inferred_denominator_per_new_user": 0.798469,
+            "rate_count_rows": 1985
+          },
+          "first_charge": {
+            "displayed_rate_weighted_by_new_users": 0.292762,
+            "reported_people": 1198473,
+            "reported_people_per_new_user": 0.227343,
+            "inferred_denominator_total": 3994590.0,
+            "inferred_denominator_per_new_user": 0.757749,
+            "median_inferred_denominator_per_new_user": 0.798469,
+            "rate_count_rows": 1985
+          }
+        },
+        "lifetime_column": {
+          "label": "终身",
+          "cohort_value_sum": 2219424.3,
+          "cohort_value_per_new_user": 0.421011,
+          "populated_cohorts": 1984,
+          "definition_status": "unconfirmed"
+        }
+      },
+      "d3": {
+        "maturity_cutoff": "2026-07-24",
+        "cohorts": 1969,
+        "new_users": 5229060,
+        "retention": {
+          "value": 0.317167,
+          "cohorts": 1969,
+          "new_users": 5229060
+        },
+        "payment": {
+          "new_users": 5229060,
+          "cohorts": 1969,
+          "new_payment": {
+            "displayed_rate_weighted_by_new_users": 0.180438,
+            "reported_people": 722929,
+            "reported_people_per_new_user": 0.138252,
+            "inferred_denominator_total": 3962949.0,
+            "inferred_denominator_per_new_user": 0.75787,
+            "median_inferred_denominator_per_new_user": 0.798986,
+            "rate_count_rows": 1969
+          },
+          "first_charge": {
+            "displayed_rate_weighted_by_new_users": 0.292739,
+            "reported_people": 1189021,
+            "reported_people_per_new_user": 0.227387,
+            "inferred_denominator_total": 3962949.0,
+            "inferred_denominator_per_new_user": 0.75787,
+            "median_inferred_denominator_per_new_user": 0.798986,
+            "rate_count_rows": 1969
+          }
+        },
+        "lifetime_column": {
+          "label": "终身",
+          "cohort_value_sum": 2215756.12,
+          "cohort_value_per_new_user": 0.423739,
+          "populated_cohorts": 1968,
+          "definition_status": "unconfirmed"
+        }
+      },
+      "d7": {
+        "maturity_cutoff": "2026-07-20",
+        "cohorts": 1937,
+        "new_users": 5138905,
+        "retention": {
+          "value": 0.183359,
+          "cohorts": 1937,
+          "new_users": 5138905
+        },
+        "payment": {
+          "new_users": 5138905,
+          "cohorts": 1937,
+          "new_payment": {
+            "displayed_rate_weighted_by_new_users": 0.180178,
+            "reported_people": 710124,
+            "reported_people_per_new_user": 0.138186,
+            "inferred_denominator_total": 3896897.0,
+            "inferred_denominator_per_new_user": 0.758313,
+            "median_inferred_denominator_per_new_user": 0.80069,
+            "rate_count_rows": 1937
+          },
+          "first_charge": {
+            "displayed_rate_weighted_by_new_users": 0.292717,
+            "reported_people": 1169421,
+            "reported_people_per_new_user": 0.227562,
+            "inferred_denominator_total": 3896897.0,
+            "inferred_denominator_per_new_user": 0.758313,
+            "median_inferred_denominator_per_new_user": 0.80069,
+            "rate_count_rows": 1937
+          }
+        },
+        "lifetime_column": {
+          "label": "终身",
+          "cohort_value_sum": 2209435.5,
+          "cohort_value_per_new_user": 0.429943,
+          "populated_cohorts": 1936,
+          "definition_status": "unconfirmed"
+        }
+      },
+      "d15": {
+        "maturity_cutoff": "2026-07-12",
+        "cohorts": 1873,
+        "new_users": 4958483,
+        "retention": {
+          "value": 0.109973,
+          "cohorts": 1873,
+          "new_users": 4958483
+        },
+        "payment": {
+          "new_users": 4958483,
+          "cohorts": 1873,
+          "new_payment": {
+            "displayed_rate_weighted_by_new_users": 0.179658,
+            "reported_people": 685532,
+            "reported_people_per_new_user": 0.138254,
+            "inferred_denominator_total": 3769832.0,
+            "inferred_denominator_per_new_user": 0.760279,
+            "median_inferred_denominator_per_new_user": 0.802296,
+            "rate_count_rows": 1873
+          },
+          "first_charge": {
+            "displayed_rate_weighted_by_new_users": 0.292827,
+            "reported_people": 1131967,
+            "reported_people_per_new_user": 0.228289,
+            "inferred_denominator_total": 3769832.0,
+            "inferred_denominator_per_new_user": 0.760279,
+            "median_inferred_denominator_per_new_user": 0.802296,
+            "rate_count_rows": 1873
+          }
+        },
+        "lifetime_column": {
+          "label": "终身",
+          "cohort_value_sum": 2189209.08,
+          "cohort_value_per_new_user": 0.441508,
+          "populated_cohorts": 1872,
+          "definition_status": "unconfirmed"
+        }
+      },
+      "d30": {
+        "maturity_cutoff": "2026-06-27",
+        "cohorts": 1753,
+        "new_users": 4620092,
+        "retention": {
+          "value": 0.072012,
+          "cohorts": 1752,
+          "new_users": 4619920
+        },
+        "payment": {
+          "new_users": 4620092,
+          "cohorts": 1753,
+          "new_payment": {
+            "displayed_rate_weighted_by_new_users": 0.178752,
+            "reported_people": 638389,
+            "reported_people_per_new_user": 0.138177,
+            "inferred_denominator_total": 3525412.0,
+            "inferred_denominator_per_new_user": 0.763061,
+            "median_inferred_denominator_per_new_user": 0.806638,
+            "rate_count_rows": 1753
+          },
+          "first_charge": {
+            "displayed_rate_weighted_by_new_users": 0.292874,
+            "reported_people": 1059116,
+            "reported_people_per_new_user": 0.229241,
+            "inferred_denominator_total": 3525412.0,
+            "inferred_denominator_per_new_user": 0.763061,
+            "median_inferred_denominator_per_new_user": 0.806638,
+            "rate_count_rows": 1753
+          }
+        },
+        "lifetime_column": {
+          "label": "终身",
+          "cohort_value_sum": 2116775.38,
+          "cohort_value_per_new_user": 0.458167,
+          "populated_cohorts": 1752,
+          "definition_status": "unconfirmed"
+        }
+      },
+      "d60": {
+        "maturity_cutoff": "2026-05-28",
+        "cohorts": 1513,
+        "new_users": 3918130,
+        "retention": {
+          "value": 0.047579,
+          "cohorts": 1503,
+          "new_users": 3901745
+        },
+        "payment": {
+          "new_users": 3918130,
+          "cohorts": 1513,
+          "new_payment": {
+            "displayed_rate_weighted_by_new_users": 0.179481,
+            "reported_people": 548056,
+            "reported_people_per_new_user": 0.139877,
+            "inferred_denominator_total": 3020821.0,
+            "inferred_denominator_per_new_user": 0.770985,
+            "median_inferred_denominator_per_new_user": 0.813321,
+            "rate_count_rows": 1513
+          },
+          "first_charge": {
+            "displayed_rate_weighted_by_new_users": 0.296936,
+            "reported_people": 917384,
+            "reported_people_per_new_user": 0.234138,
+            "inferred_denominator_total": 3020821.0,
+            "inferred_denominator_per_new_user": 0.770985,
+            "median_inferred_denominator_per_new_user": 0.813321,
+            "rate_count_rows": 1513
+          }
+        },
+        "lifetime_column": {
+          "label": "终身",
+          "cohort_value_sum": 1897864.23,
+          "cohort_value_per_new_user": 0.48438,
+          "populated_cohorts": 1512,
+          "definition_status": "unconfirmed"
+        }
+      }
+    },
+    "latest_matured_periods": {
+      "d7": {
+        "recent_window": {
+          "start": "2026-06-23",
+          "end": "2026-07-20",
+          "retention": {
+            "d1": {
+              "value": 0.427588,
+              "cohorts": 224,
+              "new_users": 638111
+            },
+            "d3": {
+              "value": 0.272761,
+              "cohorts": 224,
+              "new_users": 638111
+            },
+            "d7": {
+              "value": 0.154208,
+              "cohorts": 224,
+              "new_users": 638111
+            }
+          },
+          "payment": {
+            "new_users": 638111,
+            "cohorts": 224,
+            "new_payment": {
+              "displayed_rate_weighted_by_new_users": 0.190356,
+              "reported_people": 86545,
+              "reported_people_per_new_user": 0.135627,
+              "inferred_denominator_total": 452041.0,
+              "inferred_denominator_per_new_user": 0.708405,
+              "median_inferred_denominator_per_new_user": 0.749108,
+              "rate_count_rows": 224
+            },
+            "first_charge": {
+              "displayed_rate_weighted_by_new_users": 0.28815,
+              "reported_people": 133531,
+              "reported_people_per_new_user": 0.20926,
+              "inferred_denominator_total": 452041.0,
+              "inferred_denominator_per_new_user": 0.708405,
+              "median_inferred_denominator_per_new_user": 0.749108,
+              "rate_count_rows": 224
+            }
+          },
+          "new_users": 638111
+        },
+        "prior_window": {
+          "start": "2026-05-26",
+          "end": "2026-06-22",
+          "retention": {
+            "d1": {
+              "value": 0.444273,
+              "cohorts": 224,
+              "new_users": 647360
+            },
+            "d3": {
+              "value": 0.287622,
+              "cohorts": 224,
+              "new_users": 647360
+            },
+            "d7": {
+              "value": 0.163051,
+              "cohorts": 224,
+              "new_users": 647360
+            }
+          },
+          "payment": {
+            "new_users": 647360,
+            "cohorts": 224,
+            "new_payment": {
+              "displayed_rate_weighted_by_new_users": 0.172638,
+              "reported_people": 83337,
+              "reported_people_per_new_user": 0.128734,
+              "inferred_denominator_total": 470688.0,
+              "inferred_denominator_per_new_user": 0.727088,
+              "median_inferred_denominator_per_new_user": 0.758951,
+              "rate_count_rows": 224
+            },
+            "first_charge": {
+              "displayed_rate_weighted_by_new_users": 0.268325,
+              "reported_people": 131118,
+              "reported_people_per_new_user": 0.202543,
+              "inferred_denominator_total": 470688.0,
+              "inferred_denominator_per_new_user": 0.727088,
+              "median_inferred_denominator_per_new_user": 0.758951,
+              "rate_count_rows": 224
+            }
+          },
+          "new_users": 647360
+        }
+      },
+      "d30": {
+        "recent_window": {
+          "start": "2026-05-31",
+          "end": "2026-06-27",
+          "retention": {
+            "d1": {
+              "value": 0.439601,
+              "cohorts": 224,
+              "new_users": 659833
+            },
+            "d3": {
+              "value": 0.283333,
+              "cohorts": 224,
+              "new_users": 659833
+            },
+            "d30": {
+              "value": 0.057227,
+              "cohorts": 223,
+              "new_users": 659661
+            }
+          },
+          "payment": {
+            "new_users": 659833,
+            "cohorts": 224,
+            "new_payment": {
+              "displayed_rate_weighted_by_new_users": 0.175168,
+              "reported_people": 85096,
+              "reported_people_per_new_user": 0.128966,
+              "inferred_denominator_total": 474071.0,
+              "inferred_denominator_per_new_user": 0.718471,
+              "median_inferred_denominator_per_new_user": 0.755795,
+              "rate_count_rows": 224
+            },
+            "first_charge": {
+              "displayed_rate_weighted_by_new_users": 0.270564,
+              "reported_people": 133311,
+              "reported_people_per_new_user": 0.202037,
+              "inferred_denominator_total": 474071.0,
+              "inferred_denominator_per_new_user": 0.718471,
+              "median_inferred_denominator_per_new_user": 0.755795,
+              "rate_count_rows": 224
+            }
+          },
+          "new_users": 659833
+        },
+        "prior_window": {
+          "start": "2026-05-03",
+          "end": "2026-05-30",
+          "retention": {
+            "d1": {
+              "value": 0.461238,
+              "cohorts": 224,
+              "new_users": 543478
+            },
+            "d3": {
+              "value": 0.299811,
+              "cohorts": 224,
+              "new_users": 543478
+            },
+            "d30": {
+              "value": 0.063385,
+              "cohorts": 224,
+              "new_users": 543478
+            }
+          },
+          "payment": {
+            "new_users": 543478,
+            "cohorts": 224,
+            "new_payment": {
+              "displayed_rate_weighted_by_new_users": 0.177226,
+              "reported_people": 72011,
+              "reported_people_per_new_user": 0.1325,
+              "inferred_denominator_total": 399342.0,
+              "inferred_denominator_per_new_user": 0.73479,
+              "median_inferred_denominator_per_new_user": 0.764097,
+              "rate_count_rows": 224
+            },
+            "first_charge": {
+              "displayed_rate_weighted_by_new_users": 0.280363,
+              "reported_people": 115532,
+              "reported_people_per_new_user": 0.212579,
+              "inferred_denominator_total": 399342.0,
+              "inferred_denominator_per_new_user": 0.73479,
+              "median_inferred_denominator_per_new_user": 0.764097,
+              "rate_count_rows": 224
+            }
+          },
+          "new_users": 543478
+        }
+      }
+    },
+    "channel_h7_latest_28_days": [
+      {
+        "channel": "wajeH5-fb",
+        "cohort_start": "2026-06-23",
+        "cohort_end": "2026-07-20",
+        "cohorts": 28,
+        "new_users": 150004,
+        "d1_retention": 0.283417,
+        "d3_retention": 0.150084,
+        "d7_retention": 0.069378,
+        "new_payment_rate": 0.08028,
+        "first_charge_rate": 0.099703,
+        "new_payment_people_per_new_user": 0.053845,
+        "first_charge_people_per_new_user": 0.066865
+      },
+      {
+        "channel": "WajeSpecial-googleadwords_int",
+        "cohort_start": "2026-06-23",
+        "cohort_end": "2026-07-20",
+        "cohorts": 28,
+        "new_users": 118433,
+        "d1_retention": 0.564977,
+        "d3_retention": 0.383257,
+        "d7_retention": 0.22677,
+        "new_payment_rate": 0.205577,
+        "first_charge_rate": 0.35701,
+        "new_payment_people_per_new_user": 0.157963,
+        "first_charge_people_per_new_user": 0.27429
+      },
+      {
+        "channel": "WajeSpecial-Google商店",
+        "cohort_start": "2026-06-23",
+        "cohort_end": "2026-07-20",
+        "cohorts": 28,
+        "new_users": 116147,
+        "d1_retention": 0.548861,
+        "d3_retention": 0.372523,
+        "d7_retention": 0.224149,
+        "new_payment_rate": 0.20299,
+        "first_charge_rate": 0.368698,
+        "new_payment_people_per_new_user": 0.156095,
+        "first_charge_people_per_new_user": 0.283537
+      },
+      {
+        "channel": "PAWAJEBETH5",
+        "cohort_start": "2026-06-23",
+        "cohort_end": "2026-07-20",
+        "cohorts": 28,
+        "new_users": 98877,
+        "d1_retention": 0.302111,
+        "d3_retention": 0.178761,
+        "d7_retention": 0.099097,
+        "new_payment_rate": 0.351255,
+        "first_charge_rate": 0.419206,
+        "new_payment_people_per_new_user": 0.232885,
+        "first_charge_people_per_new_user": 0.277992
+      },
+      {
+        "channel": "WajeSpecial-facebook",
+        "cohort_start": "2026-06-23",
+        "cohort_end": "2026-07-20",
+        "cohorts": 28,
+        "new_users": 75795,
+        "d1_retention": 0.464877,
+        "d3_retention": 0.307947,
+        "d7_retention": 0.17255,
+        "new_payment_rate": 0.128912,
+        "first_charge_rate": 0.247901,
+        "new_payment_people_per_new_user": 0.108002,
+        "first_charge_people_per_new_user": 0.207745
+      },
+      {
+        "channel": "wajeH5ga-google",
+        "cohort_start": "2026-06-23",
+        "cohort_end": "2026-07-20",
+        "cohorts": 28,
+        "new_users": 53722,
+        "d1_retention": 0.378143,
+        "d3_retention": 0.231066,
+        "d7_retention": 0.12657,
+        "new_payment_rate": 0.163852,
+        "first_charge_rate": 0.208584,
+        "new_payment_people_per_new_user": 0.070437,
+        "first_charge_people_per_new_user": 0.090112
+      },
+      {
+        "channel": "PAWAJEIOS-AppStore商店",
+        "cohort_start": "2026-06-23",
+        "cohort_end": "2026-07-20",
+        "cohorts": 28,
+        "new_users": 20526,
+        "d1_retention": 0.587839,
+        "d3_retention": 0.395374,
+        "d7_retention": 0.242694,
+        "new_payment_rate": 0.332237,
+        "first_charge_rate": 0.504831,
+        "new_payment_people_per_new_user": 0.287294,
+        "first_charge_people_per_new_user": 0.436568
+      },
+      {
+        "channel": "pww",
+        "cohort_start": "2026-06-23",
+        "cohort_end": "2026-07-20",
+        "cohorts": 28,
+        "new_users": 4607,
+        "d1_retention": 0.474577,
+        "d3_retention": 0.289889,
+        "d7_retention": 0.09668,
+        "new_payment_rate": 0.29921,
+        "first_charge_rate": 0.434912,
+        "new_payment_people_per_new_user": 0.159757,
+        "first_charge_people_per_new_user": 0.227697
+      }
+    ],
+    "data_quality": {
+      "duplicate_channel_date_keys": 0,
+      "missing_core_field_counts": {
+        "新增人数": 0,
+        "终身": 1,
+        "新增付费率": 0,
+        "新增付费人数": 0,
+        "首充付费率": 0,
+        "首充付费人数": 0,
+        "次留": 8,
+        "3日留": 16,
+        "7日留": 49,
+        "15日留": 112,
+        "30日留": 233,
+        "60日留": 477
+      },
+      "immature_retention_field_population": {
+        "d1": {
+          "immature_cohorts": 8,
+          "nonzero_metric_rows": 0
+        },
+        "d3": {
+          "immature_cohorts": 24,
+          "nonzero_metric_rows": 8
+        },
+        "d7": {
+          "immature_cohorts": 56,
+          "nonzero_metric_rows": 7
+        },
+        "d15": {
+          "immature_cohorts": 120,
+          "nonzero_metric_rows": 8
+        },
+        "d30": {
+          "immature_cohorts": 240,
+          "nonzero_metric_rows": 8
+        },
+        "d60": {
+          "immature_cohorts": 480,
+          "nonzero_metric_rows": 13
+        }
+      },
+      "rate_denominator_check": {
+        "new_users": 5292449,
+        "cohorts": 1993,
+        "new_payment": {
+          "displayed_rate_weighted_by_new_users": 0.180554,
+          "reported_people": 731878,
+          "reported_people_per_new_user": 0.138287,
+          "inferred_denominator_total": 4010021.0,
+          "inferred_denominator_per_new_user": 0.757687,
+          "median_inferred_denominator_per_new_user": 0.798204,
+          "rate_count_rows": 1993
+        },
+        "first_charge": {
+          "displayed_rate_weighted_by_new_users": 0.292758,
+          "reported_people": 1203012,
+          "reported_people_per_new_user": 0.227307,
+          "inferred_denominator_total": 4010021.0,
+          "inferred_denominator_per_new_user": 0.757687,
+          "median_inferred_denominator_per_new_user": 0.798204,
+          "rate_count_rows": 1993
+        }
+      },
+      "2026_07_06_vs_2026_07_27_overlap": {
+        "by_channel": {
+          "PAWAJEBETH5": {
+            "overlap_cohorts": 249,
+            "field_changes": {
+              "新增人数": {
+                "comparable_rows": 249,
+                "changed_rows": 7
+              },
+              "终身": {
+                "comparable_rows": 249,
+                "changed_rows": 59
+              },
+              "新增付费率": {
+                "comparable_rows": 249,
+                "changed_rows": 7
+              },
+              "首充付费率": {
+                "comparable_rows": 249,
+                "changed_rows": 7
+              },
+              "次留": {
+                "comparable_rows": 248,
+                "changed_rows": 1
+              },
+              "7日留": {
+                "comparable_rows": 243,
+                "changed_rows": 0
+              },
+              "30日留": {
+                "comparable_rows": 220,
+                "changed_rows": 0
+              },
+              "60日留": {
+                "comparable_rows": 188,
+                "changed_rows": 0
+              }
+            }
+          },
+          "PAWAJEIOS-AppStore商店": {
+            "overlap_cohorts": 270,
+            "field_changes": {
+              "新增人数": {
+                "comparable_rows": 270,
+                "changed_rows": 3
+              },
+              "终身": {
+                "comparable_rows": 269,
+                "changed_rows": 59
+              },
+              "新增付费率": {
+                "comparable_rows": 270,
+                "changed_rows": 1
+              },
+              "首充付费率": {
+                "comparable_rows": 270,
+                "changed_rows": 1
+              },
+              "次留": {
+                "comparable_rows": 269,
+                "changed_rows": 2
+              },
+              "7日留": {
+                "comparable_rows": 264,
+                "changed_rows": 3
+              },
+              "30日留": {
+                "comparable_rows": 241,
+                "changed_rows": 1
+              },
+              "60日留": {
+                "comparable_rows": 212,
+                "changed_rows": 1
+              }
+            }
+          },
+          "WajeSpecial-Google商店": {
+            "overlap_cohorts": 270,
+            "field_changes": {
+              "新增人数": {
+                "comparable_rows": 270,
+                "changed_rows": 31
+              },
+              "终身": {
+                "comparable_rows": 270,
+                "changed_rows": 59
+              },
+              "新增付费率": {
+                "comparable_rows": 270,
+                "changed_rows": 3
+              },
+              "首充付费率": {
+                "comparable_rows": 270,
+                "changed_rows": 3
+              },
+              "次留": {
+                "comparable_rows": 269,
+                "changed_rows": 6
+              },
+              "7日留": {
+                "comparable_rows": 264,
+                "changed_rows": 3
+              },
+              "30日留": {
+                "comparable_rows": 241,
+                "changed_rows": 3
+              },
+              "60日留": {
+                "comparable_rows": 211,
+                "changed_rows": 0
+              }
+            }
+          },
+          "WajeSpecial-facebook": {
+            "overlap_cohorts": 270,
+            "field_changes": {
+              "新增人数": {
+                "comparable_rows": 270,
+                "changed_rows": 3
+              },
+              "终身": {
+                "comparable_rows": 270,
+                "changed_rows": 59
+              },
+              "新增付费率": {
+                "comparable_rows": 270,
+                "changed_rows": 1
+              },
+              "首充付费率": {
+                "comparable_rows": 270,
+                "changed_rows": 1
+              },
+              "次留": {
+                "comparable_rows": 269,
+                "changed_rows": 5
+              },
+              "7日留": {
+                "comparable_rows": 264,
+                "changed_rows": 3
+              },
+              "30日留": {
+                "comparable_rows": 241,
+                "changed_rows": 1
+              },
+              "60日留": {
+                "comparable_rows": 211,
+                "changed_rows": 0
+              }
+            }
+          },
+          "WajeSpecial-googleadwords_int": {
+            "overlap_cohorts": 270,
+            "field_changes": {
+              "新增人数": {
+                "comparable_rows": 270,
+                "changed_rows": 3
+              },
+              "终身": {
+                "comparable_rows": 270,
+                "changed_rows": 59
+              },
+              "新增付费率": {
+                "comparable_rows": 270,
+                "changed_rows": 1
+              },
+              "首充付费率": {
+                "comparable_rows": 270,
+                "changed_rows": 1
+              },
+              "次留": {
+                "comparable_rows": 269,
+                "changed_rows": 5
+              },
+              "7日留": {
+                "comparable_rows": 264,
+                "changed_rows": 4
+              },
+              "30日留": {
+                "comparable_rows": 241,
+                "changed_rows": 5
+              },
+              "60日留": {
+                "comparable_rows": 211,
+                "changed_rows": 0
+              }
+            }
+          },
+          "pww": {
+            "overlap_cohorts": 152,
+            "field_changes": {
+              "新增人数": {
+                "comparable_rows": 152,
+                "changed_rows": 1
+              },
+              "终身": {
+                "comparable_rows": 152,
+                "changed_rows": 58
+              },
+              "新增付费率": {
+                "comparable_rows": 152,
+                "changed_rows": 1
+              },
+              "首充付费率": {
+                "comparable_rows": 152,
+                "changed_rows": 1
+              },
+              "次留": {
+                "comparable_rows": 151,
+                "changed_rows": 0
+              },
+              "7日留": {
+                "comparable_rows": 145,
+                "changed_rows": 0
+              },
+              "30日留": {
+                "comparable_rows": 124,
+                "changed_rows": 1
+              },
+              "60日留": {
+                "comparable_rows": 93,
+                "changed_rows": 1
+              }
+            }
+          },
+          "wajeH5-fb": {
+            "overlap_cohorts": 172,
+            "field_changes": {
+              "新增人数": {
+                "comparable_rows": 172,
+                "changed_rows": 16
+              },
+              "终身": {
+                "comparable_rows": 172,
+                "changed_rows": 59
+              },
+              "新增付费率": {
+                "comparable_rows": 172,
+                "changed_rows": 11
+              },
+              "首充付费率": {
+                "comparable_rows": 172,
+                "changed_rows": 11
+              },
+              "次留": {
+                "comparable_rows": 171,
+                "changed_rows": 1
+              },
+              "7日留": {
+                "comparable_rows": 166,
+                "changed_rows": 0
+              },
+              "30日留": {
+                "comparable_rows": 143,
+                "changed_rows": 0
+              },
+              "60日留": {
+                "comparable_rows": 111,
+                "changed_rows": 0
+              }
+            }
+          },
+          "wajeH5ga-google": {
+            "overlap_cohorts": 172,
+            "field_changes": {
+              "新增人数": {
+                "comparable_rows": 172,
+                "changed_rows": 5
+              },
+              "终身": {
+                "comparable_rows": 172,
+                "changed_rows": 59
+              },
+              "新增付费率": {
+                "comparable_rows": 172,
+                "changed_rows": 3
+              },
+              "首充付费率": {
+                "comparable_rows": 172,
+                "changed_rows": 3
+              },
+              "次留": {
+                "comparable_rows": 171,
+                "changed_rows": 1
+              },
+              "7日留": {
+                "comparable_rows": 166,
+                "changed_rows": 0
+              },
+              "30日留": {
+                "comparable_rows": 143,
+                "changed_rows": 0
+              },
+              "60日留": {
+                "comparable_rows": 111,
+                "changed_rows": 0
+              }
+            }
+          }
+        },
+        "totals": {
+          "新增人数": {
+            "comparable_rows": 1825,
+            "changed_rows": 69
+          },
+          "终身": {
+            "comparable_rows": 1824,
+            "changed_rows": 471
+          },
+          "新增付费率": {
+            "comparable_rows": 1825,
+            "changed_rows": 28
+          },
+          "首充付费率": {
+            "comparable_rows": 1825,
+            "changed_rows": 28
+          },
+          "次留": {
+            "comparable_rows": 1817,
+            "changed_rows": 21
+          },
+          "7日留": {
+            "comparable_rows": 1776,
+            "changed_rows": 13
+          },
+          "30日留": {
+            "comparable_rows": 1594,
+            "changed_rows": 11
+          },
+          "60日留": {
+            "comparable_rows": 1348,
+            "changed_rows": 2
+          }
+        }
+      }
+    }
+  },
+  "lifecycle_pool": {
+    "source_file": "新包生命周期V2 - 含联运2026.7.27.xlsx",
+    "source_sheet": "原始数据活跃周期",
+    "date_start": "2025-03-17",
+    "date_end": "2026-07-27",
+    "date_count": 203,
+    "contiguous_date_ranges": [
+      {
+        "start": "2025-03-17",
+        "end": "2025-05-20",
+        "days": 65
+      },
+      {
+        "start": "2026-01-21",
+        "end": "2026-05-31",
+        "days": 131
+      },
+      {
+        "start": "2026-07-21",
+        "end": "2026-07-27",
+        "days": 7
+      }
+    ],
+    "records": 812,
+    "expected_4_lifecycle_rows_per_date": 203,
+    "recharge_amount": 39873504884.0,
+    "repurchase_amount": 0,
+    "repurchase_amount_share_of_recharge": 0.0,
+    "by_lifecycle": [
+      {
+        "lifecycle": 1,
+        "records": 203,
+        "user_days": 1200640.0,
+        "recharge_amount": 572751591.0,
+        "repurchase_amount": 0,
+        "full_bet_amount": 4303564256.77,
+        "revenue_amount": 27923951.27,
+        "repurchase_amount_share_of_recharge": 0.0,
+        "nonzero_repurchase_rows": 0
+      },
+      {
+        "lifecycle": 2,
+        "records": 203,
+        "user_days": 1195625.0,
+        "recharge_amount": 1010053384.0,
+        "repurchase_amount": 0,
+        "full_bet_amount": 8141820050.93,
+        "revenue_amount": 208612284.11,
+        "repurchase_amount_share_of_recharge": 0.0,
+        "nonzero_repurchase_rows": 0
+      },
+      {
+        "lifecycle": 3,
+        "records": 203,
+        "user_days": 3378483.0,
+        "recharge_amount": 7359670654.0,
+        "repurchase_amount": 0,
+        "full_bet_amount": 60402501395.78,
+        "revenue_amount": 1577410187.24,
+        "repurchase_amount_share_of_recharge": 0.0,
+        "nonzero_repurchase_rows": 0
+      },
+      {
+        "lifecycle": 4,
+        "records": 203,
+        "user_days": 3480118.0,
+        "recharge_amount": 30931029255.0,
+        "repurchase_amount": 0,
+        "full_bet_amount": 219722814717.97,
+        "revenue_amount": 7296247294.38,
+        "repurchase_amount_share_of_recharge": 0.0,
+        "nonzero_repurchase_rows": 0
+      }
+    ],
+    "metric_scope_caveat": "该表按日期×生命周期汇总，人数为分层人次；不能据此计算新用户 cohort 的唯一用户复购率。"
+  }
+}

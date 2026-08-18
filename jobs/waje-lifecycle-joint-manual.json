@@ -1,0 +1,26 @@
+{
+  "workflow_id": "waje_lifecycle_joint_manual",
+  "name": "Waje GM 联运生命周期数据手动周更新",
+  "mode": "manual",
+  "trigger": "每周二由用户手动提供查询日期范围后执行",
+  "timezone": "Asia/Hong_Kong",
+  "skill": "/Users/robin/.codex/skills/waje-lifecycle-joint-weekly/SKILL.md",
+  "workflow": "workflows/waje-lifecycle-joint-weekly.md",
+  "source_url": "https://prod-ac.waje-special.com:8443/sys/dynamic/lifecyclev2/pool/co",
+  "auth_url": "https://auth.wgame2025.com/if/flow/default-authentication-flow/?next=%2F",
+  "input_default": "/Users/robin/Desktop/waje data/新包生命周期V2 - 含联运2026.7.27-8.10_Joint修正版.xlsx",
+  "output_directory": "/Users/robin/Desktop/waje data",
+  "output_naming": "新包生命周期V2 - 含联运<YYYY.M.D>-<M.D>_Joint修正版.xlsx",
+  "raw_snapshot_directory": "data/raw/lifecycle_joint/<run-date>/<query-date>/",
+  "never_overwrite_input": true,
+  "never_overwrite_existing_output": true,
+  "required_quality_gates": [
+    "source_headers_match",
+    "cross_table_reconciliation_passed",
+    "historical_prefix_unchanged",
+    "non_target_sheets_unchanged",
+    "export_reimport_passed",
+    "formula_error_scan_passed",
+    "visual_qa_passed"
+  ]
+}

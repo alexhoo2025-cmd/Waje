@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "name": "Waje version experience and reward-risk watch",
+  "timezone": "Asia/Hong_Kong",
+  "release_manifest_dir": "data/incoming/release",
+  "configuration_index_path": "data/processed/waje_config/current/configuration-index.json",
+  "baseline_manifest_path": "data/processed/release_experience/prod-h5-baseline-2026-08-14.json",
+  "state_path": "data/processed/release_experience/release-watch-state.json",
+  "output_dir": "data/outputs/release_experience",
+  "knowledge_dir": "knowledge/01-产品/版本体验",
+  "release_manifest_required_fields": [
+    "release_id",
+    "version",
+    "status",
+    "released_at",
+    "source",
+    "surfaces"
+  ],
+  "policy": {
+    "release_confirmation": "Only a manifest with status=released creates a version experience task. A configuration revision change alone is a candidate signal, not production-release evidence.",
+    "experience_scope": "Use an explicitly authorized test or sandbox account where possible. A production observation may only follow normal single-account user paths.",
+    "abuse_testing": "Validate eligibility, idempotency, asset separation, configuration transition and reconciliation controls. Do not create multiple accounts, bypass identity/anti-fraud controls, automate repeated claims, attempt concurrency races, or seek external-payment or withdrawal profit."
+  }
+}

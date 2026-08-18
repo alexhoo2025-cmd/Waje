@@ -1,0 +1,84 @@
+{
+  "schema_version": 1,
+  "project": "waje-analyst",
+  "timezone": "Asia/Hong_Kong",
+  "reference_assets": [
+    "waje-competitor-analysis.html",
+    "artifact_waje_competitor.json",
+    "artifact_africa_gambling_market.json"
+  ],
+  "entities": [
+    {
+      "id": "waje",
+      "name": "Waje",
+      "market": "Nigeria",
+      "role": "product",
+      "sources": [
+        {"type": "official_site", "url": "https://www.wajegame.com/"},
+        {"type": "app_store", "url": "https://play.google.com/store/apps/details?id=com.hfhy.waje.special&hl=en-gb&gl=ng"}
+      ]
+    },
+    {
+      "id": "sportybet",
+      "name": "SportyBet",
+      "market": "Nigeria",
+      "role": "competitor",
+      "sources": [
+        {"type": "help_and_terms", "url": "https://www.sportybet.com/ng/help"},
+        {"type": "promotion", "url": "https://www.sportybet.com/ng/m/promotions"}
+      ]
+    },
+    {
+      "id": "bet9ja",
+      "name": "Bet9ja",
+      "market": "Nigeria",
+      "role": "competitor",
+      "sources": [
+        {"type": "app_store", "url": "https://play.google.com/store/apps/details?gl=ng&hl=en-gb&id=com.bet9ja.sportsbook.app"}
+      ]
+    },
+    {
+      "id": "betway_ng",
+      "name": "Betway NG",
+      "market": "Nigeria",
+      "role": "competitor",
+      "sources": [
+        {"type": "app_store", "url": "https://play.google.com/store/apps/details?gl=NG&hl=en&id=com.betway.ng"}
+      ]
+    },
+    {
+      "id": "1xbet_ng",
+      "name": "1xBet Nigeria",
+      "market": "Nigeria",
+      "role": "competitor",
+      "sources": [
+        {"type": "app_store", "url": "https://play.google.com/store/apps/details?id=org.xbet.client.ng_ps"}
+      ]
+    }
+  ],
+  "search_queries": [
+    {"id": "waje_product", "query": "Waje Game Nigeria product update OR promotion OR game"},
+    {"id": "sportybet_product", "query": "SportyBet Nigeria product update OR promotion OR feature"},
+    {"id": "bet9ja_product", "query": "Bet9ja Nigeria product update OR promotion OR feature"},
+    {"id": "betway_product", "query": "Betway NG product update OR promotion OR feature"},
+    {"id": "1xbet_product", "query": "1xBet Nigeria product update OR promotion OR feature"},
+    {"id": "ngaming_market", "query": "Nigeria online gaming betting casino market payment regulation news"}
+  ],
+  "topics": [
+    "product_update",
+    "gameplay",
+    "promotion",
+    "payment_and_withdrawal",
+    "commercial_signal",
+    "user_sentiment",
+    "market_and_regulation",
+    "stability_and_network"
+  ],
+  "collection": {
+    "timeout_seconds": 30,
+    "retries": 2,
+    "retry_backoff_seconds": 1,
+    "news_max_age_days": 30,
+    "news_query_recency_days": 14
+  }
+}

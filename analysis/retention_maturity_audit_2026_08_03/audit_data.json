@@ -1,0 +1,36 @@
+{
+  "source": {
+    "name": "起源分析平台｜数据统计｜基础留存",
+    "url": "https://datagrowth.trackares.com/tracking-web/dataStatistics/userAnalyze/baseRetained",
+    "product": "Waje Game",
+    "metric": "新增留存",
+    "filters": {
+      "start_date": "2026-07-27",
+      "end_date": "2026-08-02",
+      "terminal": "不限",
+      "software_version": "不限",
+      "media_dimension": "全部",
+      "user_identity": "起源ID"
+    },
+    "data_updated_at": "2026-08-03 07:04:47",
+    "complete_through": "2026-08-02",
+    "complete_through_basis": "从明细中观察：2026-08-02 cohort 的全部留存列为 '-'；2026-07-27 cohort 的第7天已给出 0。"
+  },
+  "cohort_rows": [
+    {"cohort_date":"2026-07-27","new_users":44,"d1_users":7,"d3_users":6,"d4_users":1,"d5_users":2,"d6_users":2,"d7_users":0},
+    {"cohort_date":"2026-07-28","new_users":60,"d1_users":14,"d3_users":7,"d4_users":6,"d5_users":4,"d6_users":5,"d7_users":null},
+    {"cohort_date":"2026-07-29","new_users":56,"d1_users":18,"d3_users":9,"d4_users":8,"d5_users":5,"d6_users":null,"d7_users":null},
+    {"cohort_date":"2026-07-30","new_users":46,"d1_users":8,"d3_users":3,"d4_users":1,"d5_users":null,"d6_users":null,"d7_users":null},
+    {"cohort_date":"2026-07-31","new_users":36,"d1_users":7,"d3_users":4,"d4_users":null,"d5_users":null,"d6_users":null,"d7_users":null},
+    {"cohort_date":"2026-08-01","new_users":45,"d1_users":7,"d3_users":null,"d4_users":null,"d5_users":null,"d6_users":null,"d7_users":null},
+    {"cohort_date":"2026-08-02","new_users":30,"d1_users":null,"d3_users":null,"d4_users":null,"d5_users":null,"d6_users":null,"d7_users":null}
+  ],
+  "expected_platform_overall": {
+    "d1":{"eligible_new_users":287,"retained_users":61,"rate":0.2125},
+    "d3":{"eligible_new_users":242,"retained_users":29,"rate":0.1198},
+    "d4":{"eligible_new_users":206,"retained_users":16,"rate":0.0777},
+    "d5":{"eligible_new_users":160,"retained_users":11,"rate":0.0688},
+    "d6":{"eligible_new_users":104,"retained_users":7,"rate":0.0673},
+    "d7":{"eligible_new_users":44,"retained_users":0,"rate":0.0}
+  }
+}

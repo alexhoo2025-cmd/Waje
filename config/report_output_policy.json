@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "effective_from": "2026-08-14",
+  "default_formats": ["markdown", "html"],
+  "markdown_role": "source_of_truth_and_diffable_review_copy",
+  "html_role": "reader_friendly_visual_delivery_copy",
+  "html_renderer": "scripts/render_analysis_report_html.py",
+  "scope": [
+    "product_experience",
+    "release_comparison",
+    "daily_intelligence_historical",
+    "weekly_intelligence",
+    "wechat_analysis",
+    "play_review_analysis"
+  ],
+  "cadence": {
+    "primary_intelligence": "weekly",
+    "google_play_reviews": "weekly",
+    "wechat_analysis": "weekly",
+    "daily_reports": "historical_only"
+  },
+  "requirements": {
+    "preserve_evidence_scope": true,
+    "preserve_source_links": true,
+    "do_not_embed_credentials_or_personal_data": true,
+    "use_accessible_semantic_tables": true,
+    "prefer_inline_css_and_no_external_assets": true
+  }
+}

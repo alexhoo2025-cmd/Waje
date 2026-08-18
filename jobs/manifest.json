@@ -1,0 +1,78 @@
+{
+  "schema_version": 2,
+  "job_id": "weekly_waje_intelligence",
+  "name": "Waje 产品与竞品每周情报管道",
+  "timezone": "Asia/Hong_Kong",
+  "schedule": "每周五 15:00 采集；17:00 周报",
+  "report_window": "上周五至本周四",
+  "status": "active",
+  "collection_automation_id": "robin-waje",
+  "report_automation_id": "robin-waje-3",
+  "stages": [
+    {
+      "id": "weekly_collect",
+      "schedule": "每周五 15:00",
+      "script": "scripts/run_weekly_intelligence_pipeline.py --mode collect",
+      "input": "config/weekly_intelligence.json + config/intel_sources.json + config/play_reviews.json",
+      "output": "data/raw/weekly/YYYY-MM-DD/batch-manifest.json + data/outputs/weekly/YYYY-MM-DD/run-log.json"
+    },
+    {
+      "id": "weekly_report",
+      "schedule": "每周五 17:00",
+      "script": "scripts/run_weekly_intelligence_pipeline.py --mode report",
+      "input": "data/raw/weekly/YYYY-MM-DD/ + authorized Play/Wechat batch outputs",
+      "output": "knowledge/03-竞品/周报/YYYY-MM-DD-Waje产品与竞品情报周报.md/html + Google Play 周报 + 公众号周报 + quality/source-verification/run-log"
+    },
+    {
+      "id": "meeting_minutes_weekday",
+      "schedule": "工作日 10:15",
+      "timezone": "Asia/Hong_Kong",
+      "script": "scripts/run_lark_meeting_minutes_pipeline.py",
+      "input": "authorized Lark smart minutes + linked transcript",
+      "output": "knowledge/05-运行/YYYY-MM-DD-晨会纪要-多领域工作安排与数据行动.md + data/processed/lark/meeting_minutes/YYYY-MM-DD/meeting-index.json + data/outputs/meeting_minutes/YYYY-MM-DD/run-log.json"
+    },
+    {
+      "id": "waje_config_weekly",
+      "schedule": "每周五 15:00",
+      "automation_id": "robin-waje-2",
+      "script": "scripts/run_waje_config_weekly.py",
+      "input": "config/waje_config_workbook.json + authorized Lark Sheets",
+      "output": "data/processed/waje_config/current/configuration-index.json + knowledge/02-数据/Waje产品游戏配置资料库.md + knowledge/02-数据/Waje配置资料/"
+    },
+    {
+      "id": "legacy_daily_intelligence",
+      "status": "historical_manual_only",
+      "script": "scripts/run_daily_pipeline.py",
+      "input": "legacy daily source snapshots",
+      "output": "historical data/raw/YYYY-MM-DD and knowledge/03-竞品/日报/ files; not scheduled"
+    },
+    {
+      "id": "graph",
+      "status": "included_in_weekly_report",
+      "script": "tools/build_graph.py",
+      "input": "knowledge/",
+      "output": "knowledge/_generated/"
+    }
+  ],
+  "required_outputs": [
+    "weekly_batch_manifest",
+    "weekly_raw_snapshot",
+    "weekly_normalized_items",
+    "weekly_analysis",
+    "weekly_quality_receipt",
+    "weekly_source_verification",
+    "weekly_intelligence_report",
+    "weekly_intelligence_html",
+    "weekly_play_reviews_report",
+    "weekly_wechat_report",
+    "weekly_run_log",
+    "graph_refresh"
+  ],
+  "failure_policy": {
+    "retry": 2,
+    "keep_raw_on_failure": true,
+    "never_overwrite_raw": true,
+    "same_batch_is_idempotent": true,
+    "notify_on": ["collection_failed", "partial_source", "report_failed", "quality_degraded", "graph_failed"]
+  }
+}

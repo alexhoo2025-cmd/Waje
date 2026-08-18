@@ -15,6 +15,8 @@ tags: [obsidian, workflow, maintenance]
 
 这样可以同时管理 `knowledge/` 知识库和根目录的 JSON、HTML、脚本及未来源码。
 
+桌面旧仓库仅保留未迁移的通用资料，不作为 Waje Analyst 的工作库。日常新增笔记、日报、脚本和图谱只写入项目目录。
+
 ## 推荐功能
 
 先使用 Obsidian 内置能力：文件属性、反向链接、关系图谱、模板、命令面板和搜索。

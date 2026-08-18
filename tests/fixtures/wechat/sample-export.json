@@ -1,0 +1,29 @@
+{
+  "articles": [
+    {
+      "article_id": "sample-001",
+      "account_name": "授权测试公众号",
+      "title": "新手留存与付费漏斗分析",
+      "canonical_url": "https://example.invalid/articles/sample-001",
+      "published_at": "2026-08-07T09:00:00+08:00",
+      "author": "分析团队",
+      "html": "<article><h1>新手留存与付费漏斗分析</h1><p>本文分析注册用户从首局到首充的转化。</p><h2>问题与口径</h2><p>按注册日观察 D1、D7 retention、LTV 和付费率。</p><table><tr><th>阶段</th><th>人数</th></tr><tr><td>注册</td><td>100</td></tr><tr><td>首充</td><td>12</td></tr></table><p><img src=\"https://example.invalid/chart.png\" alt=\"D1-D7留存折线趋势图\" width=\"800\" height=\"450\" /></p><blockquote>建议按渠道和版本复核。</blockquote><hr/><h2>建议</h2><p>建议优化首局引导并验证首充率。</p></article>"
+    },
+    {
+      "article_id": "sample-001",
+      "account_name": "授权测试公众号",
+      "title": "重复文章",
+      "canonical_url": "https://example.invalid/articles/sample-001-copy",
+      "published_at": "2026-08-07T09:00:00+08:00",
+      "html": "<p>same id should be deduplicated</p>"
+    },
+    {
+      "article_id": "sample-002",
+      "account_name": "授权测试公众号",
+      "title": "RTP 与玩法对比",
+      "canonical_url": "https://example.invalid/articles/sample-002",
+      "published_at": "2026-08-07T10:00:00+08:00",
+      "html": "<article><h1>RTP 与玩法对比</h1><p>比较 slots、Whot 和 Fish 的 RTP、下注额与派奖。</p><h2>结论</h2><p>因此需要按版本、游戏和样本量复核真实回报比。</p></article>"
+    }
+  ]
+}

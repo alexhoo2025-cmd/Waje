@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "document_title": "Waje 全链路数据需求与埋点设计（团队阅读版 V2）",
+  "document_url": "https://ksg964l11fam.sg.larksuite.com/wiki/FLI0wiquCiFgMuk3Fn5l8JaHg8b",
+  "workbook_title": "Waje 埋点设计 V2－图表数据",
+  "workbook_url": "https://ksg964l11fam.sg.larksuite.com/wiki/EF28w3XyaieDqIkhQHGlM2THguf",
+  "legacy_documents": [
+    {
+      "label": "历史文字版",
+      "url": "https://ksg964l11fam.sg.larksuite.com/wiki/JgvRw0rtjiVu1Kk91aWlVsywglb"
+    },
+    {
+      "label": "历史图片版",
+      "url": "https://ksg964l11fam.sg.larksuite.com/wiki/HSEkwERtmiVfQXkNZQclxdjmgjd"
+    }
+  ],
+  "identity": "user",
+  "chart": {
+    "sheet_name": "event_quality",
+    "title": "GAMEEND 是当前异常率尖峰",
+    "data_range": "A1:D5",
+    "position": {
+      "row": 1,
+      "col": "H"
+    },
+    "size": {
+      "width": 600,
+      "height": 360
+    }
+  }
+}

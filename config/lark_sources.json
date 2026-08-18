@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "enabled": true,
+  "silent_mode": true,
+  "retain_sender_names": false,
+  "allowed_chats": [],
+  "project_keywords": {
+    "product": ["需求", "功能", "版本", "发版", "上线", "原型", "优化", "改版", "用户分层", "生命周期"],
+    "data": ["数据", "指标", "报表", "看板", "口径", "SQL", "BQ", "MySQL", "Metabase", "Ares", "起源", "埋点", "GAMEEND", "RTP"],
+    "payment": ["充值", "提现", "支付", "订单", "奖励", "Chip", "BonusChip", "流水"],
+    "growth": ["新包", "渠道", "素材", "归因", "Adjust", "Singular", "Facebook", "Google", "投放"],
+    "issue": ["异常", "失败", "丢失", "重复", "延迟", "阻塞", "修复", "回归", "事故"],
+    "coordination": ["需要", "跟进", "负责人", "截止时间", "验收", "待确认", "排期"]
+  },
+  "api": {
+    "base_url_env": "LARK_API_BASE",
+    "token_env": "LARK_API_TOKEN",
+    "list_path": "/open-apis/im/v1/messages",
+    "timeout_seconds": 30,
+    "page_size": 50
+  },
+  "fallback": {
+    "incoming_dir": "data/incoming/lark",
+    "accepted_extensions": [".json", ".jsonl", ".zip"]
+  },
+  "knowledge": {
+    "output_dir": "knowledge/05-协同沟通",
+    "review_dir": "data/outputs/lark"
+  }
+}

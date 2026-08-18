@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "enabled": true,
+  "query": "智能纪要",
+  "only_title": true,
+  "doc_types": ["docx"],
+  "owner_name": "Max",
+  "lookback_days": 3,
+  "scope_mode": "title_owner_fallback",
+  "page_size": 30,
+  "max_candidates": 30,
+  "retry_attempts": 3,
+  "outputs": {
+    "processed_dir": "data/processed/lark/meeting_minutes",
+    "output_dir": "data/outputs/meeting_minutes",
+    "knowledge_dir": "knowledge/05-运行"
+  },
+  "schedule": {
+    "timezone": "Asia/Hong_Kong",
+    "frequency": "weekdays",
+    "time": "10:15"
+  },
+  "privacy": {
+    "store_full_transcript": false,
+    "store_participant_open_ids": false,
+    "outbound_actions": 0
+  }
+}

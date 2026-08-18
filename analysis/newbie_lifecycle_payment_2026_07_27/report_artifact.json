@@ -1,0 +1,959 @@
+{
+  "surface": "report",
+  "manifest": {
+    "version": 1,
+    "surface": "report",
+    "title": "新包新手生命周期与付费分析（截至 2026-07-27）",
+    "description": "面向产品与增长团队的新手 cohort 生命周期、付费和复购数据可用性分析。",
+    "generatedAt": "2026-08-03T08:01:07.681237+00:00",
+    "sources": [
+      {
+        "id": "mature_retention_query",
+        "label": "新包分析2026.7.27.xlsx｜成熟 cohort 留存汇总",
+        "path": "analysis/newbie_lifecycle_payment_2026_07_27/mature_retention_query.sql",
+        "query": {
+          "engine": "SQLite",
+          "language": "sql",
+          "sql": "WITH mature_retention_query (\"lifecycle_day\", \"retention_rate\", \"new_users\", \"cohort_count\", \"maturity_cutoff\") AS (\n  VALUES\n  ('D1', 0.477035, 5271653, 1985, '2026-07-26'),\n  ('D3', 0.317167, 5229060, 1969, '2026-07-24'),\n  ('D7', 0.183359, 5138905, 1937, '2026-07-20'),\n  ('D15', 0.109973, 4958483, 1873, '2026-07-12'),\n  ('D30', 0.072012, 4619920, 1752, '2026-06-27'),\n  ('D60', 0.047579, 3901745, 1503, '2026-05-28')\n)\nSELECT * FROM mature_retention_query;",
+          "description": "由 8 个渠道工作表的成熟 cohort 生成；粒度为生命周期天数。",
+          "executed_at": "2026-07-27",
+          "filters": [
+            "新增人数 > 0",
+            "仅纳入已达到对应生命周期的 cohort"
+          ],
+          "metric_definitions": [
+            "留存：源表 D1/D3/D7/D15/D30/D60 列按新增人数加权。"
+          ],
+          "tables_used": [
+            "workbook: 新包分析2026.7.27.xlsx"
+          ]
+        }
+      },
+      {
+        "id": "channel_h7_query",
+        "label": "新包分析2026.7.27.xlsx｜近 28 天渠道 cohort 汇总",
+        "path": "analysis/newbie_lifecycle_payment_2026_07_27/channel_h7_query.sql",
+        "query": {
+          "engine": "SQLite",
+          "language": "sql",
+          "sql": "WITH channel_h7_query (\"channel\", \"cohort_start\", \"cohort_end\", \"cohorts\", \"new_users\", \"d1_retention\", \"d3_retention\", \"d7_retention\", \"new_payment_rate\", \"first_charge_rate\", \"new_payment_people_per_new_user\", \"first_charge_people_per_new_user\") AS (\n  VALUES\n  ('PAWAJEIOS-AppStore商店', '2026-06-23', '2026-07-20', 28, 20526, 0.587839, 0.395374, 0.242694, 0.332237, 0.504831, 0.287294, 0.436568),\n  ('WajeSpecial-googleadwords_int', '2026-06-23', '2026-07-20', 28, 118433, 0.564977, 0.383257, 0.22677, 0.205577, 0.35701, 0.157963, 0.27429),\n  ('WajeSpecial-Google商店', '2026-06-23', '2026-07-20', 28, 116147, 0.548861, 0.372523, 0.224149, 0.20299, 0.368698, 0.156095, 0.283537),\n  ('WajeSpecial-facebook', '2026-06-23', '2026-07-20', 28, 75795, 0.464877, 0.307947, 0.17255, 0.128912, 0.247901, 0.108002, 0.207745),\n  ('wajeH5ga-google', '2026-06-23', '2026-07-20', 28, 53722, 0.378143, 0.231066, 0.12657, 0.163852, 0.208584, 0.070437, 0.090112),\n  ('PAWAJEBETH5', '2026-06-23', '2026-07-20', 28, 98877, 0.302111, 0.178761, 0.099097, 0.351255, 0.419206, 0.232885, 0.277992),\n  ('pww', '2026-06-23', '2026-07-20', 28, 4607, 0.474577, 0.289889, 0.09668, 0.29921, 0.434912, 0.159757, 0.227697),\n  ('wajeH5-fb', '2026-06-23', '2026-07-20', 28, 150004, 0.283417, 0.150084, 0.069378, 0.08028, 0.099703, 0.053845, 0.066865)\n)\nSELECT * FROM channel_h7_query;",
+          "description": "由 8 个渠道工作表的成熟 D7 cohort 生成；粒度为渠道。",
+          "executed_at": "2026-07-27",
+          "filters": [
+            "cohort 日期 2026-06-23 至 2026-07-20",
+            "新增人数 > 0",
+            "仅纳入成熟 D7 cohort"
+          ],
+          "metric_definitions": [
+            "D1/D3/D7 留存：按新增人数加权。",
+            "显示新增付费率/显示首充率：源表率列，分母待确认。",
+            "报告首充人数/新增人数：两个源表列的直接比值。"
+          ],
+          "tables_used": [
+            "workbook: 新包分析2026.7.27.xlsx"
+          ]
+        }
+      },
+      {
+        "id": "d7_period_query",
+        "label": "新包分析2026.7.27.xlsx｜成熟 D7 cohort 窗口比较",
+        "path": "analysis/newbie_lifecycle_payment_2026_07_27/d7_period_query.sql",
+        "query": {
+          "engine": "SQLite",
+          "language": "sql",
+          "sql": "WITH d7_period_query (\"metric\", \"prior_window\", \"recent_window\", \"change\") AS (\n  VALUES\n  ('D1 留存', 0.444273, 0.427588, -0.016685),\n  ('D3 留存', 0.287622, 0.272761, -0.014861),\n  ('D7 留存', 0.163051, 0.154208, -0.008843),\n  ('显示新增付费率', 0.172638, 0.190356, 0.017718),\n  ('报告新增付费人数/新增人数', 0.128734, 0.135627, 0.006893),\n  ('显示首充付费率', 0.268325, 0.28815, 0.019825),\n  ('报告首充人数/新增人数', 0.202543, 0.20926, 0.006717)\n)\nSELECT * FROM d7_period_query;",
+          "description": "最近与前一段各 28 天成熟 D7 cohort 的汇总比较。",
+          "executed_at": "2026-07-27",
+          "filters": [
+            "最近窗口 2026-06-23 至 2026-07-20",
+            "前一窗口 2026-05-26 至 2026-06-22"
+          ],
+          "metric_definitions": [
+            "显示付费率分母与新增人数不一致，报告同时提供人数/新增人数的直接比值。"
+          ],
+          "tables_used": [
+            "workbook: 新包分析2026.7.27.xlsx"
+          ]
+        }
+      },
+      {
+        "id": "lifecycle_pool_query",
+        "label": "新包生命周期V2 - 含联运2026.7.27.xlsx｜生命周期分层",
+        "path": "analysis/newbie_lifecycle_payment_2026_07_27/lifecycle_pool_query.sql",
+        "query": {
+          "engine": "SQLite",
+          "language": "sql",
+          "sql": "WITH lifecycle_pool_query (\"lifecycle\", \"records\", \"user_days\", \"recharge_amount\", \"repurchase_amount\", \"full_bet_amount\", \"revenue_amount\", \"repurchase_amount_share_of_recharge\", \"nonzero_repurchase_rows\", \"user_day_share\", \"coverage\") AS (\n  VALUES\n  (1, 203, 1200640.0, 572751591.0, 0, 4303564256.77, 27923951.27, 0.0, 0, 0.129731, '2025-03-17 至 2026-07-27（非连续）'),\n  (2, 203, 1195625.0, 1010053384.0, 0, 8141820050.93, 208612284.11, 0.0, 0, 0.129189, '2025-03-17 至 2026-07-27（非连续）'),\n  (3, 203, 3378483.0, 7359670654.0, 0, 60402501395.78, 1577410187.24, 0.0, 0, 0.365049, '2025-03-17 至 2026-07-27（非连续）'),\n  (4, 203, 3480118.0, 30931029255.0, 0, 219722814717.97, 7296247294.38, 0.0, 0, 0.376031, '2025-03-17 至 2026-07-27（非连续）')\n)\nSELECT * FROM lifecycle_pool_query;",
+          "description": "GM 生命周期奖池 V2 的日期 × 生命周期分层汇总，引用‘原始数据活跃周期’。",
+          "executed_at": "2026-07-27",
+          "filters": [
+            "生命周期 1–4",
+            "保留文件内实际日期，不假设连续覆盖"
+          ],
+          "metric_definitions": [
+            "人数为分层人次。",
+            "当日复充总金额在所有可用记录中为 0；不可用于计算真实复购。"
+          ],
+          "tables_used": [
+            "workbook: 新包生命周期V2 - 含联运2026.7.27.xlsx / 原始数据活跃周期"
+          ]
+        }
+      },
+      {
+        "id": "quality_checks_query",
+        "label": "新包分析导出与生命周期 V2｜数据质量检查",
+        "path": "analysis/newbie_lifecycle_payment_2026_07_27/quality_checks_query.sql",
+        "query": {
+          "engine": "SQLite",
+          "language": "sql",
+          "sql": "WITH quality_checks_query (\"check\", \"evidence\", \"impact\") AS (\n  VALUES\n  ('显示付费率分母', '用‘人数 / 显示付费率’反推的分母合计约为新增人数的 75.8%。', '显示付费率不能直接称为新用户付费转化率；需明确有效分母。'),\n  ('生命周期 V2 复充字段', '812 条日期×生命周期记录的‘当日复充总金额’均为 0。', '无法用该表计算复购人数、复购率或复购金额。'),\n  ('生命周期 V2 日期覆盖', '仅覆盖 2025-03-17 至 2025-05-20、2026-01-21 至 2026-05-31、2026-07-21 至 2026-07-27 三段日期。', '不适合直接作连续生命周期趋势判断。'),\n  ('快照可变性', '7 月 6 日与 7 月 27 日两版重叠 cohort 中，‘终身’列变更 471/1824；新增人数也变更 69/1825。', '需要为每次导出保留快照日，且把动态生命周期值与稳定 cohort 指标分开使用。')\n)\nSELECT * FROM quality_checks_query;",
+          "description": "对新包 7 月 6 日与 7 月 27 日快照、生命周期 V2 复充字段及覆盖范围的检查。",
+          "executed_at": "2026-07-27",
+          "filters": [
+            "按同一渠道与新增日期匹配两版新包导出"
+          ],
+          "metric_definitions": [
+            "历史 cohort 可能被回填；终身列与付费率需保留快照日和正式口径。"
+          ],
+          "tables_used": [
+            "workbook: 新包分析2026.7.6.xlsx",
+            "workbook: 新包分析2026.7.27.xlsx",
+            "workbook: 新包生命周期V2 - 含联运2026.7.27.xlsx"
+          ]
+        }
+      }
+    ],
+    "charts": [
+      {
+        "id": "mature_retention_curve",
+        "title": "成熟新用户 cohort 留存",
+        "subtitle": "截至 2026-07-27；按新增人数加权，仅纳入观察期已成熟的 cohort",
+        "type": "bar",
+        "dataset": "mature_retention",
+        "sourceId": "mature_retention_query",
+        "intent": "funnel",
+        "question": "新用户从 D1 到 D60 的留存衰减到什么程度？",
+        "comparisonContext": {
+          "grain": "新增日期 cohort",
+          "denominator": "新增人数",
+          "unit": "留存率"
+        },
+        "encodings": {
+          "x": {
+            "field": "lifecycle_day",
+            "type": "ordinal",
+            "label": "生命周期"
+          },
+          "y": {
+            "field": "retention_rate",
+            "type": "quantitative",
+            "format": "percent",
+            "label": "留存率"
+          },
+          "tooltip": [
+            {
+              "field": "new_users",
+              "type": "quantitative",
+              "format": "compact",
+              "label": "纳入新增人数"
+            },
+            {
+              "field": "cohort_count",
+              "type": "quantitative",
+              "format": "number",
+              "label": "cohort 数"
+            },
+            {
+              "field": "maturity_cutoff",
+              "type": "temporal",
+              "label": "成熟截止日期"
+            }
+          ]
+        },
+        "palette": {
+          "kind": "sequential",
+          "name": "blue"
+        },
+        "settings": {
+          "sort": "none",
+          "showValues": true
+        },
+        "layout": "full"
+      },
+      {
+        "id": "channel_d7_retention",
+        "title": "近 28 天成熟 cohort 的 D7 留存",
+        "subtitle": "2026-06-23 至 2026-07-20；按新增人数加权",
+        "type": "bar",
+        "dataset": "channel_h7",
+        "sourceId": "channel_h7_query",
+        "intent": "comparison",
+        "question": "各渠道的短期留存差异是否足以改变优化优先级？",
+        "comparisonContext": {
+          "grain": "渠道 × 新增日期 cohort",
+          "denominator": "新增人数",
+          "unit": "D7 留存率"
+        },
+        "encodings": {
+          "x": {
+            "field": "channel",
+            "type": "nominal",
+            "label": "渠道"
+          },
+          "y": {
+            "field": "d7_retention",
+            "type": "quantitative",
+            "format": "percent",
+            "label": "D7 留存"
+          },
+          "tooltip": [
+            {
+              "field": "new_users",
+              "type": "quantitative",
+              "format": "compact",
+              "label": "新增人数"
+            },
+            {
+              "field": "d1_retention",
+              "type": "quantitative",
+              "format": "percent",
+              "label": "D1 留存"
+            },
+            {
+              "field": "d3_retention",
+              "type": "quantitative",
+              "format": "percent",
+              "label": "D3 留存"
+            },
+            {
+              "field": "first_charge_rate",
+              "type": "quantitative",
+              "format": "percent",
+              "label": "显示首充率"
+            }
+          ]
+        },
+        "palette": {
+          "kind": "categorical",
+          "name": "blue"
+        },
+        "settings": {
+          "sort": "descending",
+          "categoryLabelPolicy": "rotate",
+          "showValues": true
+        },
+        "layout": "full"
+      }
+    ],
+    "tables": [
+      {
+        "id": "recent_d7_comparison",
+        "title": "近两段 28 天成熟 cohort 对比",
+        "subtitle": "最近窗口 2026-06-23 至 2026-07-20；上一窗口 2026-05-26 至 2026-06-22",
+        "dataset": "d7_period_comparison",
+        "sourceId": "d7_period_query",
+        "density": "spacious",
+        "defaultSort": {
+          "field": "metric",
+          "direction": "asc"
+        },
+        "columns": [
+          {
+            "field": "metric",
+            "label": "指标",
+            "type": "text"
+          },
+          {
+            "field": "prior_window",
+            "label": "上一窗口",
+            "format": "percent",
+            "type": "percent"
+          },
+          {
+            "field": "recent_window",
+            "label": "最近窗口",
+            "format": "percent",
+            "type": "percent"
+          },
+          {
+            "field": "change",
+            "label": "变化",
+            "format": "percent",
+            "type": "percent",
+            "movement": true,
+            "role": "movement"
+          }
+        ],
+        "layout": "full"
+      },
+      {
+        "id": "channel_h7_table",
+        "title": "渠道新手表现明细",
+        "subtitle": "2026-06-23 至 2026-07-20 的成熟 D7 cohort；率字段保持源表标签",
+        "dataset": "channel_h7",
+        "sourceId": "channel_h7_query",
+        "density": "spacious",
+        "defaultSort": {
+          "field": "new_users",
+          "direction": "desc"
+        },
+        "columns": [
+          {
+            "field": "channel",
+            "label": "渠道",
+            "type": "text"
+          },
+          {
+            "field": "new_users",
+            "label": "新增人数",
+            "format": "compact",
+            "type": "number"
+          },
+          {
+            "field": "d1_retention",
+            "label": "D1 留存",
+            "format": "percent",
+            "type": "percent"
+          },
+          {
+            "field": "d7_retention",
+            "label": "D7 留存",
+            "format": "percent",
+            "type": "percent"
+          },
+          {
+            "field": "new_payment_rate",
+            "label": "显示新增付费率",
+            "format": "percent",
+            "type": "percent"
+          },
+          {
+            "field": "first_charge_rate",
+            "label": "显示首充率",
+            "format": "percent",
+            "type": "percent"
+          },
+          {
+            "field": "first_charge_people_per_new_user",
+            "label": "报告首充人数/新增人数",
+            "format": "percent",
+            "type": "percent"
+          }
+        ],
+        "layout": "full"
+      },
+      {
+        "id": "lifecycle_pool_table",
+        "title": "生命周期 V2 分层与复充字段检查",
+        "subtitle": "日期×生命周期汇总；复充字段为 0，不视为真实复购表现",
+        "dataset": "lifecycle_pool",
+        "sourceId": "lifecycle_pool_query",
+        "density": "spacious",
+        "defaultSort": {
+          "field": "lifecycle",
+          "direction": "asc"
+        },
+        "columns": [
+          {
+            "field": "lifecycle",
+            "label": "生命周期分层",
+            "type": "number"
+          },
+          {
+            "field": "records",
+            "label": "分层记录数",
+            "format": "number",
+            "type": "number"
+          },
+          {
+            "field": "user_days",
+            "label": "人次",
+            "format": "compact",
+            "type": "number"
+          },
+          {
+            "field": "recharge_amount",
+            "label": "当日充值总金额合计",
+            "format": "compact",
+            "type": "number"
+          },
+          {
+            "field": "repurchase_amount",
+            "label": "当日复充总金额合计",
+            "format": "compact",
+            "type": "number"
+          },
+          {
+            "field": "repurchase_amount_share_of_recharge",
+            "label": "复充/充值",
+            "format": "percent",
+            "type": "percent"
+          }
+        ],
+        "layout": "full"
+      },
+      {
+        "id": "quality_table",
+        "title": "影响新手与付费决策的数据质量问题",
+        "subtitle": "这些问题决定了哪些结论可用、哪些必须等待补数或口径确认",
+        "dataset": "quality_checks",
+        "sourceId": "quality_checks_query",
+        "density": "spacious",
+        "defaultSort": {
+          "field": "check",
+          "direction": "asc"
+        },
+        "columns": [
+          {
+            "field": "check",
+            "label": "检查项",
+            "type": "text"
+          },
+          {
+            "field": "evidence",
+            "label": "证据",
+            "type": "text"
+          },
+          {
+            "field": "impact",
+            "label": "对决策的影响",
+            "type": "text"
+          }
+        ],
+        "layout": "full"
+      }
+    ],
+    "blocks": [
+      {
+        "id": "title",
+        "type": "markdown",
+        "body": "# 新包新手生命周期与付费分析（截至 2026-07-27）"
+      },
+      {
+        "id": "executive_summary",
+        "type": "markdown",
+        "body": "## Executive Summary\n- **新手生命周期的主要损耗发生在首周。** 8 个渠道共覆盖 5,292,449 名新增用户、291 个新增日期；成熟 cohort 的留存从 D1 47.7% 降至 D7 18.3%、D30 7.2%、D60 4.8%。\n- **最近 cohort 的留存继续走弱，而显示付费率的改善不能直接当成转化提升。** 最近 28 天成熟 D7 cohort 的 D7 留存为 15.4%，较上一窗口 -0.9 个百分点；显示新增付费率升至 19.0%，但“报告新增付费人数/新增人数”仅由 12.9% 升至 13.6%。\n- **H5 新客体验是优先排查对象。** wajeH5-fb 在最近 28 天带来 150,004 名新增（最大单渠道），但 D7 留存仅 6.9%、显示首充率 10.0%；相对地，Google Ads 渠道 D7 为 22.7%、显示首充率 35.7%。PAWAJEBETH5 则呈现“显示首充率 41.9%、D7 仅 9.9%”的付费后留存断层。\n- **复购与生命周期价值目前不能下结论。** 生命周期 V2 的复充金额字段在 812 条分层记录中均为 0，且日期覆盖有断档；新包表的“终身”列未提供定义和统一成熟窗，不能直接称为 LTV 或用于渠道价值排序。"
+      },
+      {
+        "id": "lifecycle_takeaway",
+        "type": "markdown",
+        "sourceId": "mature_retention_query",
+        "body": "## 首周留存是新手生命周期的核心断点\n\n**成熟 cohort 的 D1→D7 留存从 47.7% 降至 18.3%，约六成 D1 留存用户在随后六天流失。** D30 仅 7.2%，说明首周激活、首局体验和首充后的价值交付比长生命周期刺激更应前置。下图严格剔除了尚未成熟的 cohort，避免把“尚未走到该天”的用户当作流失。"
+      },
+      {
+        "id": "lifecycle_chart",
+        "type": "chart",
+        "chartId": "mature_retention_curve"
+      },
+      {
+        "id": "recent_movement",
+        "type": "markdown",
+        "sourceId": "d7_period_query",
+        "body": "## 最近 cohort：留存下降快于付费改善\n\n**最近成熟 D7 cohort 的 D1、D3、D7 分别较上一窗口下降 -1.7、-1.5、-0.9 个百分点。** 同期显示新增付费率上升，但其反推有效分母占新增人数的比例从 72.7% 降至 70.8%。因此应把“报告人数/新增人数”的小幅提升与显示率的提升分开跟踪，先确认分母变化来源。"
+      },
+      {
+        "id": "recent_table",
+        "type": "table",
+        "tableId": "recent_d7_comparison"
+      },
+      {
+        "id": "channel_takeaway",
+        "type": "markdown",
+        "sourceId": "channel_h7_query",
+        "body": "## H5 大盘量级与首周留存同时构成风险\n\n**wajeH5-fb 占最近窗口新增的 23.5%，但 D7 留存只有 6.9%，是本次数据中最值得优先验证的新手体验路径。** PAWAJEBETH5 的显示首充率达到 41.9%，却只有 9.9% 的 D7 留存，更像是支付动作之后未持续感知价值，而不是单纯的支付入口问题。iOS 样本较小（20,526 新增）但 D7 24.3%、显示首充率 50.5%，可作为体验和渠道质量的对照样本，而非直接复制结论。"
+      },
+      {
+        "id": "channel_chart",
+        "type": "chart",
+        "chartId": "channel_d7_retention"
+      },
+      {
+        "id": "channel_table",
+        "type": "table",
+        "tableId": "channel_h7_table"
+      },
+      {
+        "id": "repurchase_blocker",
+        "type": "markdown",
+        "sourceId": "lifecycle_pool_query",
+        "body": "## 复购分析被生命周期 V2 数据缺口阻断\n\n**当前生命周期 V2 只能用于观察分层充值、下注和营收金额，不能用于计算真实复购。** ‘当日复充总金额’在所有可用分层记录中为 0；并且文件实际只覆盖三段不连续日期。将 0 解释为“没有复购”会得出错误结论，应视为缺数/默认值或口径未接入，待与 GM 后台 owner 核对。"
+      },
+      {
+        "id": "lifecycle_pool_table_block",
+        "type": "table",
+        "tableId": "lifecycle_pool_table"
+      },
+      {
+        "id": "recommendations",
+        "type": "markdown",
+        "body": "## 建议的产品与数据动作\n\n1. **先做 H5 首周漏斗专项。** 按渠道 × H5版本 × 设备档位 × 网络质量拆开“落地/注册/首局完成/关键任务完成/首充/次日回访/D7 回访”；优先验证 wajeH5-fb 的低端机加载、首局完成与支付后留存断点。\n2. **把 PAWAJEBETH5 放入“首充后 7 天”实验。** 保持首充转化为 guardrail，以首充后 D1、D3、D7 留存与二次付费作为主指标，测试奖励发放节奏、首充后任务、资产可用性与回流触达。\n3. **建立用户级新手付费事实表。** 以用户 ID + 新增日期 cohort 为主键，固定输出新增、活跃、首付、二付、订单金额、首付时延、D1/D3/D7/D30；分别定义“显示率分母”“新增人数”和“有效新手”，禁止在报表中混用。\n4. **修复生命周期 V2 的复充链路与时间覆盖。** 复充相关字段应在无数据时显式标为缺失，而不是 0；补齐缺失日期并增加‘复购用户数、复购率、复购金额、累计 LTV’的 cohort 明细。"
+      },
+      {
+        "id": "quality_block",
+        "type": "markdown",
+        "body": "## 数据质量与使用边界\n\n**本报告的留存结论可用于方向判断；付费率、终身价值和复购结论需带条件使用。** 同一批历史 cohort 在两次导出间出现新增人数、付费率及‘终身’列回填，说明源表不是不可变快照。后续看板应记录数据快照日、cohort 成熟状态、分母定义和数据完整性状态。"
+      },
+      {
+        "id": "quality_table_block",
+        "type": "table",
+        "tableId": "quality_table"
+      },
+      {
+        "id": "further_questions",
+        "type": "markdown",
+        "body": "## Further Questions\n\n- ‘终身’列的正式公式、币种/单位、累计截止日和是否按用户去重是什么？\n- ‘新增付费率’与‘首充付费率’的分母为何仅约为新增人数的 76%？有效用户、风控剔除、归因规则还是跨端去重造成差异？\n- 8 个 sheet 分别对应的包、端（Android/iOS/H5）和媒体归因规则是什么？pww 的端形态需确认。\n- 复充字段为 0 是业务事实、数据缺失，还是 GM 生命周期 V2 的计算逻辑未接入？"
+      },
+      {
+        "id": "caveats",
+        "type": "markdown",
+        "body": "## Caveats and Assumptions\n\n- 文件未给出时区；本分析暂沿用项目默认 Asia/Hong_Kong，需由源系统确认。\n- 渠道间差异为观察性比较，不能直接归因于产品端或投放渠道；优化动作应通过分端、分版本的漏斗和实验验证。\n- ‘报告人数/新增人数’是两列的直接比值，不等于经用户级去重验证的转化率。\n- 生命周期 V2 的人数为分层人次，不等于新手 cohort 的唯一用户数。"
+      }
+    ]
+  },
+  "snapshot": {
+    "version": 1,
+    "generatedAt": "2026-08-03T08:01:07.681237+00:00",
+    "status": "ready",
+    "datasets": {
+      "mature_retention": [
+        {
+          "lifecycle_day": "D1",
+          "retention_rate": 0.477035,
+          "new_users": 5271653,
+          "cohort_count": 1985,
+          "maturity_cutoff": "2026-07-26"
+        },
+        {
+          "lifecycle_day": "D3",
+          "retention_rate": 0.317167,
+          "new_users": 5229060,
+          "cohort_count": 1969,
+          "maturity_cutoff": "2026-07-24"
+        },
+        {
+          "lifecycle_day": "D7",
+          "retention_rate": 0.183359,
+          "new_users": 5138905,
+          "cohort_count": 1937,
+          "maturity_cutoff": "2026-07-20"
+        },
+        {
+          "lifecycle_day": "D15",
+          "retention_rate": 0.109973,
+          "new_users": 4958483,
+          "cohort_count": 1873,
+          "maturity_cutoff": "2026-07-12"
+        },
+        {
+          "lifecycle_day": "D30",
+          "retention_rate": 0.072012,
+          "new_users": 4619920,
+          "cohort_count": 1752,
+          "maturity_cutoff": "2026-06-27"
+        },
+        {
+          "lifecycle_day": "D60",
+          "retention_rate": 0.047579,
+          "new_users": 3901745,
+          "cohort_count": 1503,
+          "maturity_cutoff": "2026-05-28"
+        }
+      ],
+      "channel_h7": [
+        {
+          "channel": "PAWAJEIOS-AppStore商店",
+          "cohort_start": "2026-06-23",
+          "cohort_end": "2026-07-20",
+          "cohorts": 28,
+          "new_users": 20526,
+          "d1_retention": 0.587839,
+          "d3_retention": 0.395374,
+          "d7_retention": 0.242694,
+          "new_payment_rate": 0.332237,
+          "first_charge_rate": 0.504831,
+          "new_payment_people_per_new_user": 0.287294,
+          "first_charge_people_per_new_user": 0.436568
+        },
+        {
+          "channel": "WajeSpecial-googleadwords_int",
+          "cohort_start": "2026-06-23",
+          "cohort_end": "2026-07-20",
+          "cohorts": 28,
+          "new_users": 118433,
+          "d1_retention": 0.564977,
+          "d3_retention": 0.383257,
+          "d7_retention": 0.22677,
+          "new_payment_rate": 0.205577,
+          "first_charge_rate": 0.35701,
+          "new_payment_people_per_new_user": 0.157963,
+          "first_charge_people_per_new_user": 0.27429
+        },
+        {
+          "channel": "WajeSpecial-Google商店",
+          "cohort_start": "2026-06-23",
+          "cohort_end": "2026-07-20",
+          "cohorts": 28,
+          "new_users": 116147,
+          "d1_retention": 0.548861,
+          "d3_retention": 0.372523,
+          "d7_retention": 0.224149,
+          "new_payment_rate": 0.20299,
+          "first_charge_rate": 0.368698,
+          "new_payment_people_per_new_user": 0.156095,
+          "first_charge_people_per_new_user": 0.283537
+        },
+        {
+          "channel": "WajeSpecial-facebook",
+          "cohort_start": "2026-06-23",
+          "cohort_end": "2026-07-20",
+          "cohorts": 28,
+          "new_users": 75795,
+          "d1_retention": 0.464877,
+          "d3_retention": 0.307947,
+          "d7_retention": 0.17255,
+          "new_payment_rate": 0.128912,
+          "first_charge_rate": 0.247901,
+          "new_payment_people_per_new_user": 0.108002,
+          "first_charge_people_per_new_user": 0.207745
+        },
+        {
+          "channel": "wajeH5ga-google",
+          "cohort_start": "2026-06-23",
+          "cohort_end": "2026-07-20",
+          "cohorts": 28,
+          "new_users": 53722,
+          "d1_retention": 0.378143,
+          "d3_retention": 0.231066,
+          "d7_retention": 0.12657,
+          "new_payment_rate": 0.163852,
+          "first_charge_rate": 0.208584,
+          "new_payment_people_per_new_user": 0.070437,
+          "first_charge_people_per_new_user": 0.090112
+        },
+        {
+          "channel": "PAWAJEBETH5",
+          "cohort_start": "2026-06-23",
+          "cohort_end": "2026-07-20",
+          "cohorts": 28,
+          "new_users": 98877,
+          "d1_retention": 0.302111,
+          "d3_retention": 0.178761,
+          "d7_retention": 0.099097,
+          "new_payment_rate": 0.351255,
+          "first_charge_rate": 0.419206,
+          "new_payment_people_per_new_user": 0.232885,
+          "first_charge_people_per_new_user": 0.277992
+        },
+        {
+          "channel": "pww",
+          "cohort_start": "2026-06-23",
+          "cohort_end": "2026-07-20",
+          "cohorts": 28,
+          "new_users": 4607,
+          "d1_retention": 0.474577,
+          "d3_retention": 0.289889,
+          "d7_retention": 0.09668,
+          "new_payment_rate": 0.29921,
+          "first_charge_rate": 0.434912,
+          "new_payment_people_per_new_user": 0.159757,
+          "first_charge_people_per_new_user": 0.227697
+        },
+        {
+          "channel": "wajeH5-fb",
+          "cohort_start": "2026-06-23",
+          "cohort_end": "2026-07-20",
+          "cohorts": 28,
+          "new_users": 150004,
+          "d1_retention": 0.283417,
+          "d3_retention": 0.150084,
+          "d7_retention": 0.069378,
+          "new_payment_rate": 0.08028,
+          "first_charge_rate": 0.099703,
+          "new_payment_people_per_new_user": 0.053845,
+          "first_charge_people_per_new_user": 0.066865
+        }
+      ],
+      "d7_period_comparison": [
+        {
+          "metric": "D1 留存",
+          "prior_window": 0.444273,
+          "recent_window": 0.427588,
+          "change": -0.016685
+        },
+        {
+          "metric": "D3 留存",
+          "prior_window": 0.287622,
+          "recent_window": 0.272761,
+          "change": -0.014861
+        },
+        {
+          "metric": "D7 留存",
+          "prior_window": 0.163051,
+          "recent_window": 0.154208,
+          "change": -0.008843
+        },
+        {
+          "metric": "显示新增付费率",
+          "prior_window": 0.172638,
+          "recent_window": 0.190356,
+          "change": 0.017718
+        },
+        {
+          "metric": "报告新增付费人数/新增人数",
+          "prior_window": 0.128734,
+          "recent_window": 0.135627,
+          "change": 0.006893
+        },
+        {
+          "metric": "显示首充付费率",
+          "prior_window": 0.268325,
+          "recent_window": 0.28815,
+          "change": 0.019825
+        },
+        {
+          "metric": "报告首充人数/新增人数",
+          "prior_window": 0.202543,
+          "recent_window": 0.20926,
+          "change": 0.006717
+        }
+      ],
+      "d30_period_comparison": [
+        {
+          "metric": "D1 留存",
+          "prior_window": 0.461238,
+          "recent_window": 0.439601,
+          "change": -0.021637
+        },
+        {
+          "metric": "D3 留存",
+          "prior_window": 0.299811,
+          "recent_window": 0.283333,
+          "change": -0.016478
+        },
+        {
+          "metric": "D30 留存",
+          "prior_window": 0.063385,
+          "recent_window": 0.057227,
+          "change": -0.006158
+        },
+        {
+          "metric": "显示新增付费率",
+          "prior_window": 0.177226,
+          "recent_window": 0.175168,
+          "change": -0.002058
+        },
+        {
+          "metric": "报告新增付费人数/新增人数",
+          "prior_window": 0.1325,
+          "recent_window": 0.128966,
+          "change": -0.003534
+        },
+        {
+          "metric": "显示首充付费率",
+          "prior_window": 0.280363,
+          "recent_window": 0.270564,
+          "change": -0.009799
+        },
+        {
+          "metric": "报告首充人数/新增人数",
+          "prior_window": 0.212579,
+          "recent_window": 0.202037,
+          "change": -0.010542
+        }
+      ],
+      "lifecycle_pool": [
+        {
+          "lifecycle": 1,
+          "records": 203,
+          "user_days": 1200640.0,
+          "recharge_amount": 572751591.0,
+          "repurchase_amount": 0,
+          "full_bet_amount": 4303564256.77,
+          "revenue_amount": 27923951.27,
+          "repurchase_amount_share_of_recharge": 0.0,
+          "nonzero_repurchase_rows": 0,
+          "user_day_share": 0.129731,
+          "coverage": "2025-03-17 至 2026-07-27（非连续）"
+        },
+        {
+          "lifecycle": 2,
+          "records": 203,
+          "user_days": 1195625.0,
+          "recharge_amount": 1010053384.0,
+          "repurchase_amount": 0,
+          "full_bet_amount": 8141820050.93,
+          "revenue_amount": 208612284.11,
+          "repurchase_amount_share_of_recharge": 0.0,
+          "nonzero_repurchase_rows": 0,
+          "user_day_share": 0.129189,
+          "coverage": "2025-03-17 至 2026-07-27（非连续）"
+        },
+        {
+          "lifecycle": 3,
+          "records": 203,
+          "user_days": 3378483.0,
+          "recharge_amount": 7359670654.0,
+          "repurchase_amount": 0,
+          "full_bet_amount": 60402501395.78,
+          "revenue_amount": 1577410187.24,
+          "repurchase_amount_share_of_recharge": 0.0,
+          "nonzero_repurchase_rows": 0,
+          "user_day_share": 0.365049,
+          "coverage": "2025-03-17 至 2026-07-27（非连续）"
+        },
+        {
+          "lifecycle": 4,
+          "records": 203,
+          "user_days": 3480118.0,
+          "recharge_amount": 30931029255.0,
+          "repurchase_amount": 0,
+          "full_bet_amount": 219722814717.97,
+          "revenue_amount": 7296247294.38,
+          "repurchase_amount_share_of_recharge": 0.0,
+          "nonzero_repurchase_rows": 0,
+          "user_day_share": 0.376031,
+          "coverage": "2025-03-17 至 2026-07-27（非连续）"
+        }
+      ],
+      "quality_checks": [
+        {
+          "check": "显示付费率分母",
+          "evidence": "用‘人数 / 显示付费率’反推的分母合计约为新增人数的 75.8%。",
+          "impact": "显示付费率不能直接称为新用户付费转化率；需明确有效分母。"
+        },
+        {
+          "check": "生命周期 V2 复充字段",
+          "evidence": "812 条日期×生命周期记录的‘当日复充总金额’均为 0。",
+          "impact": "无法用该表计算复购人数、复购率或复购金额。"
+        },
+        {
+          "check": "生命周期 V2 日期覆盖",
+          "evidence": "仅覆盖 2025-03-17 至 2025-05-20、2026-01-21 至 2026-05-31、2026-07-21 至 2026-07-27 三段日期。",
+          "impact": "不适合直接作连续生命周期趋势判断。"
+        },
+        {
+          "check": "快照可变性",
+          "evidence": "7 月 6 日与 7 月 27 日两版重叠 cohort 中，‘终身’列变更 471/1824；新增人数也变更 69/1825。",
+          "impact": "需要为每次导出保留快照日，且把动态生命周期值与稳定 cohort 指标分开使用。"
+        }
+      ]
+    }
+  },
+  "sources": [
+    {
+      "id": "mature_retention_query",
+      "label": "新包分析2026.7.27.xlsx｜成熟 cohort 留存汇总",
+      "path": "analysis/newbie_lifecycle_payment_2026_07_27/mature_retention_query.sql",
+      "query": {
+        "engine": "SQLite",
+        "language": "sql",
+        "sql": "WITH mature_retention_query (\"lifecycle_day\", \"retention_rate\", \"new_users\", \"cohort_count\", \"maturity_cutoff\") AS (\n  VALUES\n  ('D1', 0.477035, 5271653, 1985, '2026-07-26'),\n  ('D3', 0.317167, 5229060, 1969, '2026-07-24'),\n  ('D7', 0.183359, 5138905, 1937, '2026-07-20'),\n  ('D15', 0.109973, 4958483, 1873, '2026-07-12'),\n  ('D30', 0.072012, 4619920, 1752, '2026-06-27'),\n  ('D60', 0.047579, 3901745, 1503, '2026-05-28')\n)\nSELECT * FROM mature_retention_query;",
+        "description": "由 8 个渠道工作表的成熟 cohort 生成；粒度为生命周期天数。",
+        "executed_at": "2026-07-27",
+        "filters": [
+          "新增人数 > 0",
+          "仅纳入已达到对应生命周期的 cohort"
+        ],
+        "metric_definitions": [
+          "留存：源表 D1/D3/D7/D15/D30/D60 列按新增人数加权。"
+        ],
+        "tables_used": [
+          "workbook: 新包分析2026.7.27.xlsx"
+        ]
+      }
+    },
+    {
+      "id": "channel_h7_query",
+      "label": "新包分析2026.7.27.xlsx｜近 28 天渠道 cohort 汇总",
+      "path": "analysis/newbie_lifecycle_payment_2026_07_27/channel_h7_query.sql",
+      "query": {
+        "engine": "SQLite",
+        "language": "sql",
+        "sql": "WITH channel_h7_query (\"channel\", \"cohort_start\", \"cohort_end\", \"cohorts\", \"new_users\", \"d1_retention\", \"d3_retention\", \"d7_retention\", \"new_payment_rate\", \"first_charge_rate\", \"new_payment_people_per_new_user\", \"first_charge_people_per_new_user\") AS (\n  VALUES\n  ('PAWAJEIOS-AppStore商店', '2026-06-23', '2026-07-20', 28, 20526, 0.587839, 0.395374, 0.242694, 0.332237, 0.504831, 0.287294, 0.436568),\n  ('WajeSpecial-googleadwords_int', '2026-06-23', '2026-07-20', 28, 118433, 0.564977, 0.383257, 0.22677, 0.205577, 0.35701, 0.157963, 0.27429),\n  ('WajeSpecial-Google商店', '2026-06-23', '2026-07-20', 28, 116147, 0.548861, 0.372523, 0.224149, 0.20299, 0.368698, 0.156095, 0.283537),\n  ('WajeSpecial-facebook', '2026-06-23', '2026-07-20', 28, 75795, 0.464877, 0.307947, 0.17255, 0.128912, 0.247901, 0.108002, 0.207745),\n  ('wajeH5ga-google', '2026-06-23', '2026-07-20', 28, 53722, 0.378143, 0.231066, 0.12657, 0.163852, 0.208584, 0.070437, 0.090112),\n  ('PAWAJEBETH5', '2026-06-23', '2026-07-20', 28, 98877, 0.302111, 0.178761, 0.099097, 0.351255, 0.419206, 0.232885, 0.277992),\n  ('pww', '2026-06-23', '2026-07-20', 28, 4607, 0.474577, 0.289889, 0.09668, 0.29921, 0.434912, 0.159757, 0.227697),\n  ('wajeH5-fb', '2026-06-23', '2026-07-20', 28, 150004, 0.283417, 0.150084, 0.069378, 0.08028, 0.099703, 0.053845, 0.066865)\n)\nSELECT * FROM channel_h7_query;",
+        "description": "由 8 个渠道工作表的成熟 D7 cohort 生成；粒度为渠道。",
+        "executed_at": "2026-07-27",
+        "filters": [
+          "cohort 日期 2026-06-23 至 2026-07-20",
+          "新增人数 > 0",
+          "仅纳入成熟 D7 cohort"
+        ],
+        "metric_definitions": [
+          "D1/D3/D7 留存：按新增人数加权。",
+          "显示新增付费率/显示首充率：源表率列，分母待确认。",
+          "报告首充人数/新增人数：两个源表列的直接比值。"
+        ],
+        "tables_used": [
+          "workbook: 新包分析2026.7.27.xlsx"
+        ]
+      }
+    },
+    {
+      "id": "d7_period_query",
+      "label": "新包分析2026.7.27.xlsx｜成熟 D7 cohort 窗口比较",
+      "path": "analysis/newbie_lifecycle_payment_2026_07_27/d7_period_query.sql",
+      "query": {
+        "engine": "SQLite",
+        "language": "sql",
+        "sql": "WITH d7_period_query (\"metric\", \"prior_window\", \"recent_window\", \"change\") AS (\n  VALUES\n  ('D1 留存', 0.444273, 0.427588, -0.016685),\n  ('D3 留存', 0.287622, 0.272761, -0.014861),\n  ('D7 留存', 0.163051, 0.154208, -0.008843),\n  ('显示新增付费率', 0.172638, 0.190356, 0.017718),\n  ('报告新增付费人数/新增人数', 0.128734, 0.135627, 0.006893),\n  ('显示首充付费率', 0.268325, 0.28815, 0.019825),\n  ('报告首充人数/新增人数', 0.202543, 0.20926, 0.006717)\n)\nSELECT * FROM d7_period_query;",
+        "description": "最近与前一段各 28 天成熟 D7 cohort 的汇总比较。",
+        "executed_at": "2026-07-27",
+        "filters": [
+          "最近窗口 2026-06-23 至 2026-07-20",
+          "前一窗口 2026-05-26 至 2026-06-22"
+        ],
+        "metric_definitions": [
+          "显示付费率分母与新增人数不一致，报告同时提供人数/新增人数的直接比值。"
+        ],
+        "tables_used": [
+          "workbook: 新包分析2026.7.27.xlsx"
+        ]
+      }
+    },
+    {
+      "id": "lifecycle_pool_query",
+      "label": "新包生命周期V2 - 含联运2026.7.27.xlsx｜生命周期分层",
+      "path": "analysis/newbie_lifecycle_payment_2026_07_27/lifecycle_pool_query.sql",
+      "query": {
+        "engine": "SQLite",
+        "language": "sql",
+        "sql": "WITH lifecycle_pool_query (\"lifecycle\", \"records\", \"user_days\", \"recharge_amount\", \"repurchase_amount\", \"full_bet_amount\", \"revenue_amount\", \"repurchase_amount_share_of_recharge\", \"nonzero_repurchase_rows\", \"user_day_share\", \"coverage\") AS (\n  VALUES\n  (1, 203, 1200640.0, 572751591.0, 0, 4303564256.77, 27923951.27, 0.0, 0, 0.129731, '2025-03-17 至 2026-07-27（非连续）'),\n  (2, 203, 1195625.0, 1010053384.0, 0, 8141820050.93, 208612284.11, 0.0, 0, 0.129189, '2025-03-17 至 2026-07-27（非连续）'),\n  (3, 203, 3378483.0, 7359670654.0, 0, 60402501395.78, 1577410187.24, 0.0, 0, 0.365049, '2025-03-17 至 2026-07-27（非连续）'),\n  (4, 203, 3480118.0, 30931029255.0, 0, 219722814717.97, 7296247294.38, 0.0, 0, 0.376031, '2025-03-17 至 2026-07-27（非连续）')\n)\nSELECT * FROM lifecycle_pool_query;",
+        "description": "GM 生命周期奖池 V2 的日期 × 生命周期分层汇总，引用‘原始数据活跃周期’。",
+        "executed_at": "2026-07-27",
+        "filters": [
+          "生命周期 1–4",
+          "保留文件内实际日期，不假设连续覆盖"
+        ],
+        "metric_definitions": [
+          "人数为分层人次。",
+          "当日复充总金额在所有可用记录中为 0；不可用于计算真实复购。"
+        ],
+        "tables_used": [
+          "workbook: 新包生命周期V2 - 含联运2026.7.27.xlsx / 原始数据活跃周期"
+        ]
+      }
+    },
+    {
+      "id": "quality_checks_query",
+      "label": "新包分析导出与生命周期 V2｜数据质量检查",
+      "path": "analysis/newbie_lifecycle_payment_2026_07_27/quality_checks_query.sql",
+      "query": {
+        "engine": "SQLite",
+        "language": "sql",
+        "sql": "WITH quality_checks_query (\"check\", \"evidence\", \"impact\") AS (\n  VALUES\n  ('显示付费率分母', '用‘人数 / 显示付费率’反推的分母合计约为新增人数的 75.8%。', '显示付费率不能直接称为新用户付费转化率；需明确有效分母。'),\n  ('生命周期 V2 复充字段', '812 条日期×生命周期记录的‘当日复充总金额’均为 0。', '无法用该表计算复购人数、复购率或复购金额。'),\n  ('生命周期 V2 日期覆盖', '仅覆盖 2025-03-17 至 2025-05-20、2026-01-21 至 2026-05-31、2026-07-21 至 2026-07-27 三段日期。', '不适合直接作连续生命周期趋势判断。'),\n  ('快照可变性', '7 月 6 日与 7 月 27 日两版重叠 cohort 中，‘终身’列变更 471/1824；新增人数也变更 69/1825。', '需要为每次导出保留快照日，且把动态生命周期值与稳定 cohort 指标分开使用。')\n)\nSELECT * FROM quality_checks_query;",
+        "description": "对新包 7 月 6 日与 7 月 27 日快照、生命周期 V2 复充字段及覆盖范围的检查。",
+        "executed_at": "2026-07-27",
+        "filters": [
+          "按同一渠道与新增日期匹配两版新包导出"
+        ],
+        "metric_definitions": [
+          "历史 cohort 可能被回填；终身列与付费率需保留快照日和正式口径。"
+        ],
+        "tables_used": [
+          "workbook: 新包分析2026.7.6.xlsx",
+          "workbook: 新包分析2026.7.27.xlsx",
+          "workbook: 新包生命周期V2 - 含联运2026.7.27.xlsx"
+        ]
+      }
+    }
+  ]
+}

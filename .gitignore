@@ -1,0 +1,36 @@
+.venv-wechat/
+__pycache__/
+*.py[cod]
+.DS_Store
+node_modules/
+.playwright/
+data/processed/play_reviews/review_index.sqlite3*
+data/processed/play_reviews/.pipeline.lock
+
+# Local workspaces, caches, and generated temporary artifacts
+.codex-work/
+tmp/
+output/
+outputs/
+data/raw/
+data/processed/
+data/outputs/
+
+# Dependency trees and local runtime files
+**/node_modules/
+node_modules
+**/.venv/
+*.sqlite3*
+*.lock
+
+# Binary/report renderings; keep the source Markdown and code instead
+**/*.html
+**/*.htm
+**/*.pdf
+**/*.png
+**/*.jpg
+**/*.jpeg
+**/*.svg
+**/*.xlsx
+**/*.xls
+**/*.ndjson

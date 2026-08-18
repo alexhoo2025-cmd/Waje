@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "enabled": true,
+  "timezone": "Asia/Hong_Kong",
+  "collection_weekday": "FR",
+  "collection_time": "15:00",
+  "report_time": "17:00",
+  "window": "previous_friday_to_thursday",
+  "outputs": {
+    "raw_dir": "data/raw/weekly",
+    "processed_dir": "data/processed/weekly",
+    "output_dir": "data/outputs/weekly"
+  },
+  "include": {
+    "public_intelligence": true,
+    "google_play_reviews": true,
+    "wechat_articles": true,
+    "release_watch": true
+  },
+  "privacy": {
+    "store_credentials": false,
+    "store_cookies": false,
+    "store_tokens": false,
+    "store_personal_details": false,
+    "store_author_display_names": false
+  }
+}
