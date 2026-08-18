@@ -19,6 +19,7 @@ data/outputs/
 # Dependency trees and local runtime files
 **/node_modules/
 node_modules
+**/node_modules
 **/.venv/
 *.sqlite3*
 *.lock
