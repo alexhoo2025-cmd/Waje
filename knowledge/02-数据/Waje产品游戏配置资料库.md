@@ -3,8 +3,8 @@ type: configuration-reference
 domain: product-game-and-business-config
 product: Waje Special
 status: generated
-updated: 2026-08-14
-source_revision: 17313
+updated: 2026-08-28
+source_revision: 17409
 tags: [waje, 新包, 配置, 游戏, 数值, 风控, 生命周期]
 ---
 
@@ -15,9 +15,9 @@ tags: [waje, 新包, 配置, 游戏, 数值, 风控, 生命周期]
 ## 1. 同步状态
 
 - 来源：[飞书配置工作簿](https://ksg964l11fam.sg.larksuite.com/sheets/WWBBsLNl4hTFnbtI9arlmGsqgoc)
-- 当前 revision：`17313`；读取时间：`2026-08-14T15:00:59+08:00`。
-- 工作表：`67` 个，其中隐藏 ` 14` 个；结构化配置项：`24305` 条。
-- 本次差异：新增 `73`、修改 `2`、删除 `0`。
+- 当前 revision：`17409`；读取时间：`2026-08-28T15:03:22+08:00`。
+- 工作表：`69` 个，其中隐藏 ` 13` 个；结构化配置项：`24637` 条。
+- 本次差异：新增 `332`、修改 `0`、删除 `0`。
 - 更新频率：每周五 15:00（Asia/Hong_Kong）；revision 未变化时不重写资料。
 
 ## 2. 阅读入口
@@ -32,8 +32,8 @@ tags: [waje, 新包, 配置, 游戏, 数值, 风控, 生命周期]
 
 | 工作表 | 新增 | 修改 | 删除 |
 | --- | ---: | ---: | ---: |
-| 2.18.0配置（三端） | 73 | 0 | 0 |
-| 轻量游戏配置_通用 | 0 | 2 | 0 |
+| 有效期Chip场景和配置 | 94 | 0 | 0 |
+| 轻量游戏Tower(9013) | 238 | 0 | 0 |
 
 ## 4. 全部工作表目录
 
@@ -51,7 +51,7 @@ tags: [waje, 新包, 配置, 游戏, 数值, 风控, 生命周期]
 | 10 | 21点 | 游戏与场次经济 | 隐藏 | `historical_reference` | 107 |
 | 11 | 匹配时长、反作弊 | 支付提现与风控 | 可见 | `current_candidate` | 26 |
 | 12 | 个人盈利控制 | 数值与生命周期 | 可见 | `current_candidate` | 131 |
-| 13 | 新包破产保护（V1老玩家） | 数值与生命周期 | 隐藏 | `historical_reference` | 914 |
+| 13 | 新包破产保护（V1老玩家） | 数值与生命周期 | 可见 | `historical_reference` | 914 |
 | 14 | 百人whot数值 | 游戏与场次经济 | 隐藏 | `historical_reference` | 357 |
 | 15 | 外接游戏下注列表 | 游戏与场次经济 | 隐藏 | `historical_reference` | 539 |
 | 16 | tada游戏 | 游戏与场次经济 | 隐藏 | `historical_reference` | 1517 |
@@ -105,7 +105,9 @@ tags: [waje, 新包, 配置, 游戏, 数值, 风控, 生命周期]
 | 64 | 人脸识别配置 | 支付提现与风控 | 可见 | `current_candidate` | 50 |
 | 65 | 轻量游戏配置_Limbo | 游戏与场次经济 | 可见 | `current_candidate` | 150 |
 | 66 | 轻量游戏配置_通用 | 游戏与场次经济 | 可见 | `current_candidate` | 150 |
-| 67 | 2.18.0配置（三端） | 版本分包与平台配置 | 可见 | `current_candidate` | 73 |
+| 67 | 轻量游戏Tower(9013) | 游戏与场次经济 | 可见 | `current_candidate` | 238 |
+| 68 | 2.18.0配置（三端） | 版本分包与平台配置 | 可见 | `current_candidate` | 73 |
+| 69 | 有效期Chip场景和配置 | 版本分包与平台配置 | 可见 | `current_candidate` | 94 |
 
 ## 5. 使用边界
 

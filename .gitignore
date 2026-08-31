@@ -16,6 +16,15 @@ data/raw/
 data/processed/
 data/outputs/
 
+# Local Gemini CLI environment and machine-specific overrides
+.gemini/.env
+.gemini/*.local.*
+.gemini/**/credentials*
+.gemini/**/tokens*
+
+# Local Metabase runtime (JRE, JAR, H2 app DB, logs)
+.local/metabase/
+
 # Dependency trees and local runtime files
 **/node_modules/
 node_modules

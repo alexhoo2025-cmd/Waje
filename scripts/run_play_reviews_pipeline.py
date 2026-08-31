@@ -36,6 +36,22 @@ def read_json(path: Path | None) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def reusable_manifest(date: str) -> tuple[Path | None, dict]:
+    """Reuse a successful same-day collection batch instead of fetching it twice.
+
+    The Friday weekly collection runs before the daily 20:20 Play task.  A
+    successful raw batch is immutable and already indexed by the weekly
+    pipeline, so the later task should build/verify the report from it rather
+    than create another browser snapshot.  Degraded or blocked batches remain
+    retryable and are intentionally not reused here.
+    """
+    manifest_path = latest_manifest(date)
+    manifest = read_json(manifest_path)
+    if manifest_path and manifest.get("status") == "ok" and manifest.get("raw_file"):
+        return manifest_path, manifest
+    return None, {}
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--date", default=dt.datetime.now().astimezone().date().isoformat())
@@ -59,12 +75,17 @@ def main() -> int:
             return 3
         try:
             if not args.skip_collect:
-                seed = run([PYTHON, "scripts/play_review_index.py", "seed-existing"])
-                stages.append({"stage": "index_seed", "status": "ok", "returncode": seed})
-                collect_rc = run(["node", "scripts/collect_play_reviews.mjs", "--date", args.date, "--mode", "incremental", "--min-new-reviews", "200", "--backfill-unseen"], {0, 2})
-                manifest_path = latest_manifest(args.date)
-                manifest = read_json(manifest_path)
-                stages.append({"stage": "collect", "status": manifest.get("status", "error"), "returncode": collect_rc, "manifest": str(manifest_path.relative_to(ROOT)) if manifest_path else ""})
+                manifest_path, manifest = reusable_manifest(args.date)
+                if manifest_path:
+                    collect_rc = 0
+                    stages.append({"stage": "collect", "status": "skipped_existing_batch", "returncode": collect_rc, "manifest": str(manifest_path.relative_to(ROOT)), "reason": "successful_same_day_batch_reused"})
+                else:
+                    seed = run([PYTHON, "scripts/play_review_index.py", "seed-existing"])
+                    stages.append({"stage": "index_seed", "status": "ok", "returncode": seed})
+                    collect_rc = run(["node", "scripts/collect_play_reviews.mjs", "--date", args.date, "--mode", "incremental", "--min-new-reviews", "200", "--backfill-unseen"], {0, 2})
+                    manifest_path = latest_manifest(args.date)
+                    manifest = read_json(manifest_path)
+                    stages.append({"stage": "collect", "status": manifest.get("status", "error"), "returncode": collect_rc, "manifest": str(manifest_path.relative_to(ROOT)) if manifest_path else ""})
                 if manifest.get("raw_file"):
                     normalize_rc = run([PYTHON, "scripts/normalize_play_reviews.py", "--date", args.date, "--manifest", str(manifest_path)])
                     stages.append({"stage": "normalize", "status": "ok", "returncode": normalize_rc})

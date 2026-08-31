@@ -57,6 +57,7 @@ def build_report(root: Path, collection_date: dt.date) -> tuple[Path, dict]:
     play_report = root / "knowledge/01-产品/Google Play用户评价/周报" / f"{collection_date.isoformat()}-Google Play用户评价周报.html"
     wechat_report = root / "knowledge/03-竞品/周报" / f"{collection_date.isoformat()}-博彩社交游戏公众号周报.md"
     source_verification = read_json(output / "source-verification.json", {"status": "pending_manual_review", "items": []})
+    verification_summary = source_verification.get("review_summary", {})
 
     lines = [
         "---",
@@ -77,7 +78,7 @@ def build_report(root: Path, collection_date: dt.date) -> tuple[Path, dict]:
         "",
         f"- 批次状态：`{quality.get('status', 'unknown')}`；来源：{quality.get('source_health', {}).get('ok', 0)}/{quality.get('source_health', {}).get('total', 0)} 成功。",
         f"- 原始/去重条目：{normalized.get('raw_item_count', 0)} / {normalized.get('unique_item_count', len(items))}；重复 {normalized.get('duplicate_count', 0)} 条。",
-        f"- P0/P1 待复核：{len(p0_p1)} 条；来源类型：{', '.join(f'{key}（{value}）' for key, value in source_counts.most_common()) or '暂无'}。",
+        f"- P0/P1 待复核：{len(p0_p1)} 条采集信号；补充公开核验 P0/P1：{verification_summary.get('p0_count', 0)}/{verification_summary.get('p1_count', 0)} 条；来源类型：{', '.join(f'{key}（{value}）' for key, value in source_counts.most_common()) or '暂无'}。",
         f"- 主题分布：{', '.join(f'{key}（{value}）' for key, value in topic_counts.most_common(8)) or '暂无'}。",
         "",
         "## 2. 本周产品与竞品核心变化",
@@ -163,6 +164,7 @@ def build_report(root: Path, collection_date: dt.date) -> tuple[Path, dict]:
         "",
         f"- 质量回执：`{(output / 'quality.json').relative_to(root)}`。",
         f"- 来源核验：`{(output / 'source-verification.json').relative_to(root)}`，当前状态：`{source_verification.get('status', 'pending_manual_review')}`。",
+        f"- 补充公开核验：P0 {verification_summary.get('p0_count', 0)} 条；P1 {verification_summary.get('p1_count', 0)} 条；人工复核 {verification_summary.get('manual_review_count', 0)} 条。",
         f"- 公众号周报：{wechat_report.relative_to(root) if wechat_report.exists() else '本批次未生成'}。",
         "- 本周报不保存 Token、Cookie、密码、用户真实展示名或用户个人明细。",
         "",

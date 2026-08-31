@@ -1,0 +1,160 @@
+{
+  "schema_version": 1,
+  "mode": "enterprise_web_primary",
+  "preferred_execution_backend": "enterprise_web_agent",
+  "execution_policy": {
+    "delegate_by_default": true,
+    "enterprise_token_budget": "unconstrained_by_codex",
+    "codex_role": [
+      "task_router",
+      "metric_and_source_auditor",
+      "final_deliverable_editor"
+    ],
+    "delegate_when": [
+      "public_web_research",
+      "long_document_synthesis",
+      "authorized_bigquery_aggregate_analysis",
+      "multi_source_comparison",
+      "first_draft_reporting"
+    ],
+    "keep_in_codex_when": [
+      "simple_copyediting",
+      "local_file_patch_or_validation",
+      "final_metric_definition_and_quality_audit"
+    ],
+    "handoff_contract": "Gemini may reason at full depth. Return a concise decision summary plus structured evidence, source URLs or approved aggregate metrics, quality status, and open questions for Codex audit."
+  },
+  "project_id": "wajenigeria",
+  "data_project_id": "wajenigeria",
+  "runtime_project_id": "indigo-gecko-500503-j3",
+  "location": "us-central1",
+  "data_location": "europe-west4",
+  "firebase_source_scope": {
+    "mode": "firebase_only",
+    "project_id": "wajenigeria",
+    "approved_dataset_allowlist": [
+      "wajenigeria.waje_ng_firebase_android",
+      "wajenigeria.waje_ng_firebase_android_performance",
+      "wajenigeria.waje_ng_firebase_android_sessions",
+      "wajenigeria.waje_ng_firebase_android_crashlytics",
+      "wajenigeria.waje_ng_firebase_ios",
+      "wajenigeria.waje_ng_firebase_ios_performance",
+      "wajenigeria.waje_ng_firebase_h5"
+    ],
+    "raw_rows_allowed": false,
+    "requires_aggregate_output": true
+  },
+  "enterprise_identity_required": true,
+  "auth_profile": "enterprise-gemini",
+  "mcp_policy_path": "config/bigquery_mcp_policy.json",
+  "gemini_command": ["gemini"],
+  "approval_mode": "plan",
+  "output_format": "json",
+  "preferred_models": {
+    "default": "gemini-3.7-flash",
+    "complex_analysis": "gemini-3.1-pro-preview",
+    "web_research": "gemini-3.7-flash",
+    "competitor_intelligence": "gemini-3.1-pro-preview"
+  },
+  "model_fallback": {
+    "enabled": true,
+    "models": [
+      "gemini-3.7-flash",
+      "gemini-3.5-flash",
+      "gemini-2.5-flash",
+      "gemini-2.5-pro"
+    ],
+    "allow_cli_default": true,
+    "max_attempts": 5,
+    "retry_on": [
+      "model_unavailable",
+      "model_transient",
+      "failed_timeout",
+      "failed_invalid_json"
+    ],
+    "note": "模型名称为有序偏好；不可用时依次回退，最后允许 Gemini CLI 使用企业默认模型。权限错误不绕过、不通过换模型规避。"
+  },
+  "web_execution": {
+    "base_url": "https://vertexaisearch.cloud.google.com",
+    "agents": {
+      "public_research": "Deep Research",
+      "data_query": "Data Execution Agent",
+      "analysis": "Deep Analysis Agent",
+      "orchestration": "Master Orchestrator",
+      "product_context": "Robin-PM"
+    },
+    "output_policy": "Store only public source facts or approved aggregate results. Never copy browser cookies, account details, raw internal rows, or uploaded-file contents into the project.",
+    "fallback_status": "web_execution_required"
+  },
+  "timezone": "Africa/Lagos",
+  "default_window_days": 7,
+  "max_complete_days": 7,
+  "limits": {
+    "max_bytes_billed": 5368709120,
+    "max_rows": 3000,
+    "max_result_bytes": 3000000,
+    "timeout_seconds": 180
+  },
+  "allowed_datasets": [],
+  "allowed_views": [],
+  "sensitive_identifiers": [
+    "user_id",
+    "uuid",
+    "phone",
+    "phone_number",
+    "email",
+    "bvn",
+    "nin",
+    "biometric",
+    "cookie",
+    "token",
+    "order_id",
+    "account_number",
+    "bank_account"
+  ],
+  "task_types": {
+    "h5_performance": {
+      "purpose": "按 H5/PWA、版本、包体、渠道、设备、浏览器和网络分析页面与游戏性能。",
+      "required_dimensions": ["event_date", "surface_type", "web_version", "package_id", "device_tier", "network_type"],
+      "required_quality": ["data_cutoff", "complete_day", "event_coverage", "missing_reason"]
+    },
+    "multiplatform_firebase_device_performance": {
+      "purpose": "严格 Firebase-only 汇总 Android、iOS 和 H5 的设备、原生性能、事件、会话、稳定性与数据质量；不加入 Origin 服务端事实。",
+      "requires_bigquery": true,
+      "required_dimensions": ["metric_date_lagos", "endpoint", "app_package", "app_version", "country", "device_name", "os_version", "network_type", "event_category", "trace_category"],
+      "required_quality": ["data_cutoff", "complete_day", "sample_size", "missing_reason", "query_bytes", "quality_status"]
+    },
+    "h5_lightgame": {
+      "purpose": "分析轻量化游戏上线前后的进入、加载、首局、首注、结算、付费和留存变化。",
+      "required_dimensions": ["event_date", "game_id", "surface_type", "channel", "web_version"],
+      "required_quality": ["release_id", "mature_cohort", "sample_size", "missing_reason"]
+    },
+    "game_rtp": {
+      "purpose": "分析游戏有效下注、最终派奖、有效局数和真实 RTP，并按游戏、玩法、端、包、渠道和配置切分。",
+      "required_dimensions": ["event_date", "game_id", "play_id", "mode_id", "surface_type", "package_id", "channel", "config_version", "currency_type"],
+      "required_quality": ["effective_stake", "final_payout", "valid_rounds", "complete_day", "data_cutoff", "missing_reason"]
+    },
+    "payer_retention": {
+      "purpose": "分析首充、新增付费玩家、历史付费玩家的付费和成熟留存表现。",
+      "required_dimensions": ["register_date", "payer_segment", "surface_type", "channel"],
+      "required_quality": ["mature_cohort", "denominator", "currency", "data_cutoff"]
+    },
+    "kyc": {
+      "purpose": "分析 KYC 人脸认证触发、身份校验、人脸尝试、成功、失败和提现后续结果。",
+      "required_dimensions": ["event_date", "flow_type", "surface_type", "package_id", "failure_stage"],
+      "required_quality": ["aggregation_only", "data_cutoff", "missing_reason"]
+    },
+    "web_research": {
+      "purpose": "检索公开网页、产品公告、应用商店、行业新闻和用户舆情，输出带来源的事实摘要。",
+      "requires_bigquery": false,
+      "required_dimensions": ["source", "published_at", "country", "product", "topic"],
+      "required_quality": ["source_url", "published_at", "evidence_level", "retrieved_at"]
+    },
+    "competitor_intelligence": {
+      "purpose": "搜集和分析 Waje 及竞品的公开产品、运营、商业化、支付、稳定性、市场和用户反馈动态。",
+      "requires_bigquery": false,
+      "required_dimensions": ["competitor", "country", "surface", "topic", "source"],
+      "required_quality": ["source_url", "retrieved_at", "evidence_level", "claim_boundary"]
+    }
+  }
+}

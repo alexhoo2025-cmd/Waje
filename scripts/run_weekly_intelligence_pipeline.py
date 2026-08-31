@@ -227,16 +227,19 @@ def assess_quality(collection_date: dt.date, raw_manifest: dict[str, Any], norma
     wechat_manifest = latest_manifest(ROOT / "data/raw/wechat" / collection_date.isoformat())
     wechat = read_json(wechat_manifest) if wechat_manifest else {}
     play_quality = read_json(ROOT / "data/outputs/play_reviews" / collection_date.isoformat() / "quality.json")
+    play_manifest = latest_manifest(ROOT / "data/raw/play_reviews" / collection_date.isoformat())
+    play_raw = read_json(play_manifest) if play_manifest else {}
+    play_status = play_quality.get("status") or play_raw.get("status") or support.get("play_reviews", {}).get("status", "missing")
     quality = {
         "schema_version": 1,
         "collection_date": collection_date.isoformat(),
         "window": {"start": week_window(collection_date)[0].isoformat(), "end": week_window(collection_date)[1].isoformat()},
-        "status": "degraded" if failed or wechat.get("status") not in {"ok", "not_configured"} or play_quality.get("status") in {"degraded", "blocked", "shortfall"} else "ready",
+        "status": "degraded" if failed or wechat.get("status") not in {"ok", "not_configured"} or play_status in {"degraded", "blocked", "shortfall"} else "ready",
         "source_health": {"total": len(records), "ok": len(ok), "failed": len(failed), "success_rate": round(len(ok) / len(records), 4) if records else 0, "failed_sources": failed, "transport_fallbacks": [item.get("source_id") for item in ok if item.get("transport")]},
         "content_health": {key: normalized.get(key, 0) for key in ("raw_item_count", "unique_item_count", "duplicate_count", "stale_item_count")},
         "analysis_health": {"analyzed_count": len(analysis.get("items", [])), "manual_review_count": sum(1 for item in analysis.get("items", []) if item.get("needs_manual_verification"))},
         "wechat_health": {"status": wechat.get("status", "missing"), "article_count": len(wechat.get("articles", [])), "errors": wechat.get("errors", [])},
-        "play_reviews_health": {"status": play_quality.get("status", support.get("play_reviews", {}).get("status", "missing")), "summary": read_json(ROOT / "data/processed/play_reviews" / collection_date.isoformat() / "summary.json")},
+        "play_reviews_health": {"status": play_status, "summary": read_json(ROOT / "data/processed/play_reviews" / collection_date.isoformat() / "summary.json")},
         "release_watch": read_json(ROOT / "data/outputs/release_experience" / collection_date.isoformat() / "release-watch.json"),
         "quality_flags": [],
     }
@@ -244,7 +247,7 @@ def assess_quality(collection_date: dt.date, raw_manifest: dict[str, Any], norma
         quality["quality_flags"].append("source_failure")
     if wechat.get("status") not in {"ok", "not_configured"}:
         quality["quality_flags"].append("wechat_collection_degraded")
-    if play_quality.get("status") in {"degraded", "blocked", "shortfall"}:
+    if play_status in {"degraded", "blocked", "shortfall"}:
         quality["quality_flags"].append("play_reviews_collection_degraded")
     if not analysis.get("items"):
         quality["quality_flags"].append("no_analyzed_items")

@@ -1,9 +1,10 @@
 {
   "schema_version": 1,
-  "effective_from": "2026-08-14",
-  "default_formats": ["markdown", "html"],
-  "markdown_role": "source_of_truth_and_diffable_review_copy",
-  "html_role": "reader_friendly_visual_delivery_copy",
+  "effective_from": "2026-08-19",
+  "default_formats": ["lark_doc", "markdown"],
+  "lark_doc_role": "primary_internal_reading_review_and_sharing_copy",
+  "markdown_role": "project_archive_and_diffable_source_copy",
+  "html_role": "optional_only_when_explicitly_requested",
   "html_renderer": "scripts/render_analysis_report_html.py",
   "scope": [
     "product_experience",
@@ -24,6 +25,10 @@
     "preserve_source_links": true,
     "do_not_embed_credentials_or_personal_data": true,
     "use_accessible_semantic_tables": true,
-    "prefer_inline_css_and_no_external_assets": true
+    "highlight_core_metrics_and_decisions": true,
+    "move_methodology_and_limitations_to_notes": true,
+    "prefer_plain_business_language": true,
+    "verify_lark_document_by_api_readback": true,
+    "generate_html_only_on_explicit_request": true
   }
 }

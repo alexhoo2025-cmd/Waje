@@ -1,0 +1,126 @@
+{
+  "schema_version": 1,
+  "status": "blocked_pending_external_prerequisites",
+  "project_id": "wajenigeria",
+  "policy_mode": "fail_closed",
+  "remote_mcp": {
+    "endpoint": "https://bigquery.googleapis.com/mcp",
+    "trusted": false,
+    "allowed_tools": [
+      "list_dataset_ids",
+      "get_dataset_info",
+      "list_table_ids",
+      "get_table_info",
+      "execute_sql_readonly"
+    ],
+    "denied_tools": [
+      "execute_sql"
+    ]
+  },
+  "execution_roles": {
+    "bigquery_api": "deterministic scheduled checks, dry runs, fixed query templates and receipts",
+    "remote_mcp": "schema discovery and approved aggregate-only exploratory analysis",
+    "llm": "query drafting and interpretation only after all policy gates pass"
+  },
+  "limits": {
+    "max_bytes_per_query": 5368709120,
+    "max_bytes_per_audit": 26843545600,
+    "max_rows": 3000,
+    "minimum_group_size": 10,
+    "timeout_seconds": 180
+  },
+  "sql_policy": {
+    "allowed_statement_starts": ["select", "with"],
+    "forbidden_operations": [
+      "insert", "update", "delete", "merge", "create", "drop", "alter",
+      "truncate", "export", "load", "call", "grant", "revoke",
+      "execute immediate", "script", "python"
+    ],
+    "require_date_predicate": true,
+    "date_predicate_fields": [
+      "event_date", "report_date", "cohort_date", "date", "dt",
+      "year_day", "_partitiondate", "event_time", "event_timestamp"
+    ],
+    "forbid_select_star": true,
+    "require_limit": true,
+    "forbidden_identifiers": [
+      "user_id", "uuid", "phone", "phone_number", "email", "bvn", "nin",
+      "biometric", "face_image", "document_image", "account_number", "bank_account",
+      "order_id", "device_id", "advertising_id", "ip", "token", "cookie",
+      "raw_response", "third_party_raw_response"
+    ]
+  },
+  "candidate_views": [
+    {
+      "logical_name": "wajenigeria.agent_analytics.vw_kyc_daily_safe",
+      "theme": "kyc",
+      "state": "pending_source_mapping",
+      "allowed_dimensions": ["event_date", "flow_type", "surface_type", "package_id", "channel", "version", "risk_rule_version", "failure_stage"],
+      "required_quality_fields": ["data_cutoff", "complete_day", "linkage_rate", "missing_reason"]
+    },
+    {
+      "logical_name": "wajenigeria.agent_analytics.vw_game_rtp_daily_safe",
+      "theme": "game_rtp",
+      "state": "pending_source_mapping",
+      "allowed_dimensions": ["event_date", "game_id", "play_id", "mode_id", "room_id", "surface_type", "package_id", "channel", "config_version", "currency_type"],
+      "required_quality_fields": ["effective_stake", "final_payout", "valid_rounds", "complete_day", "missing_reason"]
+    },
+    {
+      "logical_name": "wajenigeria.agent_analytics.vw_lifecycle_payer_daily_safe",
+      "theme": "payer_retention",
+      "state": "pending_source_mapping",
+      "allowed_dimensions": ["cohort_date", "lifecycle_day", "payer_segment", "surface_type", "package_id", "channel"],
+      "required_quality_fields": ["mature_cohort", "denominator", "currency", "data_cutoff", "complete_day"]
+    },
+    {
+      "logical_name": "wajenigeria.agent_analytics.vw_h5_performance_daily_safe",
+      "theme": "h5_performance",
+      "state": "pending_source_mapping",
+      "allowed_dimensions": ["event_date", "page_id", "game_id", "web_version", "device_tier", "browser", "network_type"],
+      "required_quality_fields": ["sample_size", "event_coverage", "complete_day", "data_cutoff", "missing_reason"]
+    },
+    {
+      "logical_name": "wajenigeria.agent_analytics.vw_firebase_endpoint_coverage_daily_safe",
+      "theme": "multiplatform_firebase_device_performance",
+      "state": "pending_source_mapping",
+      "allowed_dimensions": ["metric_date_lagos", "endpoint", "app_package", "app_version", "source_name", "data_cutoff_at", "complete_day", "quality_status"],
+      "required_quality_fields": ["data_cutoff_at", "complete_day", "source_freshness_lag_minutes", "quality_status", "quality_note"]
+    },
+    {
+      "logical_name": "wajenigeria.agent_analytics.vw_firebase_event_session_daily_safe",
+      "theme": "multiplatform_firebase_device_performance",
+      "state": "pending_source_mapping",
+      "allowed_dimensions": ["metric_date_lagos", "endpoint", "app_package", "app_version", "event_category", "event_name_bucket"],
+      "required_quality_fields": ["event_count", "distinct_session_count", "data_cutoff_at", "complete_day", "quality_status"]
+    },
+    {
+      "logical_name": "wajenigeria.agent_analytics.vw_firebase_native_performance_daily_safe",
+      "theme": "multiplatform_firebase_device_performance",
+      "state": "pending_source_mapping",
+      "allowed_dimensions": ["metric_date_lagos", "endpoint", "app_package", "app_version", "country", "device_name_bucket", "os_version", "network_type", "trace_category"],
+      "required_quality_fields": ["performance_record_count", "sample_size", "data_cutoff_at", "complete_day", "quality_status"]
+    },
+    {
+      "logical_name": "wajenigeria.agent_analytics.vw_firebase_stability_daily_safe",
+      "theme": "multiplatform_firebase_device_performance",
+      "state": "pending_source_mapping",
+      "allowed_dimensions": ["metric_date_lagos", "endpoint", "app_package", "app_version", "os_version", "device_name_bucket", "error_type"],
+      "required_quality_fields": ["dedup_event_count", "issue_count", "data_cutoff_at", "complete_day", "quality_status"]
+    },
+    {
+      "logical_name": "wajenigeria.agent_analytics.vw_firebase_h5_behavior_daily_safe",
+      "theme": "multiplatform_firebase_device_performance",
+      "state": "pending_source_mapping",
+      "allowed_dimensions": ["metric_date_lagos", "endpoint", "app_package", "app_version", "event_category", "event_name_bucket"],
+      "required_quality_fields": ["event_count", "covered_days", "data_cutoff_at", "complete_day", "quality_status", "missing_reason"]
+    }
+  ],
+  "active_allowed_views": [],
+  "required_external_actions": [
+    "Grant the approved MCP calling principal tool-use permission on the MCP tool project.",
+    "Grant the query principal job creation and read access only on approved aggregate views.",
+    "Grant Vertex model prediction and service usage permissions on indigo-gecko-500503-j3 for Gemini execution.",
+    "Apply a server-side deny policy for execute_sql and any non-read-only BigQuery MCP tool.",
+    "Create and validate the four candidate aggregate views before moving them into active_allowed_views."
+  ]
+}

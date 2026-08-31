@@ -112,6 +112,12 @@ def play_reviews_weekly_snapshot(root: Path, report_date: dt.date) -> dict[str, 
     receipt = read_json(receipt_path)
     metrics = artifact.get("metrics", {}) if isinstance(artifact, dict) else {}
     datasets = artifact.get("datasets", {}) if isinstance(artifact, dict) else {}
+    topic_rows = []
+    for row in datasets.get("topics", []):
+        if isinstance(row, dict):
+            topic_rows.append(row)
+        elif isinstance(row, (list, tuple)) and len(row) >= 3:
+            topic_rows.append({"label": row[0], "count": row[1], "rate": row[2]})
     return {
         "available": bool(artifact_path.exists()),
         "status": artifact.get("status", "missing") if isinstance(artifact, dict) else "missing",
@@ -121,7 +127,7 @@ def play_reviews_weekly_snapshot(root: Path, report_date: dt.date) -> dict[str, 
         "metrics": metrics,
         "rating_distribution": datasets.get("ratings", []),
         "daily_rows": datasets.get("daily", []),
-        "topics": datasets.get("topics", []),
+        "topics": topic_rows,
     }
 
 
@@ -573,7 +579,17 @@ def build_artifact(root: Path, report_date: dt.date) -> tuple[dict[str, Any], di
         "id": "src_google_play_reviews",
         "label": "Waje Google Play 用户评价专项周报",
         "href": SOURCE_URL if "SOURCE_URL" in globals() else "https://play.google.com/store/apps/details?id=com.hfhy.waje.special&hl=en-gb&gl=ng&pli=1",
-        "query": {"engine": "local_google_play_review_pipeline", "description": "公开评价与开发者回复的按日采集、去重、版本和质量汇总；D 级证据。"},
+        "query": {
+            "engine": "local_google_play_review_pipeline",
+            "sql": "SELECT topic.label, topic.count, topic.rate FROM play_reviews_weekly_topics WHERE window_start >= '{start}' AND window_end <= '{end}';".format(
+                start=report_date - dt.timedelta(days=7), end=report_date - dt.timedelta(days=1)
+            ),
+            "description": "公开评价与开发者回复的按日采集、去重、版本和质量汇总；D 级证据。",
+            "language": "sql",
+            "executed_at": dt.datetime.now().astimezone().isoformat(timespec="seconds"),
+            "tables_used": ["play_reviews_weekly_topics", "play_reviews_weekly_ratings", "google_play_review_raw"],
+            "filters": ["本周新评价", "去重后按日聚合", "按质量短评与主题归类"],
+        },
     })
     h5_source_id = "src_waje_h5_observation"
     internal_metric_source_id = "src_internal_metric_contract"

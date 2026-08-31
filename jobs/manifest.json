@@ -3,7 +3,7 @@
   "job_id": "weekly_waje_intelligence",
   "name": "Waje 产品与竞品每周情报管道",
   "timezone": "Asia/Hong_Kong",
-  "schedule": "每周五 15:00 采集；17:00 周报",
+  "schedule": "工作日 10:15 晨会；每日 20:20 Play 评价；周一 08:00 Play 周报、10:00 总周报 HTML；周五 15:00 采集/配置、17:00 总周报",
   "report_window": "上周五至本周四",
   "status": "active",
   "collection_automation_id": "robin-waje",
@@ -12,6 +12,8 @@
     {
       "id": "weekly_collect",
       "schedule": "每周五 15:00",
+      "automation_id": "robin-waje",
+      "model": "gpt-5.3-codex-spark",
       "script": "scripts/run_weekly_intelligence_pipeline.py --mode collect",
       "input": "config/weekly_intelligence.json + config/intel_sources.json + config/play_reviews.json",
       "output": "data/raw/weekly/YYYY-MM-DD/batch-manifest.json + data/outputs/weekly/YYYY-MM-DD/run-log.json"
@@ -19,14 +21,51 @@
     {
       "id": "weekly_report",
       "schedule": "每周五 17:00",
+      "automation_id": "robin-waje-3",
+      "model": "gpt-5.3-codex-spark",
       "script": "scripts/run_weekly_intelligence_pipeline.py --mode report",
       "input": "data/raw/weekly/YYYY-MM-DD/ + authorized Play/Wechat batch outputs",
       "output": "knowledge/03-竞品/周报/YYYY-MM-DD-Waje产品与竞品情报周报.md/html + Google Play 周报 + 公众号周报 + quality/source-verification/run-log"
     },
     {
+      "id": "google_play_reviews_daily",
+      "schedule": "每日 20:20",
+      "timezone": "Asia/Hong_Kong",
+      "automation_id": "robin-google-play-spark",
+      "model": "gpt-5.3-codex-spark",
+      "script": "scripts/run_play_reviews_pipeline.py --period daily",
+      "input": "config/play_reviews.json + data/processed/play_reviews/review_index.sqlite3 + public Google Play page",
+      "output": "data/raw/play_reviews/YYYY-MM-DD/ + data/outputs/play_reviews/YYYY-MM-DD/ + knowledge/01-产品/Google Play用户评价/日报/",
+      "failure_policy": "shortfall/blocked/degraded is reportable; never fabricate missing reviews"
+    },
+    {
+      "id": "google_play_reviews_weekly",
+      "schedule": "每周一 08:00",
+      "timezone": "Asia/Hong_Kong",
+      "automation_id": "robin-google-play-spark-2",
+      "model": "gpt-5.3-codex-spark",
+      "script": "scripts/run_play_reviews_pipeline.py --period weekly --skip-collect",
+      "input": "上周一至周日已入库的 Play 评价、版本记录和日报分析",
+      "output": "data/outputs/play_reviews/weekly/YYYY-MM-DD/ + knowledge/01-产品/Google Play用户评价/周报/",
+      "failure_policy": "missing dates remain missing; report partial/degraded"
+    },
+    {
+      "id": "weekly_intelligence_html",
+      "schedule": "每周一 10:00",
+      "timezone": "Asia/Hong_Kong",
+      "automation_id": "robin-waje-html-spark",
+      "model": "gpt-5.3-codex-spark",
+      "script": "scripts/build_weekly_intelligence_html.py --date YYYY-MM-DD",
+      "input": "上周一至周日的本地情报、指标回执和 Play 专项周报摘要",
+      "output": "knowledge/03-竞品/周报/YYYY-MM-DD-Waje竞品情报周报.html + output/html/Waje-weekly-report.html + data/outputs/weekly/YYYY-MM-DD/delivery-receipt.json",
+      "failure_policy": "portable validation/package/verification failure is reportable; no fabricated metrics"
+    },
+    {
       "id": "meeting_minutes_weekday",
       "schedule": "工作日 10:15",
       "timezone": "Asia/Hong_Kong",
+      "automation_id": "robin",
+      "model": "gpt-5.3-codex-spark",
       "script": "scripts/run_lark_meeting_minutes_pipeline.py",
       "input": "authorized Lark smart minutes + linked transcript",
       "output": "knowledge/05-运行/YYYY-MM-DD-晨会纪要-多领域工作安排与数据行动.md + data/processed/lark/meeting_minutes/YYYY-MM-DD/meeting-index.json + data/outputs/meeting_minutes/YYYY-MM-DD/run-log.json"
@@ -35,6 +74,7 @@
       "id": "waje_config_weekly",
       "schedule": "每周五 15:00",
       "automation_id": "robin-waje-2",
+      "model": "gpt-5.3-codex-spark",
       "script": "scripts/run_waje_config_weekly.py",
       "input": "config/waje_config_workbook.json + authorized Lark Sheets",
       "output": "data/processed/waje_config/current/configuration-index.json + knowledge/02-数据/Waje产品游戏配置资料库.md + knowledge/02-数据/Waje配置资料/"
@@ -45,6 +85,15 @@
       "script": "scripts/run_daily_pipeline.py",
       "input": "legacy daily source snapshots",
       "output": "historical data/raw/YYYY-MM-DD and knowledge/03-竞品/日报/ files; not scheduled"
+    },
+    {
+      "id": "manual_browser_workbooks",
+      "status": "manual_only",
+      "workflow": [
+        "waje-lifecycle-joint-weekly",
+        "waje-origin-new-user-analysis-update"
+      ],
+      "reason": "依赖已登录浏览器、可见筛选条件、人工点击查询历史记录和必要的外部写入确认；不配置无头定时执行"
     },
     {
       "id": "graph",
@@ -68,6 +117,12 @@
     "weekly_run_log",
     "graph_refresh"
   ],
+  "model_policy": {
+    "scheduled_script_tasks": "gpt-5.3-codex-spark",
+    "scheduled_reasoning_effort": "medium/high by task",
+    "interactive_browser_tasks": "manual_only",
+    "manual_only_reason": "登录态、筛选口径和外部表格写入必须在可见会话中确认"
+  },
   "failure_policy": {
     "retry": 2,
     "keep_raw_on_failure": true,

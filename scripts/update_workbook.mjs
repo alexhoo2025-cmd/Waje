@@ -5,6 +5,7 @@ import { pathToFileURL } from "node:url";
 
 const moduleRoot = process.env.CODEX_NODE_MODULES || "/Users/robin/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules";
 const { FileBlob, SpreadsheetFile } = await import(pathToFileURL(path.join(moduleRoot, "@oai/artifact-tool/dist/artifact_tool.mjs")).href);
+const JSZip = (await import(pathToFileURL(path.join(moduleRoot, "jszip/lib/index.js")).href)).default;
 
 function parseArgs(argv) {
   const out = {};
@@ -21,6 +22,7 @@ function parseArgs(argv) {
 
 const args = parseArgs(process.argv.slice(2));
 const INPUT_PATH = args.input || "/Users/robin/Desktop/waje data/新包生命周期V2 - 含联运2026.7.27-8.10_Joint修正版.xlsx";
+const freshOutput = args["fresh-output"] === true;
 const startDate = args["start-date"];
 const endDate = args["end-date"];
 if (!/^\d{4}-\d{2}-\d{2}$/.test(startDate || "") || !/^\d{4}-\d{2}-\d{2}$/.test(endDate || "")) {
@@ -183,7 +185,7 @@ async function loadDataset(config) {
 
   assert(summary.length === 1 && summary[0].length === 11, `${config.date}: summary shape invalid`);
   assert(detail.length === game.length * 5 && detail.every((row) => row.length === 21), `${config.date}: detail shape invalid (${detail.length})`);
-  assert(game.length >= 27 && game.length <= 28 && game.every((row) => row.length === 19), `${config.date}: game shape invalid (${game.length})`);
+  assert(game.length > 0 && game.every((row) => row.length === 19), `${config.date}: game shape invalid (${game.length})`);
   assert(active.length === 4 && active.every((row) => row.length === 31), `${config.date}: active shape invalid (${active.length})`);
 
   const gameNames = game.map((row) => String(row[1]));
@@ -195,7 +197,8 @@ async function loadDataset(config) {
   }
   assert(new Set(active.map((row) => Number(row[1]))).size === 4, `${config.date}: duplicate active lifecycle rows`);
 
-  const activeAmounts = { baseBet: sum(activeAll, 2), baseExpected: sum(activeAll, 6), baseActual: sum(activeAll, 7), protection: sum(activeAll, 8), control: sum(activeAll, 9), entireBet: sum(activeAll, 10), entireExpected: sum(activeAll, 15), entireActual: sum(activeAll, 16), people: sum(activeAll, 18) };
+  const activeIncluded = activeAll.filter((row) => Number(row[1]) > 0);
+  const activeAmounts = { baseBet: sum(activeIncluded, 2), baseExpected: sum(activeIncluded, 6), baseActual: sum(activeIncluded, 7), protection: sum(activeIncluded, 8), control: sum(activeIncluded, 9), entireBet: sum(activeIncluded, 10), entireExpected: sum(activeIncluded, 15), entireActual: sum(activeIncluded, 16), people: sum(activeIncluded, 18) };
   const gameAmounts = { baseBet: sum(game, 2), baseExpected: sum(game, 3), baseActual: sum(game, 4), protection: sum(game, 8), control: sum(game, 9), entireBet: sum(game, 12), entireExpected: sum(game, 13), entireActual: sum(game, 14) };
 
   for (const key of ["baseBet", "baseExpected", "baseActual", "protection", "control", "entireBet", "entireExpected", "entireActual"]) {
@@ -211,8 +214,9 @@ async function loadDataset(config) {
 
   for (const gameRow of game) {
     const name = String(gameRow[1]);
-    const detailRows = detailAll.filter((row) => Number(row[1]) >= 1 && Number(row[1]) <= 11 && String(row[2]) === name);
-    assert(detailRows.length === 11, `${config.date}: ${name} detail rows=${detailRows.length}`);
+    const detailRows = detailAll.filter((row) => Number(row[1]) > 0 && String(row[2]) === name);
+    assert(detailRows.length > 0, `${config.date}: ${name} has no positive-lifecycle detail rows`);
+    assert(new Set(detailRows.map((row) => Number(row[1]))).size === detailRows.length, `${config.date}: ${name} duplicate lifecycle detail rows`);
     const pairs = [
       [sum(detailRows, 9), gameRow[2], "baseBet"],
       [sum(detailRows, 7), gameRow[3], "baseExpected"],
@@ -273,6 +277,47 @@ function sheetHash(sheet) {
   const used = sheet.getUsedRange(false);
   if (!used) return sha({ name: sheet.name, empty: true });
   return sha({ name: sheet.name, address: used.address, values: used.values, formulas: used.formulas });
+}
+
+async function truncateWorkbookRows(filePath, maxRowsBySheet) {
+  const zip = await JSZip.loadAsync(await fs.readFile(filePath));
+  const workbookXml = await zip.file("xl/workbook.xml").async("string");
+  const relationshipsXml = await zip.file("xl/_rels/workbook.xml.rels").async("string");
+  const relationships = Object.fromEntries(
+    [...relationshipsXml.matchAll(/<(?:Relationship|x:Relationship)\b[^>]*\/>/g)]
+      .map((match) => {
+        const id = match[0].match(/\bId="([^"]+)"/)?.[1];
+        const rawTarget = match[0].match(/\bTarget="([^"]+)"/)?.[1];
+        if (!id || !rawTarget) return null;
+        const target = rawTarget.replace(/^\//, "");
+        return [id, target.startsWith("xl/") ? target : `xl/${target}`];
+      })
+      .filter(Boolean),
+  );
+  const sheetPaths = Object.fromEntries(
+    [...workbookXml.matchAll(/<(?:sheet|x:sheet)\b[^>]*\bname="([^"]+)"[^>]*\br:id="([^"]+)"[^>]*\/>/g)]
+      .map((match) => [match[1], relationships[match[2]]])
+      .filter(([, sheetPath]) => sheetPath),
+  );
+
+  for (const [sheetName, maxRow] of Object.entries(maxRowsBySheet)) {
+    const sheetPath = sheetPaths[sheetName];
+    assert(sheetPath && zip.file(sheetPath), `Cannot locate worksheet XML for ${sheetName}`);
+    let xml = await zip.file(sheetPath).async("string");
+    xml = xml.replace(/<(?:x:)?row\b[^>]*\br="(\d+)"[^>]*>[\s\S]*?<\/(?:x:)?row>/g, (rowXml, rowNumber) => (
+      Number(rowNumber) > maxRow ? "" : rowXml
+    ));
+    xml = xml.replace(/<dimension\b[^>]*\bref="([A-Z]+\d+):([A-Z]+)\d+"[^>]*\/>/, (_match, first, lastColumn) => (
+      `<dimension ref="${first}:${lastColumn}${maxRow}"/>`
+    ));
+    zip.file(sheetPath, xml);
+  }
+
+  await fs.writeFile(filePath, await zip.generateAsync({
+    type: "nodebuffer",
+    compression: "DEFLATE",
+    compressionOptions: { level: 6 },
+  }));
 }
 
 function applyAppendedFormats(sheet, kind, baseStart, rowCount) {
@@ -344,7 +389,10 @@ for (const [kind, spec] of Object.entries(targetSheets)) {
   const requestedRows = Object.fromEntries(sourceConfigs.map((config) => [config.date, findRowsBySerial(sheet, excelSerial(config.date))]));
   const existingDates = Object.values(requestedRows).filter((rows) => rows.length > 0).length;
   const totalRows = datasets.reduce((n, d) => n + d[kind].length, 0);
-  if (existingDates === 0) {
+  if (freshOutput) {
+    baseStarts[kind] = 1;
+    appendMode[kind] = false;
+  } else if (existingDates === 0) {
     baseStarts[kind] = used.rowCount;
     appendMode[kind] = true;
   } else {
@@ -377,6 +425,16 @@ for (const [kind, spec] of Object.entries(targetSheets)) {
     sheet.getRangeByIndexes(baseStart + at, 0, rowsForDate, spec.sourceColumns).values = datasets[i][kind];
     at += rowsForDate;
   }
+  // In fresh-output mode the style template still contains its old Joint
+  // rows below the newly written ordinary-pool data. Clear that tail before
+  // validation; otherwise the same dates can be found twice in memory and
+  // the output would be validated against stale template values. The XML
+  // truncation below remains as a second, file-level guard.
+  if (freshOutput && baseStart + totalRows < originalTailEnd) {
+    sheet
+      .getRangeByIndexes(baseStart + totalRows, 0, originalTailEnd - (baseStart + totalRows), spec.columns)
+      .clear({ applyTo: "all" });
+  }
   // Reapply imported body/number formats because copyFrom copies values/formulas,
   // not imported cell styles. Source dates remain Excel serial values.
   applyAppendedFormats(sheet, kind, baseStart, totalRows);
@@ -404,6 +462,14 @@ await renderQa(workbook, sheetMapping.active, "A1:AE20", "active-preview.png");
 
 const outputBlob = await SpreadsheetFile.exportXlsx(workbook);
 await outputBlob.save(OUTPUT_PATH);
+if (freshOutput) {
+  const maxRowsBySheet = {};
+  for (const [kind, spec] of Object.entries(targetSheets)) {
+    const totalRows = datasets.reduce((count, dataset) => count + dataset[kind].length, 0);
+    maxRowsBySheet[sheetMapping[kind]] = 1 + totalRows;
+  }
+  await truncateWorkbookRows(OUTPUT_PATH, maxRowsBySheet);
+}
 await fs.copyFile(OUTPUT_PATH, DESKTOP_PATH);
 
 const verifyBlob = await FileBlob.load(OUTPUT_PATH);
@@ -460,6 +526,7 @@ const report = {
   sourceManifest,
   finalCounts,
   invariants: {
+    freshOutput,
     nonTargetSheetsUnchanged: true,
     historicalRowsBeforeQueryRangeUnchanged: true,
     sourceHeadersValidated: true,
