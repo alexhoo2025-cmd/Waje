@@ -34,6 +34,7 @@ node_modules
 **/node_modules
 **/.venv/
 *.sqlite3*
+**/*.sqlite*
 *.lock
 
 # Binary/report renderings; keep the source Markdown and code instead
