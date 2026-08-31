@@ -55,3 +55,9 @@ node_modules
 **/*_receipt.json
 **/preflight.json
 **/source_inventory.json
+
+# Analysis run outputs; keep analysis Markdown, SQL, and source code
+analysis/**/*.json
+analysis/**/*.xml
+analysis/**/*.csv
+analysis/**/*.tsv
