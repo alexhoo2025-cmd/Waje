@@ -9,6 +9,9 @@ data/processed/play_reviews/.pipeline.lock
 
 # Local workspaces, caches, and generated temporary artifacts
 .codex-work/
+.bkit/
+.gemini/
+plugins/
 tmp/
 output/
 outputs/
@@ -44,3 +47,11 @@ node_modules
 **/*.xlsx
 **/*.xls
 **/*.ndjson
+
+# Generated analysis receipts, query outputs, and raw metadata
+**/query_outputs/
+**/raw_metadata/
+**/*-receipt.json
+**/*_receipt.json
+**/preflight.json
+**/source_inventory.json
