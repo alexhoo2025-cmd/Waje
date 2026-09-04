@@ -3,20 +3,20 @@ import crypto from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
 
-const runDir = "data/outputs/origin_new_user/2026-08-28-30d";
+const runDir = process.env.RUN_DIR || "data/outputs/origin_new_user/2026-08-28-30d";
 const backupDir = path.join(runDir, "lark-backup");
 const output = path.join(runDir, "backup-manifest.json");
 const workbookInfo = {
   token: "At8gwdbXUiPa0WkXvKqlSUNKg5d",
-  revision: 716,
+  revision: Number(process.env.BACKUP_REVISION || 716),
   sheets: [
-    ["WajeSpecial-facebook", "9cd78d", 321, 44],
-    ["WajeSpecial-googleadwords_int", "xWsChb", 321, 44],
-    ["WajeSpecial-Google商店", "Cfkonh", 321, 44],
-    ["WAJEIOS-AppStore商店", "25iiEi", 321, 44],
-    ["WAJEBETH5", "GrWEoo", 300, 53],
-    ["wajeH5-facebook", "vkV1SD", 222, 44],
-    ["wajeH5ga-googlewords_int", "ef19NP", 223, 44],
+    ["WajeSpecial-facebook", "9cd78d", 322, 44],
+    ["WajeSpecial-googleadwords_int", "xWsChb", 322, 44],
+    ["WajeSpecial-Google商店", "Cfkonh", 322, 44],
+    ["WAJEIOS-AppStore商店", "25iiEi", 322, 44],
+    ["WAJEBETH5", "GrWEoo", 301, 53],
+    ["wajeH5-facebook", "vkV1SD", 224, 44],
+    ["wajeH5ga-googlewords_int", "ef19NP", 224, 44],
     ["PWA", "gjy6I1", 403, 55],
   ],
 };

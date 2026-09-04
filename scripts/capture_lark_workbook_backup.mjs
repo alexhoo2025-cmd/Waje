@@ -10,13 +10,13 @@ const cli = "/Users/robin/.local/node-v24.18.1-darwin-arm64/bin/lark-cli";
 const token = "At8gwdbXUiPa0WkXvKqlSUNKg5d";
 const dir = process.env.LARK_BACKUP_DIR || "data/outputs/origin_new_user/2026-08-28-30d/lark-backup";
 const items = [
-  ["WajeSpecial-facebook", "9cd78d", "AR322"],
-  ["WajeSpecial-googleadwords_int", "xWsChb", "AR322"],
-  ["WajeSpecial-Google商店", "Cfkonh", "AR322"],
-  ["WAJEIOS-AppStore商店", "25iiEi", "AR322"],
-  ["WAJEBETH5", "GrWEoo", "BA301"],
-  ["wajeH5-facebook", "vkV1SD", "AR224"],
-  ["wajeH5ga-googlewords_int", "ef19NP", "AR224"],
+  ["WajeSpecial-facebook", "9cd78d", "AR325"],
+  ["WajeSpecial-googleadwords_int", "xWsChb", "AR325"],
+  ["WajeSpecial-Google商店", "Cfkonh", "AR325"],
+  ["WAJEIOS-AppStore商店", "25iiEi", "AR325"],
+  ["WAJEBETH5", "GrWEoo", "BA304"],
+  ["wajeH5-facebook", "vkV1SD", "AR227"],
+  ["wajeH5ga-googlewords_int", "ef19NP", "AR227"],
   ["PWA", "gjy6I1", "BC403"],
 ];
 const safe = (value) => value.replace(/[^\w.-]+/g, "_");

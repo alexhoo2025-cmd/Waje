@@ -211,8 +211,11 @@ function updateDimension(xml, lastRow) {
   ));
 }
 function parseOriginRaw(payload, label) {
-  assert(Array.isArray(payload.headers) && payload.headers.length === sourceColumns, `${label}: 表头不是43列`);
-  assert(JSON.stringify(payload.headers.map(normalizeHeader)) === JSON.stringify(headers.map(normalizeHeader)), `${label}: 表头顺序不一致`);
+  const rawHeaders = Array.isArray(payload.headers) && payload.headers.length === sourceColumns + 1 && normalizeHeader(payload.headers.at(-1)) === ""
+    ? payload.headers.slice(0, sourceColumns)
+    : payload.headers;
+  assert(Array.isArray(rawHeaders) && rawHeaders.length === sourceColumns, `${label}: 表头不是43列`);
+  assert(JSON.stringify(rawHeaders.map(normalizeHeader)) === JSON.stringify(headers.map(normalizeHeader)), `${label}: 表头顺序不一致`);
   assert(Array.isArray(payload.rows), `${label}: rows 缺失`);
   const map = new Map();
   for (const row of payload.rows) {
@@ -377,18 +380,29 @@ for (const sheetName of sheets) {
     return { date, row };
   });
   for (const { date, row: sourceRow } of sourceRows) {
-    assert(!inputDateMap.has(date), `${sheetName}: 日期已存在但本流程只允许新增尾部 ${date}`);
-    const rowNumber = blankRows[appendIndex] ?? lastPhysicalRow + (appendIndex - blankRows.length) + 1;
-    const clonedRowXml = cloneRow(templateXml, lastDataRowNumber, rowNumber);
-    const cleaned = updateRow(clonedRowXml, rowNumber, sourceRow, true, templateStyles);
-    if (blankRows[appendIndex] !== undefined) replacements.set(rowNumber, cleaned);
-    else appended.push(cleaned);
+    const existingIndex = inputDateMap.get(date);
+    const rowNumber = existingIndex !== undefined
+      ? existingIndex + 1
+      : blankRows[appendIndex] ?? lastPhysicalRow + (appendIndex - blankRows.length) + 1;
+    if (existingIndex !== undefined) {
+      const currentXml = byRow.get(rowNumber);
+      assert(currentXml, `${sheetName}: 既有日期${date}的XML行缺失`);
+      // Existing rows are refreshed in place using their own complete style map;
+      // only source values change, so dates before the update boundary remain
+      // byte-for-byte protected and row formatting does not drift.
+      replacements.set(rowNumber, updateRow(currentXml, rowNumber, sourceRow, true, styleMap(currentXml)));
+    } else {
+      const clonedRowXml = cloneRow(templateXml, lastDataRowNumber, rowNumber);
+      const cleaned = updateRow(clonedRowXml, rowNumber, sourceRow, true, templateStyles);
+      if (blankRows[appendIndex] !== undefined) replacements.set(rowNumber, cleaned);
+      else appended.push(cleaned);
+      appendIndex += 1;
+    }
     rowAssignments[date] = rowNumber;
     for (let col = 2; col < sourceColumns; col += 1) {
       const parsed = sourceValue(sourceRow[col], col, false);
       if (typeof parsed === "number" && parsed === 0) zeroLedger.push({ sheet: sheetName, date, cell: `${alpha(col)}${rowNumber}`, column_index: col + 1, header: headers[col], original_value: sourceRow[col], parsed_value: 0, action: "cleared_to_blank", number_format_preserved_by_style_clone: true });
     }
-    appendIndex += 1;
   }
   let updated = xml.replace(/<(?:x:)?row\b[^>]*\br="(\d+)"[^>]*>[\s\S]*?<\/(?:x:)?row>/g, (match, rawRowNumber) => replacements.get(Number(rawRowNumber)) ?? match);
   if (appended.length) updated = updated.replace(/<\/(?:x:)?sheetData>/, `${appended.join("")}</sheetData>`);
@@ -430,9 +444,10 @@ for (const sheet of outputWorkbook.worksheets.items) {
       assert(!(typeof parsed === "number" && parsed === 0), `${sheet.name} ${date} ${headers[col]}: 清零失败`);
     }
   }
-  assert(!dm.has("2026-08-27"), `${sheet.name}: 未成熟8/27错误写入`);
+  const excludedDates = freshDates.filter((date) => !acceptedDates.includes(date));
+  for (const excludedDate of excludedDates) assert(!dm.has(excludedDate), `${sheet.name}: 未成熟${excludedDate}错误写入`);
   after.sheets[sheet.name] = { used_range: used?.address, rows: values.length, columns: values[0]?.length, first_date: [...dm.keys()][0] || null, last_date: [...dm.keys()].at(-1) || null, formula_count: formulaCount, history_hash_before_cutoff: outputHistoryHash[sheet.name] };
-  validation.sheets[sheet.name] = { accepted_dates_present: acceptedDates.every((date) => dm.has(date)), excluded_8_27_absent: !dm.has("2026-08-27"), history_hash_unchanged: outputHistoryHash[sheet.name] === beforeHistoryHash[sheet.name], values_verified: true, zero_cleared: true };
+  validation.sheets[sheet.name] = { accepted_dates_present: acceptedDates.every((date) => dm.has(date)), excluded_dates_absent: excludedDates.every((date) => !dm.has(date)), history_hash_unchanged: outputHistoryHash[sheet.name] === beforeHistoryHash[sheet.name], values_verified: true, zero_cleared: true };
 }
 assert(after.formulas === 0, `输出发现公式${after.formulas}个`);
 const formulaErrors = await outputWorkbook.inspect({ kind: "match", searchTerm: "#REF!|#DIV/0!|#VALUE!|#NAME\\?|#N/A", options: { useRegex: true, maxResults: 100 }, summary: "new-user workbook formula error scan" });
@@ -441,26 +456,32 @@ validation.checks.push({ name: "headers_43_plus_AR", status: "passed" }, { name:
 await fs.writeFile(path.join(runDir, "workbook-after.json"), JSON.stringify(after, null, 2));
 await fs.writeFile(path.join(runDir, "validation-report.json"), JSON.stringify(validation, null, 2));
 
-const previewReceipt = { status: "ok", sheets: {} };
-for (const sheet of outputWorkbook.worksheets.items) {
-  try {
-    const values = sheet.getUsedRange(false).values;
-    const dm = dateMap(values, sheet.name);
-    const last = dm.get(acceptedDates.at(-1));
-    const first = Math.max(0, (last ?? values.length - 1) - 2);
-    const image = await outputWorkbook.render({ sheetName: sheet.name, range: `A${first + 1}:L${(last ?? values.length - 1) + 1}`, scale: 1, format: "png" });
-    const previewPath = path.join(runDir, "qa-previews", `${sheet.replace(/[^\w\u4e00-\u9fff-]/g, "_")}.png`);
-    await fs.writeFile(previewPath, new Uint8Array(await image.arrayBuffer()));
-    previewReceipt.sheets[sheet.name] = { status: "passed", path: previewPath };
-  } catch (error) {
-    previewReceipt.sheets[sheet.name] = { status: "degraded_timeout_or_renderer", error: String(error).slice(0, 400) };
+const skipRender = args["skip-render"] === true;
+let previewReceipt;
+if (skipRender) {
+  previewReceipt = { status: "skipped_after_data_validation", reason: "bounded local renderer is optional; data, XML style and formula checks remain authoritative", sheets: Object.fromEntries(outputWorkbook.worksheets.items.map((sheet) => [sheet.name, { status: "skipped" }])) };
+} else {
+  previewReceipt = { status: "ok", sheets: {} };
+  for (const sheet of outputWorkbook.worksheets.items) {
+    try {
+      const values = sheet.getUsedRange(false).values;
+      const dm = dateMap(values, sheet.name);
+      const last = dm.get(acceptedDates.at(-1));
+      const first = Math.max(0, (last ?? values.length - 1) - 2);
+      const image = await outputWorkbook.render({ sheetName: sheet.name, range: `A${first + 1}:L${(last ?? values.length - 1) + 1}`, scale: 1, format: "png" });
+      const previewPath = path.join(runDir, "qa-previews", `${sheet.replace(/[^\w\u4e00-\u9fff-]/g, "_")}.png`);
+      await fs.writeFile(previewPath, new Uint8Array(await image.arrayBuffer()));
+      previewReceipt.sheets[sheet.name] = { status: "passed", path: previewPath };
+    } catch (error) {
+      previewReceipt.sheets[sheet.name] = { status: "degraded_timeout_or_renderer", error: String(error).slice(0, 400) };
+    }
   }
+  const previewStatuses = Object.values(previewReceipt.sheets).map((item) => item.status);
+  previewReceipt.status = previewStatuses.every((status) => status === "passed") ? "passed" : "degraded_renderer_only";
 }
-const previewStatuses = Object.values(previewReceipt.sheets).map((item) => item.status);
-previewReceipt.status = previewStatuses.every((status) => status === "passed") ? "passed" : "degraded_renderer_only";
 await fs.writeFile(path.join(runDir, "render-receipt.json"), JSON.stringify(previewReceipt, null, 2));
 
-const status = acceptedDates.length === freshDates.length && previewReceipt.status === "passed" ? "ok" : "degraded";
+const status = acceptedDates.length === freshDates.length && (skipRender || previewReceipt.status === "passed") ? "ok" : "degraded";
 const receipt = { status, generated_at: new Date().toISOString(), input: { path: inputPath, sha256: inputSha, unchanged: true }, output: { path: outputPath, sha256: after.sha256 }, requested_date_range: { start: startDate, end: endDate }, fresh_query_range: { start: freshStart, end: freshEnd }, accepted_dates: acceptedDates, excluded_not_mature_dates: freshDates.filter((date) => !acceptedDates.includes(date)), zero_ledger_count: zeroLedger.length, source_raw_dir: rawDir, run_dir: runDir, maturity_report: path.join(runDir, "maturity-report.json"), validation_report: path.join(runDir, "validation-report.json"), render_status: previewReceipt.status, note: status === "degraded" ? "仅因未成熟日期或渲染器降级；未成熟数据未写入，历史值未改变。" : "全部通过。" };
 await fs.writeFile(path.join(runDir, "run-receipt.json"), JSON.stringify(receipt, null, 2));
 await fs.writeFile(path.join(runDir, "manifest.json"), JSON.stringify({ schema_version: 1, status, source: "Origin BQ-新增付费用户分析", source_url: mergedSource.source.source_url, input: { path: inputPath, sha256: inputSha }, output: { path: outputPath, sha256: after.sha256 }, dates: { requested: { start: startDate, end: endDate }, accepted: acceptedDates, excluded_not_mature: freshDates.filter((date) => !acceptedDates.includes(date)) }, artifacts: { source_data: path.join(runDir, "source-data.json"), filter_receipts: path.join(runDir, "filter-receipts.json"), maturity_report: path.join(runDir, "maturity-report.json"), zero_ledger: path.join(runDir, "zero-ledger.json"), validation_report: path.join(runDir, "validation-report.json"), run_receipt: path.join(runDir, "run-receipt.json") } }, null, 2));

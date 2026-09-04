@@ -12,10 +12,8 @@ from typing import Any
 
 
 DEFAULT_FALLBACK_MODELS = (
+    "gemini-3.8-flash",
     "gemini-3.7-flash",
-    "gemini-3.5-flash",
-    "gemini-2.5-flash",
-    "gemini-2.5-pro",
 )
 
 
@@ -105,4 +103,3 @@ def classify_model_attempt(returncode: int, stderr: str, *, timed_out: bool = Fa
 
 def retryable_model_status(status: str) -> bool:
     return status in {"model_unavailable", "model_transient", "failed_timeout", "failed_invalid_json"}
-

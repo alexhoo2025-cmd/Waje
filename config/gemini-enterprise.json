@@ -3,7 +3,18 @@
   "mode": "enterprise_web_primary",
   "preferred_execution_backend": "enterprise_web_agent",
   "execution_policy": {
-    "delegate_by_default": true,
+    "delegate_by_default": false,
+    "cli_normal_invocation_enabled": false,
+    "availability": "backend_specific",
+    "web_agent": {
+      "enabled_for_complex_tasks": true,
+      "availability": "user_confirmed_operational",
+      "confirmation_source": "user_feedback_2026-09-04",
+      "note": "用户确认网页Agent执行效果较好，偶尔需账户或凭证验证；不受本地CLI恢复门禁影响。",
+      "authentication_handling": "resume_same_authorized_account_session"
+    },
+    "review_window": "2026-08-22/2026-09-04",
+    "routing_note": "仅复杂交互任务按能力分派；Claude负责分析、数据处理、设计与代码，Gemini网页Agent可承担企业资料/授权查询等专项。简单日常任务不分派。只有本地Gemini CLI保持恢复门禁。",
     "enterprise_token_budget": "unconstrained_by_codex",
     "codex_role": [
       "task_router",
@@ -51,28 +62,63 @@
   "approval_mode": "plan",
   "output_format": "json",
   "preferred_models": {
-    "default": "gemini-3.7-flash",
+    "default": "gemini-3.8-flash",
     "complex_analysis": "gemini-3.1-pro-preview",
-    "web_research": "gemini-3.7-flash",
+    "web_research": "gemini-3.8-flash",
     "competitor_intelligence": "gemini-3.1-pro-preview"
   },
   "model_fallback": {
     "enabled": true,
     "models": [
-      "gemini-3.7-flash",
-      "gemini-3.5-flash",
-      "gemini-2.5-flash",
-      "gemini-2.5-pro"
+      "gemini-3.8-flash",
+      "gemini-3.7-flash"
     ],
-    "allow_cli_default": true,
-    "max_attempts": 5,
+    "allow_cli_default": false,
+    "max_attempts": 2,
     "retry_on": [
       "model_unavailable",
       "model_transient",
       "failed_timeout",
       "failed_invalid_json"
     ],
-    "note": "模型名称为有序偏好；不可用时依次回退，最后允许 Gemini CLI 使用企业默认模型。权限错误不绕过、不通过换模型规避。"
+    "note": "企业 CLI 的默认模型为 gemini-3.8-flash，仅在模型不可用、短暂故障、超时或无效 JSON 时回退 gemini-3.7-flash。Agent Platform 的独立模型选择由 agent_platform.model 管理；权限、许可证和 SQL 安全错误不通过换模型规避。"
+  },
+  "agent_platform": {
+    "agent_name": "Waje 端侧设备与性能分析助手",
+    "agent_id": "waje-device-performance-analyst-v1",
+    "design_project_id": "wajenigeria",
+    "model": "gemini-3.1-pro-preview",
+    "model_fallback": ["gemini-2.5-pro"],
+    "model_location": "global",
+    "agent_runtime_region_preference": "us-west1",
+    "thinking_level": "MEDIUM",
+    "privacy_mode": "aggregate_only",
+    "daily_monitor": {
+      "timezone": "Africa/Lagos",
+      "schedule": "0 13 * * *",
+      "external_notifications": false
+    },
+    "web_tools": {
+      "google_search": true,
+      "url_context": true,
+      "scope": "public_sources_only",
+      "evidence_fields": [
+        "source_url",
+        "title",
+        "published_at",
+        "retrieved_at",
+        "evidence_level",
+        "claim_boundary"
+      ],
+      "note": "Public web research complements, but never replaces, approved BigQuery aggregate facts."
+    },
+    "safe_views": [
+      "wajenigeria.agent_analytics.vw_firebase_endpoint_coverage_daily_safe",
+      "wajenigeria.agent_analytics.vw_firebase_event_session_daily_safe",
+      "wajenigeria.agent_analytics.vw_firebase_native_performance_daily_safe",
+      "wajenigeria.agent_analytics.vw_firebase_stability_daily_safe",
+      "wajenigeria.agent_analytics.vw_firebase_h5_behavior_daily_safe"
+    ]
   },
   "web_execution": {
     "base_url": "https://vertexaisearch.cloud.google.com",

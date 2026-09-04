@@ -38,13 +38,13 @@ python3 scripts/run_daily_pipeline.py
 8. 与 Waje 项目密切相关的飞书、网页、PDF、Excel、图片和会议资料，完成拆解后默认写入对应 `knowledge/` 专题 Markdown，保留来源/revision/哈希和证据状态，并刷新知识图谱；如用户明确要求只回答、不入库，再跳过持久化。
 9. 文档入库执行 [[knowledge/04-方法/相关文档拆解与知识入库默认工作流]]；涉及敏感资料时只保存脱敏规则、机制和验证要求，不复制证件号、账号、完整逐字稿或带授权码的原始资源。
 
-## 企业 Gemini 协作入口
+## 企业 Gemini 专项入口（2026-09-04 调整）
 
-- 企业 Gemini 是 Waje 项目的优先执行层：公开检索、长文档拆解、授权 BigQuery 聚合查询、多来源对比和报告初稿，默认先由相应 Gemini Agent 完成；不因节省 Gemini Token 而压缩其推理或资料处理深度。
+- 协作仅用于本项目聊天中的复杂分析、数据处理、方案设计等任务，规则见AGENTS.md；简单日常任务用原默认轻量模型/脚本，不分派。用户确认Gemini网页Agent效果较好，偶有认证需求，保留复杂专项使用；只有本地Gemini CLI桥接调用暂停，--recovery-probe用于该CLI恢复测试。
 - Codex 负责识别任务边界、选择 Agent、审计来源/口径/数据质量并完成最终可交付产物。简单润色、项目本地文件修改与最终质量把关可直接由 Codex 完成。
 - Waje BigQuery 分析任务使用 `config/gemini-enterprise.json`、`tools/gemini_bridge.py` 和 `scripts/run_gemini_waje_analysis.py`。
 - Firebase 多端设备/性能汇总使用 `scripts/run_gemini_multiplatform_firebase_analysis.py`；默认执行 `analysis/firebase_multiplatform_device_performance_2026_08_27/sql/summary/` 的窗口级聚合 SQL，不下载明细行。Gemini MCP 未通过安全门禁时，才按回执标记 `api_fallback` 并使用个人 ADC 的只读 BigQuery API 复核。
-- 当前优先执行通道为企业 Gemini 网页 Agent：公开竞品/市场研究使用 Deep Research；经授权的聚合数据查询使用 Data Execution Agent；跨资料诊断使用 Deep Analysis Agent；复杂任务由 Master Orchestrator 编排。
+- 企业网页Agent按用户反馈作为可用专项通道：企业资料、授权聚合查询及跨资料研究适合时使用。偶发账户/凭证验证恢复同一授权会话即可，不受CLI门禁影响；网页的精确运行量和成功率未单独采集，不虚构这些统计。
 - 企业 Gemini 只负责认证聚合视图的只读查询和初步解释；Codex 负责指标口径、数据质量、相关性边界和最终报告。
 - BigQuery 数据项目与 Gemini/Vertex 运行项目分开维护；未确认 `runtime_project_id` 前不得真实调用。
 - 模型名称是有序偏好而非硬性依赖：读取 `config/gemini-enterprise.json` 的 `model_fallback`，首选不可用时依次尝试候选模型，最后允许 Gemini CLI 使用企业默认模型；权限错误不通过更换模型绕过。

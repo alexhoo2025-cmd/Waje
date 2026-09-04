@@ -5,19 +5,19 @@ import { pathToFileURL } from "node:url";
 
 const moduleRoot = process.env.CODEX_NODE_MODULES || "/Users/robin/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules";
 const { FileBlob, SpreadsheetFile } = await import(pathToFileURL(path.join(moduleRoot, "@oai/artifact-tool/dist/artifact_tool.mjs")).href);
-const outputWorkbookPath = "/Users/robin/Desktop/waje data/新用户数据分析2026.7.29-8.26_new_AI更新版.xlsx";
-const runDir = "data/outputs/origin_new_user/2026-08-28-30d";
-const acceptedDates = ["2026-08-25", "2026-08-26"];
+const outputWorkbookPath = "/Users/robin/Desktop/waje data/新用户数据分析2026.8.25-8.31_new_AI更新版.xlsx";
+const runDir = "data/outputs/origin_new_user/2026-08-31-7d";
+const acceptedDates = ["2026-08-25", "2026-08-26", "2026-08-27", "2026-08-28", "2026-08-29"];
 const sourceColumns = 43;
 const localToOnline = {
-  "WajeSpecial-facebook": { online: "WajeSpecial-facebook", id: "9cd78d", rowStart: 321, local: "WajeSpecial-facebook", templateRow: 320 },
-  "WajeSpecial-googleadwords_int": { online: "WajeSpecial-googleadwords_int", id: "xWsChb", rowStart: 321, local: "WajeSpecial-googleadwords_int", templateRow: 320 },
-  "WajeSpecial-Google商店": { online: "WajeSpecial-Google商店", id: "Cfkonh", rowStart: 321, local: "WajeSpecial-Google商店", templateRow: 320 },
-  "wajeios-AppStore商店": { online: "WAJEIOS-AppStore商店", id: "25iiEi", rowStart: 321, local: "wajeios-AppStore商店", templateRow: 320 },
-  "wajebetH5-facebook": { online: "WAJEBETH5", id: "GrWEoo", rowStart: 300, local: "wajebetH5-facebook", templateRow: 299 },
-  "wajeH5-fb": { online: "wajeH5-facebook", id: "vkV1SD", rowStart: 223, local: "wajeH5-fb", templateRow: 222 },
-  "wajeH5ga-googlewors_int": { online: "wajeH5ga-googlewords_int", id: "ef19NP", rowStart: 223, local: "wajeH5ga-googlewors_int", templateRow: 222 },
-  "pww": { online: "PWA", id: "gjy6I1", rowStart: 218, local: "pww", templateRow: 217 },
+  "WajeSpecial-facebook": { online: "WajeSpecial-facebook", id: "9cd78d", rowStart: 321, local: "WajeSpecial-facebook", templateRow: 322 },
+  "WajeSpecial-googleadwords_int": { online: "WajeSpecial-googleadwords_int", id: "xWsChb", rowStart: 321, local: "WajeSpecial-googleadwords_int", templateRow: 322 },
+  "WajeSpecial-Google商店": { online: "WajeSpecial-Google商店", id: "Cfkonh", rowStart: 321, local: "WajeSpecial-Google商店", templateRow: 322 },
+  "wajeios-AppStore商店": { online: "WAJEIOS-AppStore商店", id: "25iiEi", rowStart: 321, local: "wajeios-AppStore商店", templateRow: 322 },
+  "wajebetH5-facebook": { online: "WAJEBETH5", id: "GrWEoo", rowStart: 300, local: "wajebetH5-facebook", templateRow: 301 },
+  "wajeH5-fb": { online: "wajeH5-facebook", id: "vkV1SD", rowStart: 223, local: "wajeH5-fb", templateRow: 224 },
+  "wajeH5ga-googlewors_int": { online: "wajeH5ga-googlewords_int", id: "ef19NP", rowStart: 223, local: "wajeH5ga-googlewors_int", templateRow: 224 },
+  "pww": { online: "PWA", id: "gjy6I1", rowStart: 218, local: "pww", templateRow: 219 },
 };
 const backupNames = {
   "WajeSpecial-facebook": "WajeSpecial-facebook.json",
@@ -71,7 +71,7 @@ for (const [localName, map] of Object.entries(localToOnline)) {
       if (border) cell.border_styles = border;
       cells.push(cell);
     }
-    const rowNumber = map.rowStart + (date === acceptedDates[0] ? 0 : 1);
+    const rowNumber = map.rowStart + acceptedDates.indexOf(date);
     writes.push({ sheet_id: map.id, range: `A${rowNumber}:AQ${rowNumber}`, cells: [cells] });
     firstRowCells.push({ date, row_number: rowNumber, source_row: row.slice(0, sourceColumns), style_template_row: map.templateRow });
   }
@@ -79,5 +79,5 @@ for (const [localName, map] of Object.entries(localToOnline)) {
 }
 await fs.writeFile(path.join(runDir, "lark-writes.json"), JSON.stringify(writes, null, 2));
 await fs.writeFile(path.join(runDir, "lark-alias-mapping.json"), JSON.stringify({ status: "validated_by_header_and_date_boundary", mappings: mappingReceipt }, null, 2));
-await fs.writeFile(path.join(runDir, "lark-write-plan.json"), JSON.stringify({ status: "ready_for_execute", target_token: "At8gwdbXUiPa0WkXvKqlSUNKg5d", target_revision_before_write_expected: 723, dates: acceptedDates, source_columns: sourceColumns, range_end: "AQ", writes: writes.map((item) => ({ sheet_id: item.sheet_id, range: item.range, cell_count: item.cells[0].length })), excluded_not_mature_dates: ["2026-08-27"], extra_columns_preserved: true }, null, 2));
+await fs.writeFile(path.join(runDir, "lark-write-plan.json"), JSON.stringify({ status: "ready_for_execute", target_token: "At8gwdbXUiPa0WkXvKqlSUNKg5d", target_revision_before_write_expected: 724, dates: acceptedDates, source_columns: sourceColumns, range_end: "AQ", writes: writes.map((item) => ({ sheet_id: item.sheet_id, range: item.range, cell_count: item.cells[0].length })), excluded_not_mature_dates: ["2026-08-30", "2026-08-31"], extra_columns_preserved: true }, null, 2));
 console.log(JSON.stringify({ status: "ok", writes: writes.length, cells: writes.reduce((n, w) => n + w.cells[0].length, 0), files: [path.join(runDir, "lark-writes.json"), path.join(runDir, "lark-alias-mapping.json"), path.join(runDir, "lark-write-plan.json")] }, null, 2));

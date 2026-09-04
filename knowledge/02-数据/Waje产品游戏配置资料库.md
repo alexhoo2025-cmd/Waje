@@ -3,8 +3,8 @@ type: configuration-reference
 domain: product-game-and-business-config
 product: Waje Special
 status: generated
-updated: 2026-08-28
-source_revision: 17409
+updated: 2026-09-04
+source_revision: 17947
 tags: [waje, 新包, 配置, 游戏, 数值, 风控, 生命周期]
 ---
 
@@ -15,9 +15,9 @@ tags: [waje, 新包, 配置, 游戏, 数值, 风控, 生命周期]
 ## 1. 同步状态
 
 - 来源：[飞书配置工作簿](https://ksg964l11fam.sg.larksuite.com/sheets/WWBBsLNl4hTFnbtI9arlmGsqgoc)
-- 当前 revision：`17409`；读取时间：`2026-08-28T15:03:22+08:00`。
-- 工作表：`69` 个，其中隐藏 ` 13` 个；结构化配置项：`24637` 条。
-- 本次差异：新增 `332`、修改 `0`、删除 `0`。
+- 当前 revision：`17947`；读取时间：`2026-09-04T15:01:52+08:00`。
+- 工作表：`70` 个，其中隐藏 ` 13` 个；结构化配置项：`26402` 条。
+- 本次差异：新增 `1765`、修改 `0`、删除 `0`。
 - 更新频率：每周五 15:00（Asia/Hong_Kong）；revision 未变化时不重写资料。
 
 ## 2. 阅读入口
@@ -32,8 +32,7 @@ tags: [waje, 新包, 配置, 游戏, 数值, 风控, 生命周期]
 
 | 工作表 | 新增 | 修改 | 删除 |
 | --- | ---: | ---: | ---: |
-| 有效期Chip场景和配置 | 94 | 0 | 0 |
-| 轻量游戏Tower(9013) | 238 | 0 | 0 |
+| 轻量化whot配置 | 1765 | 0 | 0 |
 
 ## 4. 全部工作表目录
 
@@ -108,6 +107,7 @@ tags: [waje, 新包, 配置, 游戏, 数值, 风控, 生命周期]
 | 67 | 轻量游戏Tower(9013) | 游戏与场次经济 | 可见 | `current_candidate` | 238 |
 | 68 | 2.18.0配置（三端） | 版本分包与平台配置 | 可见 | `current_candidate` | 73 |
 | 69 | 有效期Chip场景和配置 | 版本分包与平台配置 | 可见 | `current_candidate` | 94 |
+| 70 | 轻量化whot配置 | 游戏与场次经济 | 可见 | `current_candidate` | 1765 |
 
 ## 5. 使用边界
 

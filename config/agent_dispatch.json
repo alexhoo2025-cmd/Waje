@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "enabled": true,
+  "default_provider": "claude",
+  "models": {"haiku": "anthropic/claude-haiku-4.5", "sonnet": "anthropic/claude-sonnet-5", "opus": "anthropic/claude-opus-5"},
+  "roles": {"organizer": "haiku", "analyst": "sonnet", "developer": "sonnet", "reviewer": "sonnet", "specialist": "opus"},
+  "concurrency": {"default": 2, "maximum": 4, "healthy_results_to_expand": 2},
+  "timeouts": {"default": 600, "opus": 1200, "queue": 1800},
+  "transient_retries": 1,
+  "context_max_characters": 24000,
+  "cost_policy": "observe_only_no_daily_or_per_task_caps",
+  "scope": "complex_interactive_project_tasks_only",
+  "require_delegation_reason": true,
+  "routine_execution": "existing_default_model_and_scripts_no_delegation",
+  "excluded_workflows": ["play_reviews", "weekly_intelligence", "meeting_minutes", "config_changes"],
+  "pipeline_stages": [],
+  "pipeline_acceptance": "disabled_routine_tasks_do_not_delegate",
+  "gemini": {
+    "automatic_dispatch": false,
+    "specialist_mode": "backend_specific",
+    "web_agent": {"enabled_for_complex_tasks": true, "availability": "user_confirmed_operational", "occasional_authentication": "resume_same_authorized_account"},
+    "cli": {"automatic_dispatch": false, "mode": "explicit_recovery_only"},
+    "recovery_requirements": ["enterprise_identity_verified", "vertex_inference_verified", "approved_views_verified_for_bq", "real_result_validated", "downstream_consumption_verified"],
+    "do_not_transfer_query_credentials_to_claude": true
+  }
+}

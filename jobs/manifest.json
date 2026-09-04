@@ -6,6 +6,18 @@
   "schedule": "工作日 10:15 晨会；每日 20:20 Play 评价；周一 08:00 Play 周报、10:00 总周报 HTML；周五 15:00 采集/配置、17:00 总周报",
   "report_window": "上周五至本周四",
   "status": "active",
+  "agent_collaboration": {
+    "enabled_for_scheduled_jobs": false,
+    "scope": "complex_interactive_project_tasks_only",
+    "provider": "claude",
+    "config": "config/agent_dispatch.json",
+    "entrypoint": "tools/claude_bridge.py",
+    "integration": "none_for_routine_jobs",
+    "coordinator_acceptance_required": true,
+    "automatic_publication": "disabled",
+    "gemini_specialist": "web_available_for_complex_interactive_tasks_cli_recovery_only",
+    "schedule_changed": false
+  },
   "collection_automation_id": "robin-waje",
   "report_automation_id": "robin-waje-3",
   "stages": [

@@ -329,6 +329,7 @@ def run_task(
     task_id: str | None = None,
     output_dir: Path = OUTPUT_ROOT,
     dry_run: bool = False,
+    recovery_probe: bool = False,
 ) -> dict[str, Any]:
     config = load_config(config_path)
     resolved_id = _task_id(task_id)
@@ -346,6 +347,19 @@ def run_task(
             "prompt": prompt,
             "config_path": str(config_path.relative_to(ROOT) if config_path.is_relative_to(ROOT) else config_path),
         }
+
+    policy = config.get("execution_policy", {})
+    if policy.get("cli_normal_invocation_enabled", policy.get("normal_invocation_enabled")) is False and not recovery_probe:
+        task_root = output_dir / dt.datetime.now().astimezone().date().isoformat() / resolved_id
+        if task_root.exists():
+            resolved_id += "-" + uuid.uuid4().hex[:8]
+            task_root = task_root.with_name(resolved_id)
+        paused = {"status": "blocked_recovery_required", "task_id": resolved_id, "task_type": task_type,
+                  "started_at": dt.datetime.now(dt.UTC).isoformat(), "model_attempts": [],
+                  "error": "Local Gemini CLI is paused pending an explicit enterprise recovery probe. This does not disable the user-confirmed operational web Agent."}
+        _write_json(task_root / "receipt.json", paused)
+        _write_json(task_root / "result.json", {})
+        return {"status": paused["status"], "task_id": resolved_id, "output_dir": _display_path(task_root)}
 
     started_at = dt.datetime.now(dt.UTC).isoformat()
     task_spec = config.get("task_types", {}).get(task_type, {})
@@ -486,6 +500,7 @@ def cli_main(argv: list[str] | None = None) -> int:
     parser.add_argument("--task-id")
     parser.add_argument("--output-dir", default=str(OUTPUT_ROOT))
     parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument("--recovery-probe", action="store_true", help="Explicitly test enterprise recovery; existing auth and query gates still apply")
     args = parser.parse_args(argv)
     result = run_task(
         task=args.task,
@@ -497,6 +512,7 @@ def cli_main(argv: list[str] | None = None) -> int:
         task_id=args.task_id,
         output_dir=Path(args.output_dir).resolve(),
         dry_run=args.dry_run,
+        recovery_probe=args.recovery_probe,
     )
     print(json.dumps(result, ensure_ascii=False, indent=2))
     return 0 if result["status"] in {"ok", "no_data", "delayed", "quality_warning", "dry_run"} else 2

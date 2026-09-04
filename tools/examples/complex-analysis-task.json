@@ -1,0 +1,14 @@
+{
+  "parent_task_id": "interactive-complex-data-design",
+  "origin": "interactive",
+  "parent_complexity": "complex",
+  "delegation_reason": "独立复核跨币种统计口径，主Agent并行设计数据处理流程",
+  "role": "analyst",
+  "complexity": "normal",
+  "goal": "基于模拟材料复核方案的统计口径，指出聚合前置条件，不声称查询过生产数据。",
+  "window": "synthetic example, no production data",
+  "evidence": [{"id": "sample", "text": "模拟方案涉及不同币种的下注和派奖，未给出换算规则，且有未结算记录。"}],
+  "acceptance": ["不得直接跨币种求和", "明确终态结算边界", "区分事实、假设与建议"],
+  "targets": [],
+  "depends_on": []
+}
