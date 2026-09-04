@@ -1,8 +1,4 @@
-"""Optional Claude interpretation stage with deterministic extract-only publication.
-
-The coordinator must separately review generated interpretations. Exact extracts
-can enter the report immediately; their source scope is printed alongside them.
-"""
+"""Reviewed publication for complex tasks; the former routine hook is retired."""
 import html
 import json
 import os

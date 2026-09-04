@@ -46,6 +46,6 @@ Play报告、竞品周报、晨会、配置差异已移除enrich调用；旧enri
 
 ## Gemini及资料边界
 
-用户确认Gemini网页Agent效果较好，偶尔需要账户/凭证验证，保留为复杂任务专项通道；按需恢复同一授权会话后继续。本地Gemini CLI单独保持blocked_recovery_required和--recovery-probe门禁；不得根据CLI失败停用网页Agent。用户反馈和CLI回执分别标注来源，不自动调整IAM、云端部署或授权数据范围。
+用户确认Gemini网页Agent效果较好，偶尔需要账户/凭证验证，保留为复杂任务专项通道；按需恢复同一授权会话后继续。本地Gemini CLI权限未开通，完全排除，返回blocked_cli_excluded；--recovery-probe也不触发调用。不根据CLI问题停用网页Agent。用户反馈和CLI回执分别标注来源，不自动调整IAM、云端部署或授权数据范围。
 
 任务包经过第三方代理，仅允许用户授权的精选脱敏材料；正则检查仅为辅助，不替代主Agent判断。费用、吞吐和成功率以可见回执为边界，不推测未记录的云端活动。

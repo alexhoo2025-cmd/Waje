@@ -40,7 +40,7 @@ python3 scripts/run_daily_pipeline.py
 
 ## 企业 Gemini 专项入口（2026-09-04 调整）
 
-- 协作仅用于本项目聊天中的复杂分析、数据处理、方案设计等任务，规则见AGENTS.md；简单日常任务用原默认轻量模型/脚本，不分派。用户确认Gemini网页Agent效果较好，偶有认证需求，保留复杂专项使用；只有本地Gemini CLI桥接调用暂停，--recovery-probe用于该CLI恢复测试。
+- 协作仅用于本项目聊天中的复杂分析、数据处理、方案设计等任务，规则见AGENTS.md；简单日常任务用原默认轻量模型/脚本，不分派。用户确认Gemini网页Agent效果较好，偶有认证需求，保留复杂专项使用；本地Gemini CLI权限未开通，完全排除调配，不自动调用、重试或恢复探测。
 - Codex 负责识别任务边界、选择 Agent、审计来源/口径/数据质量并完成最终可交付产物。简单润色、项目本地文件修改与最终质量把关可直接由 Codex 完成。
 - Waje BigQuery 分析任务使用 `config/gemini-enterprise.json`、`tools/gemini_bridge.py` 和 `scripts/run_gemini_waje_analysis.py`。
 - Firebase 多端设备/性能汇总使用 `scripts/run_gemini_multiplatform_firebase_analysis.py`；默认执行 `analysis/firebase_multiplatform_device_performance_2026_08_27/sql/summary/` 的窗口级聚合 SQL，不下载明细行。Gemini MCP 未通过安全门禁时，才按回执标记 `api_fallback` 并使用个人 ADC 的只读 BigQuery API 复核。

@@ -57,8 +57,8 @@ def audit(root, end):
 def render(d):
     s = d["summary"]
     lines = ["# Gemini 专用流程近两周评估", "", f"窗口：{d['window']['from']} 至 {d['window']['to']}，香港时间；今天为未完整日。", "",
-        f"**已记录任务 {s['recorded_tasks']} 次，可用模型结果 {s['usable_results']} 份。当前本地证据不支持继续默认优先委派 Gemini。**", "",
-        "这不是账户全量调用统计。网页 Agent、云端任务及未落盘分派的执行量未知；不将缺失回执计成零。", "",
+        f"**本地 Gemini CLI 已记录任务 {s['recorded_tasks']} 次，可用模型结果 {s['usable_results']} 份；这不能代表网页 Agent 的执行效果。**", "",
+        "用户在2026-09-04确认：网页Agent效果较好，偶有账户/凭证验证需求；本地CLI权限未开通，不纳入调配。这不是账户全量调用统计，网页调用量和成功率未量化采集。", "",
         "|日期|任务|状态|调用情况|结果|", "|---|---|---|---|---|"]
     for r in d["records"]:
         lines.append(f"|{r['date']}|{r['task_id']}|{r['status']}|{'尝试CLI' if r['cli_attempted'] else '未知/未调用'}|{'存在，待审计' if r['has_model_result'] else '无可用结果'}|")
@@ -67,9 +67,9 @@ def render(d):
         "- 旧回执缺少结束时间和逐次调用记录，不能计算可信平均耗时、Token效率或整体成功率。",
         "- 通用桥接允许数据集/视图为空；Agent Platform 候选 safe views 是另一套配置，不能当成当前已可查询的授权。",
         "- 项目任务清单没有 Gemini 专用脚本调度项；配置中的 Agent 名称、计划时间不证明云端任务已部署或运行。",
-        "- 通用公开资料分析、材料拆解、报告和代码审查转交 Claude；主 Agent 负责来源采集、聚合查询和最终审计。",
-        "- Gemini 通用自动分派关闭；企业 BQ / Agent Platform 专项保留。正常桥接调用暂停，恢复测试需显式 recovery-probe。",
-        "- 恢复顺序：企业身份 → Vertex推理 → 允许视图/只读查询（BQ任务）→ 真实结构化结果 → 下游消费回读。恢复成功后再显式调整可用性配置。",
+        "- 简单日常任务用原默认轻量模型和脚本，不协作。仅聊天中的复杂分析、数据处理、方案设计等按能力分派。",
+        "- Claude和Gemini网页Agent可用于适合的复杂任务；本地Gemini CLI完全排除，不自动调用、探测或重试。",
+        "- 网页Agent偶发账户/凭证验证恢复同一授权会话后继续，不与本地CLI权限问题混同。",
         "- 不改云端部署、IAM、账户或专用数据权限；CLI/网页可用性分别记录，不互相替代。", "", "## 边界补充（不计入两周分母）", ""]
     for r in d["boundary_context_not_in_denominator"]:
         lines.append(f"- {r['date']}：{r['task_id']}，{r['status']}；{r['reason']}。")

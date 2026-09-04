@@ -349,14 +349,15 @@ def run_task(
         }
 
     policy = config.get("execution_policy", {})
-    if policy.get("cli_normal_invocation_enabled", policy.get("normal_invocation_enabled")) is False and not recovery_probe:
+    excluded = policy.get("cli_excluded_from_collaboration", False)
+    if excluded or (policy.get("cli_normal_invocation_enabled", policy.get("normal_invocation_enabled")) is False and not recovery_probe):
         task_root = output_dir / dt.datetime.now().astimezone().date().isoformat() / resolved_id
         if task_root.exists():
             resolved_id += "-" + uuid.uuid4().hex[:8]
             task_root = task_root.with_name(resolved_id)
-        paused = {"status": "blocked_recovery_required", "task_id": resolved_id, "task_type": task_type,
+        paused = {"status": "blocked_cli_excluded" if excluded else "blocked_recovery_required", "task_id": resolved_id, "task_type": task_type,
                   "started_at": dt.datetime.now(dt.UTC).isoformat(), "model_attempts": [],
-                  "error": "Local Gemini CLI is paused pending an explicit enterprise recovery probe. This does not disable the user-confirmed operational web Agent."}
+                  "error": "Local Gemini CLI excluded: permissions not enabled; no automatic invocation or recovery probe. Web Agent is independently available." if excluded else "Local Gemini CLI requires recovery; web Agent is independently available."}
         _write_json(task_root / "receipt.json", paused)
         _write_json(task_root / "result.json", {})
         return {"status": paused["status"], "task_id": resolved_id, "output_dir": _display_path(task_root)}

@@ -19,7 +19,7 @@
     "automatic_dispatch": false,
     "specialist_mode": "backend_specific",
     "web_agent": {"enabled_for_complex_tasks": true, "availability": "user_confirmed_operational", "occasional_authentication": "resume_same_authorized_account"},
-    "cli": {"automatic_dispatch": false, "mode": "explicit_recovery_only"},
+    "cli": {"automatic_dispatch": false, "mode": "excluded", "reason": "permissions_not_enabled_user_confirmed", "automatic_recovery_probe": false},
     "recovery_requirements": ["enterprise_identity_verified", "vertex_inference_verified", "approved_views_verified_for_bq", "real_result_validated", "downstream_consumption_verified"],
     "do_not_transfer_query_credentials_to_claude": true
   }

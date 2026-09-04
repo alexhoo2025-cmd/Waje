@@ -15,7 +15,7 @@ workspace: /Users/robin/Documents/wajetan_analyst
 
 ### 当前协作策略（2026-09-04 更新）
 
-仅对用户在本项目各聊天中交付的复杂分析、数据处理、方案设计和开发任务按需分派。简单任务及Play报告、竞品周报、晨会、配置差异流程用原默认轻量模型和脚本，不协作。参见AGENTS.md及tools/claude_collaboration.md，入口tools/claude_bridge.py，配置config/agent_dispatch.json。模型按子任务能力选择，不设每日预算限制。Gemini网页Agent用户确认效果较好，保留复杂专项使用；仅本地CLI保持恢复门禁，不能混同。
+仅对用户在本项目各聊天中交付的复杂分析、数据处理、方案设计和开发任务按需分派。简单任务及Play报告、竞品周报、晨会、配置差异流程用原默认轻量模型和脚本，不协作。参见AGENTS.md及tools/claude_collaboration.md，入口tools/claude_bridge.py，配置config/agent_dispatch.json。模型按子任务能力选择，不设每日预算限制。Gemini网页Agent用户确认效果较好，保留复杂专项使用；本地Gemini CLI权限未开通，完全排除，不自动恢复或探测，不能混同。
 
 ### 0.1 项目定位
 

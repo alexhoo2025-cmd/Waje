@@ -59,7 +59,9 @@ def main():
         "coordinator_findings":["Both first code candidates had invalid diff/context, caught before apply", "Mixed-currency RTP range was invalid; corrected after feedback", "Coordinator initially omitted trailing blank line from code context; full context supplied on second revision"],
         "generated_at":dt.datetime.now(dt.timezone.utc).isoformat()}
     write(directory/"validation.json",data)
-    body=f'''# Claude 协作机制验证报告
+    body=f'''# Claude 协作机制历史验证报告
+
+当前范围已调整：以下日常集成测试属于历史v1，日常调度钩子已撤销。现仅复杂交互任务协作；Gemini网页Agent可用，本地CLI排除。最新规则以AGENTS.md为准。
 
 **桥接、三档模型、并行、返工、代码应用和报告消费已验证。**
 

@@ -15,7 +15,7 @@
     "integration": "none_for_routine_jobs",
     "coordinator_acceptance_required": true,
     "automatic_publication": "disabled",
-    "gemini_specialist": "web_available_for_complex_interactive_tasks_cli_recovery_only",
+    "gemini_specialist": "web_available_for_complex_interactive_tasks_local_cli_excluded",
     "schedule_changed": false
   },
   "collection_automation_id": "robin-waje",

@@ -5,6 +5,8 @@
   "execution_policy": {
     "delegate_by_default": false,
     "cli_normal_invocation_enabled": false,
+    "cli_excluded_from_collaboration": true,
+    "cli_exclusion_reason": "用户确认本地Gemini CLI权限未开通，不纳入调配与协作，不自动探测、重试或恢复。",
     "availability": "backend_specific",
     "web_agent": {
       "enabled_for_complex_tasks": true,
@@ -14,7 +16,7 @@
       "authentication_handling": "resume_same_authorized_account_session"
     },
     "review_window": "2026-08-22/2026-09-04",
-    "routing_note": "仅复杂交互任务按能力分派；Claude负责分析、数据处理、设计与代码，Gemini网页Agent可承担企业资料/授权查询等专项。简单日常任务不分派。只有本地Gemini CLI保持恢复门禁。",
+    "routing_note": "仅复杂交互任务按能力分派；Claude负责分析、数据处理、设计与代码，Gemini网页Agent可承担企业资料/授权查询等专项。简单日常任务不分派。本地Gemini CLI权限未开通，完全排除。",
     "enterprise_token_budget": "unconstrained_by_codex",
     "codex_role": [
       "task_router",

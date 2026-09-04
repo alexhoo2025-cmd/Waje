@@ -201,11 +201,13 @@ class BridgeTests(unittest.TestCase):
             self.b.run(tid)
         proc.assert_not_called();self.assertEqual(self.b.status(tid)["receipt"]["reason"],"proxy_auth_not_configured")
 
-    def test_gemini_recovery_gate_never_calls_cli(self):
+    def test_gemini_excluded_even_with_recovery_flag(self):
         from tools.gemini_bridge import run_task
         with patch("tools.gemini_bridge.subprocess.run") as run:
-            r=run_task("公开最小测试","web_research",output_dir=Path(self.temp.name)/"gemini",task_id="gate-test")
-        self.assertEqual(r["status"],"blocked_recovery_required");run.assert_not_called()
+            for probe in (False,True):
+                r=run_task("公开最小测试","web_research",output_dir=Path(self.temp.name)/"gemini",task_id="gate-test",recovery_probe=probe)
+                self.assertEqual(r["status"],"blocked_cli_excluded")
+            run.assert_not_called()
 
 
 if __name__ == "__main__":
