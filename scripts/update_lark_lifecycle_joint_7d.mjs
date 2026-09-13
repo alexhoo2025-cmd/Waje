@@ -30,10 +30,10 @@ const TARGET = {
   active: { id: "TEdtsX", backup: "TEdtsX.json", start: "B", end: "AC", dateColumn: "A", label: "原始数据活跃周期" },
 };
 
-const REQUESTED_DATES = [
-  "2026-08-24", "2026-08-25", "2026-08-26", "2026-08-27",
-  "2026-08-28", "2026-08-29", "2026-08-30",
-];
+const REQUESTED_DATES = String(
+  process.env.LARK_REQUESTED_DATES ||
+  "2026-08-24,2026-08-25,2026-08-26,2026-08-27,2026-08-28,2026-08-29,2026-08-30",
+).split(",").map((date) => date.trim()).filter(Boolean);
 
 const SOURCE_HEADERS = {
   summary: ["总基础下注额", "总完全下注额", "总基础真实回报比", "总完全真实回报比", "总基础预期回报比", "总完全预期回报比", "总人数", "今日完全实际盈利调整幅度", "当前完全实际盈利扣除幅度", "修改"],
@@ -60,6 +60,7 @@ const backupRoot = path.resolve(args["backup-root"] || BACKUP_ROOT);
 const outRoot = path.resolve(args["output-dir"] || OUT_ROOT);
 const token = args.token || TOKEN;
 const dryRun = Boolean(args["dry-run"]);
+const allowMiddleMissing = Boolean(args["allow-middle-missing"]);
 
 function fail(message) { throw new Error(message); }
 function assert(condition, message) { if (!condition) fail(message); }
@@ -331,14 +332,17 @@ async function main() {
       assert(missingDates.length > 0, `${kind} missing keys but no missing date block`);
       const missingDateSet = new Set(missingDates);
       assert(missing.every((item) => missingDateSet.has(isoDate(item.sourceRow[0]))), `${kind} has partial missing keys inside an existing date; refusing append`);
-      const existingLater = info.data.some((r) => REQUESTED_DATES.includes(isoDate(r.values[0])) && isoDate(r.values[0]) > missingDates[0]);
-      assert(!existingLater, `${kind} has later requested rows after missing date block; refusing positional append`);
+      const laterRows = info.data.filter((r) => isoDate(r.values[0]) > missingDates[0]);
+      const existingLater = laterRows.length > 0;
+      assert(!existingLater || allowMiddleMissing, `${kind} has later rows after missing date block; refusing positional append`);
       const expectedMissingCount = { summary: missingDates.length, detail: missingDates.length * 155, game: missingDates.length * 31, active: missingDates.length * 4 }[kind];
       assert(missing.length === expectedMissingCount, `${kind} missing count ${missing.length} != ${expectedMissingCount}`);
-      allInsertions.push({ kind, sheet_id: spec.id, position: maxDataRow + 1, count: missing.length });
+      const insertionPosition = laterRows.length ? Math.min(...laterRows.map((r) => r.row)) : maxDataRow + 1;
+      allInsertions.push({ kind, sheet_id: spec.id, position: insertionPosition, count: missing.length });
     }
     const rowAssignments = [...matched];
-    let nextRow = maxDataRow + 1;
+    const insertion = allInsertions.find((item) => item.kind === kind);
+    let nextRow = insertion?.position || maxDataRow + 1;
     for (const date of missingDates) {
       const dateItems = missing.filter((item) => isoDate(item.sourceRow[0]) === date).sort((a, b) => {
         if (kind === "summary") return 0;
@@ -369,7 +373,7 @@ async function main() {
       source_count: source[kind].rows.length,
       matched_count: matched.length,
       append_count: missing.length,
-      append_position: missing.length ? maxDataRow + 1 : null,
+      append_position: missing.length ? (allInsertions.find((item) => item.kind === kind)?.position || maxDataRow + 1) : null,
       requested_date_count: REQUESTED_DATES.length,
       write_regions: regions.map((r) => r.range),
       date_fix_count: dateFixes.length,

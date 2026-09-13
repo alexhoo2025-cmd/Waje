@@ -1,0 +1,43 @@
+/* Waje report readability standard, 2026-09-07. Presentation only. */
+:root{--wr-bg:#eef3f8;--wr-paper:#ffffff;--wr-ink:#18344f;--wr-muted:#516579;--wr-line:#d5e1ec;--wr-blue:#185ca5;--wr-tint:#edf5fd;--wr-header:#e7edf3;--wr-warn:#fff6e5;--wr-positive:#eaf6ef;--wr-radius:16px}
+html{scroll-behavior:smooth;scroll-padding-top:84px}
+body{background:var(--wr-bg)!important;color:var(--wr-ink)!important;font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif!important}
+.dashboard-shell.report-shell{--ds-report-content-max-width:1120px;--ds-report-content-half-width:560px;--analytics-shell-max-width:1120px;--ds-section-gap:28px;padding-bottom:72px!important}
+.report-shell>.report-content-grid,.report-shell>.analytics-layout-canvas{max-width:1120px!important}
+.report-shell .analytics-top-bar,.portable-page-header{width:100%!important;margin-inline:0!important;height:auto!important;min-height:58px;padding:14px 20px!important;background:var(--wr-paper)!important;border-bottom:1px solid var(--wr-line)!important;color:var(--wr-ink)!important}
+.report-shell .analytics-top-bar-title{font-size:16px!important;font-weight:650!important;color:var(--wr-ink)!important}
+.report-shell .analytics-top-bar h1{font-size:16px!important;line-height:1.5!important;font-weight:650!important}
+.report-shell .analytics-layout-item{margin:0!important;padding:0!important;min-width:0!important}
+.report-shell .report-markdown-block,.portable-markdown{padding:24px 28px!important;background:var(--wr-paper)!important;border:1px solid var(--wr-line)!important;border-radius:var(--wr-radius)!important;max-width:100%!important}
+.report-shell .markdown-body,.report-shell .markdown-render,.portable-markdown{color:var(--wr-ink)!important;font-size:16px!important;line-height:1.85!important}
+.report-shell .markdown-body p,.report-shell .markdown-body li,.report-shell .markdown-render p,.report-shell .markdown-render li,.portable-markdown p,.portable-markdown li{font-size:16px!important;line-height:1.85!important;color:var(--wr-ink)!important;overflow-wrap:anywhere}
+.report-shell h1,.portable-markdown h1{font-size:34px!important;line-height:1.3!important;font-weight:750!important;color:var(--wr-ink)!important;letter-spacing:-.02em}
+.report-shell h2,.portable-markdown h2{font-size:23px!important;line-height:1.45!important;font-weight:700!important;color:var(--wr-blue)!important;margin-bottom:16px!important}
+.report-shell h3,.portable-markdown h3{font-size:18px!important;font-weight:650!important;color:var(--wr-ink)!important}
+.report-shell strong,.portable-markdown strong{font-weight:700!important}
+.report-shell .report-markdown-block[id^='summary'],.portable-block[data-artifact-block-id^='summary']>.portable-markdown{background:var(--wr-tint)!important;border-color:var(--wr-blue)!important;border-left:5px solid var(--wr-blue)!important}
+.report-shell .report-markdown-block#questions_story,.report-shell .report-markdown-block#caveats,.portable-block[data-artifact-block-id='caveats']>.portable-markdown{background:var(--wr-warn)!important}
+.report-shell .report-markdown-block#next_steps,.portable-block[data-artifact-block-id='next_steps']>.portable-markdown{background:var(--wr-positive)!important}
+.report-shell .report-metric-card,.portable-metric-card{background:var(--wr-tint)!important;border:1px solid var(--wr-blue)!important;border-top:4px solid var(--wr-blue)!important;border-radius:14px!important;padding:20px!important}
+.report-shell .report-metric-value,.portable-metric-value{font-size:28px!important;line-height:1.25!important;font-weight:750!important;color:var(--wr-blue)!important}
+.report-shell .table-card,.report-shell .chart-card,.portable-table-card,.portable-chart-summary{background:var(--wr-paper)!important;padding:24px!important;border:1px solid var(--wr-line)!important;border-radius:var(--wr-radius)!important;min-width:0!important}
+.report-shell .table-card h2,.report-shell .chart-card h2,.portable-visual-header h2,.portable-visual-header>strong{font-size:18px!important;line-height:1.5!important;color:var(--wr-ink)!important;font-weight:700!important}
+.report-shell .table-wrap,.portable-table-scroll{max-width:100%!important;overflow-x:auto!important;border:1px solid var(--wr-line)!important;border-radius:10px!important}
+.report-shell .table-scroll-content{width:100%!important;min-width:100%!important}
+.report-shell .table-wrap table,.portable-table-scroll table{width:100%!important;min-width:640px!important;table-layout:fixed!important;border-collapse:collapse!important}
+.report-shell .table-wrap th,.portable-table-scroll th{padding:12px 14px!important;background:var(--wr-header)!important;color:var(--wr-ink)!important;font-size:14px!important;font-weight:700!important;line-height:1.6!important;white-space:normal!important}
+.report-shell .table-wrap td,.portable-table-scroll td{padding:13px 14px!important;color:var(--wr-ink)!important;font-size:15px!important;line-height:1.7!important;white-space:normal!important;overflow-wrap:anywhere!important;max-width:none!important;vertical-align:top!important;border-bottom:1px solid var(--wr-line)!important}
+.report-shell .table-wrap tbody tr:nth-child(even) td,.portable-table-scroll tbody tr:nth-child(even) td{background:color-mix(in srgb,var(--wr-tint) 45%,var(--wr-paper))!important}
+.report-shell .table-wrap tbody tr:hover td,.portable-table-scroll tbody tr:hover td{background:var(--wr-tint)!important}
+.report-shell code,.portable-markdown code{font-size:.88em!important;white-space:normal!important;overflow-wrap:anywhere;background:var(--wr-tint)!important;color:var(--wr-blue)!important;border-radius:4px;padding:2px 5px}
+.portable-fallback[data-portable-surface='report']>.portable-block-stack{max-width:1120px!important}
+.report-shell .report-markdown-block#title{border-top:6px solid var(--wr-blue)!important;padding-block:32px!important}
+@media(prefers-color-scheme:dark){:root{--wr-bg:#101b29;--wr-paper:#19283a;--wr-ink:#e2ecf7;--wr-muted:#b2c3d5;--wr-line:#354c64;--wr-blue:#8dc6ff;--wr-tint:#223c56;--wr-header:#2c3c50;--wr-warn:#3a3121;--wr-positive:#203e36}}
+@media(max-width:760px){.dashboard-shell.report-shell{padding-inline:16px!important}.report-shell .report-markdown-block,.portable-markdown{padding:20px!important}.report-shell h1,.portable-markdown h1{font-size:27px!important}.report-shell h2,.portable-markdown h2{font-size:21px!important}.report-shell .table-card,.report-shell .chart-card,.portable-table-card,.portable-chart-summary{padding:16px!important}.report-shell .analytics-top-bar{position:static!important}.report-shell .table-wrap td,.portable-table-scroll td{font-size:14px!important;padding:11px!important}.report-shell .table-wrap th,.portable-table-scroll th{padding:11px!important}.portable-fallback{padding-inline:16px!important}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+.report-shell .markdown-body table,.report-shell .markdown-render table,.portable-markdown table{display:block;max-width:100%;overflow-x:auto;border-collapse:collapse;border:1px solid var(--wr-line);border-radius:10px;font-variant-numeric:tabular-nums}
+.report-shell .markdown-body th,.report-shell .markdown-render th,.portable-markdown th{background:var(--wr-header)!important;color:var(--wr-ink)!important;padding:12px 14px!important;font-size:14px!important;line-height:1.6!important;white-space:normal!important}
+.report-shell .markdown-body td,.report-shell .markdown-render td,.portable-markdown td{color:var(--wr-ink)!important;padding:12px 14px!important;font-size:15px!important;line-height:1.75!important;white-space:normal!important;overflow-wrap:anywhere;min-width:140px;vertical-align:top;border-bottom:1px solid var(--wr-line)!important}
+.report-shell .markdown-body tbody tr:nth-child(even),.report-shell .markdown-render tbody tr:nth-child(even),.portable-markdown tbody tr:nth-child(even){background:color-mix(in srgb,var(--wr-tint) 45%,var(--wr-paper))}
+@media(max-width:760px){.report-shell .analytics-top-bar{flex-direction:column!important;align-items:flex-start!important;gap:4px!important}.report-shell .analytics-top-bar h1{font-size:14px!important;white-space:normal!important;overflow:visible!important}.report-shell .analytics-top-bar-freshness{font-size:11px!important}.report-shell .analytics-layout-canvas{margin-top:24px!important;gap:20px!important}}
+@media print{body{background:white!important}.report-shell .table-wrap table,.portable-table-scroll table{min-width:0!important}.portable-markdown,.portable-table-card{break-inside:avoid}.portable-page-header{position:static!important}}

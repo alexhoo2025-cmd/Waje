@@ -74,7 +74,7 @@ def build_report(root: Path, collection_date: dt.date) -> tuple[Path, dict]:
         "",
         f"> 统计窗口：{start.isoformat()} 至 {end.isoformat()}；采集批次：{collection_date.isoformat()} 15:00（Asia/Hong_Kong）。公开页面是产品与用户线索，不直接代表 Waje 真实经营指标。",
         "",
-        "## 1. 本周摘要",
+        "## 1. 执行摘要",
         "",
         f"- 批次状态：`{quality.get('status', 'unknown')}`；来源：{quality.get('source_health', {}).get('ok', 0)}/{quality.get('source_health', {}).get('total', 0)} 成功。",
         f"- 原始/去重条目：{normalized.get('raw_item_count', 0)} / {normalized.get('unique_item_count', len(items))}；重复 {normalized.get('duplicate_count', 0)} 条。",

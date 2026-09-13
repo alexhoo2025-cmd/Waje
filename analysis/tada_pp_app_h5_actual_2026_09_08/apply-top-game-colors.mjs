@@ -1,0 +1,18 @@
+import fs from 'node:fs';
+import assert from 'node:assert/strict';
+import {execFileSync} from 'node:child_process';
+const base='analysis/tada_pp_app_h5_actual_2026_09_08/',dir=base+'revisions/2026-09-09-top-game-colors/';fs.mkdirSync(dir,{recursive:true});
+const call=args=>{const r=JSON.parse(execFileSync('/Users/robin/.local/node/bin/lark-cli',['docs',...args,'--doc','MUmUdKO7ko3hKIxY822lBXJQggg','--as','user','--format','json'],{encoding:'utf8',timeout:45000,maxBuffer:8e6}));assert(r.ok);return r.data;};
+const fetch=()=>call(['+fetch','--detail','full']).document;
+const before=fetch();fs.writeFileSync(dir+'lark.before.json',JSON.stringify(before,null,2));
+const targets=[...before.content.matchAll(/<table\b[^>]*id="([^"]+)"[^>]*>[\s\S]*?<\/table>/g)].filter(m=>m[0].includes('APP厂商内占比')&&m[0].includes('X7 HOT')&&m[0].includes('Sweet Bonanza'));
+assert.equal(targets.length,1);const original=targets[0][0];const strip=s=>s.replace(/<[^>]+>/g,'');const rows=[...original.match(/<tbody>([\s\S]*?)<\/tbody>/)[1].matchAll(/<tr>[\s\S]*?<\/tr>/g)].map(m=>[...m[0].matchAll(/<td[^>]*>([\s\S]*?)<\/td>/g)].map(c=>strip(c[1])));assert.equal(rows.length,10);
+const num=s=>Number(s.replace(/[,％%]/g,'')),max={};for(const vendor of ['Tada','PP'])max[vendor]=[2,3,4,5].map(i=>Math.max(...rows.filter(r=>r[0]===vendor).map(r=>num(r[i]))));
+let idx=0;const peaks=[];let xml=original.replace(/\s+id="[^"]+"/g,'');xml=xml.replace(/<tbody>[\s\S]*?<\/tbody>/,body=>body.replace(/<tr>[\s\S]*?<\/tr>/g,row=>{const values=rows[idx++],vendor=values[0];let col=0;return row.replace(/<td\b([^>]*)>([\s\S]*?)<\/td>/g,(_,attrs,content)=>{const i=col++,peak=i>=2&&num(values[i])===max[vendor][i-2];if(peak)peaks.push({vendor,game:values[1],column:i,value:values[i]});const color=peak?'light-yellow':vendor==='Tada'?'light-blue':'light-orange';let inner=content;if(peak)inner=inner.replace(/<p([^>]*)>([\s\S]*?)<\/p>/g,(_,a,t)=>'<p'+a+'><b>'+t.replace(/<\/?b>/g,'')+'</b></p>');return '<td'+attrs.replace(/\s+background-color="[^"]*"/g,'')+' background-color="'+color+'">'+inner+'</td>';});}));
+const result=call(['+update','--command','block_replace','--block-id',targets[0][1],'--revision-id',String(before.revision_id),'--content',xml]);assert.equal(result.result,'success');assert.equal((result.warnings||[]).length,0);
+const after=fetch();fs.writeFileSync(dir+'lark.after.json',JSON.stringify(after,null,2));const updated=[...after.content.matchAll(/<table\b[^>]*>[\s\S]*?<\/table>/g)].find(m=>m[0].includes('APP厂商内占比')&&m[0].includes('X7 HOT')&&m[0].includes('Sweet Bonanza'))[0];assert.equal(strip(original),strip(updated));assert.equal(peaks.length,8);assert((updated.match(/<b>/g)||[]).length>=8);
+fs.writeFileSync(dir+'lark-receipt.json',JSON.stringify({status:'full_readback_verified',revision:after.revision_id,peaks,cell_text_unchanged:true},null,2));
+const a=JSON.parse(fs.readFileSync(base+'artifact.json')),t=a.manifest.tables.find(t=>t.id==='top-games'),local=a.snapshot.datasets[t.dataset];assert.equal(local.length,10);for(let j=0;j<10;j++)for(let i=0;i<6;i++)assert.equal(String(local[j][t.columns[i].field]),rows[j][i]);
+const legend='Tada浅蓝、PP浅橙；加粗并以浅黄高亮各厂商组内各数值列的最大值。峰值仅在当前展示的5款游戏中比较，不代表全部游戏排名。';
+const body='### '+t.title+'\n\n'+legend+'\n\n'+t.subtitle+'\n\n| '+t.columns.map(c=>c.label).join(' | ')+' |\n| '+t.columns.map(()=> '---').join(' | ')+' |\n'+local.map(r=>'| '+t.columns.map((c,i)=>i>=2&&num(String(r[c.field]))===max[r['厂商']][i-2]?'**'+r[c.field]+'**':r[c.field]).join(' | ')+' |').join('\n');
+fs.writeFileSync(dir+'body.json',JSON.stringify(body));console.log(JSON.stringify({status:'full_readback_verified',revision:after.revision_id,peaks}));

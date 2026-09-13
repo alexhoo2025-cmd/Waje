@@ -1,5 +1,19 @@
 # 全平台用户生命周期与付费价值分析刷新（2026-09-04）
 
+> 最新交付入口已转至 `analysis/same_surface_paid_retention_2026_09_04/`：按用户确认的实际端口径生成阶段版HTML与飞书文档。本目录原查询保留为历史账号回访背景，不应再次运行旧HTML生成器覆盖最新同端报告。
+
+## 当前有效版本：付费用户留存专题
+
+报告已按用户最新要求改为新增付费、首次付费用户留存主线，最终使用 `payer_focus.py`。
+
+- 主证据：`paid_retention_server_success_v1/` 三个月聚合结果；`paid_retention_denominators_v1/` 同口径注册分母；`paid_cohort_dictionary_history/` 历史日活覆盖和渠道字典。
+- **纠正原支付语义：** `order_success` 是创建订单信号，不能作为成功付费。当前查询使用服务端 `view_metaevent_order.is_success='pay_success'`；历史首充同时核对首充标记与画像日期。旧付费率、ARPU和付费人数结论不再用于当前报告。
+- 历史+实时日活统一使用 `view_user_version_daily`，已确认6月有历史记录；旧“6月日活缺失”只适用于旧的实时表查询，不应套用到新付费留存。
+- 当前“新增付费”暂定注册当日成功付费，待业务确认窗口。PWA三个候选渠道分别列示，平台映射待确认，不输出正式PWA整体结论。
+- 仅辅助保留独立H5联运LTV，不冒充付费人群专属LTV。原 `analysis_summary.json`、旧SQL/回执以及 `artifact_before_paid_focus.json` 是历史审计工件，不是当前付费数据源。
+- 当前数值验证回执为 `paid_focus_validation.json`；`validate_report.py` 自动路由至新校验。下方原版本说明仅供历史参考。
+- 本次已执行聚合查询累计处理20,422,810,325字节（约19.02GiB），没有线上写入。单条成本门槛拦截的查询未执行；替代源按新文件留痕。
+
 本目录是对 2026-09-03 全平台 cohort 报告的独立刷新运行。
 
 - 仅调用 `wajenigeria` Cloud BigQuery 的只读聚合查询。

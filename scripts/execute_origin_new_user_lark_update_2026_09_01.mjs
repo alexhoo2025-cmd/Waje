@@ -55,7 +55,8 @@ const receipt = {
   write_regions: writes.map((w) => ({ sheet_id: w.sheet_id, range: w.range, rows: w.cells.length, columns: w.cells[0]?.length || 0 })),
   accepted_dates: plan.accepted_dates,
   excluded_not_mature_dates: plan.excluded_not_mature_dates,
+  maturity_ledger_count: plan.maturity_ledger_count,
   zero_ledger_count: plan.zero_ledger_count,
 };
 await fs.writeFile(path.join(runDir, "lark-write-receipt.json"), JSON.stringify(receipt, null, 2) + "\n");
-console.log(JSON.stringify({ status: receipt.status, revision: `${revisionBefore}->${revisionAfter}`, write_regions: writes.length, zero_ledger_count: plan.zero_ledger_count }, null, 2));
+console.log(JSON.stringify({ status: receipt.status, revision: `${revisionBefore}->${revisionAfter}`, write_regions: writes.length, maturity_ledger_count: plan.maturity_ledger_count, zero_ledger_count: plan.zero_ledger_count }, null, 2));

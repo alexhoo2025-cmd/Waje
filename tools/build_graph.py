@@ -18,6 +18,8 @@ import re
 from pathlib import Path
 from urllib.parse import unquote
 
+from execution_graph import build_execution_graph
+
 
 SOURCE_EXTENSIONS = {
     ".md", ".mdx", ".json", ".html", ".htm", ".py", ".js", ".jsx",
@@ -151,6 +153,7 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--root", type=Path, default=Path(__file__).resolve().parents[1])
     parser.add_argument("--out", type=Path, default=None)
+    parser.add_argument("--skip-execution-graph", action="store_true")
     args = parser.parse_args()
     root = args.root.resolve()
     out = (args.out or root / "knowledge/_generated").resolve()
@@ -180,6 +183,13 @@ def main() -> None:
     )
     (out / "代码与资产图谱.md").write_text(note, encoding="utf-8")
     print(f"generated {len(nodes)} nodes and {len(edges)} edges in {out}")
+    if not args.skip_execution_graph:
+        execution = build_execution_graph(root, reason="asset_graph_refresh")
+        print(
+            "generated execution graph "
+            f"{len(execution['nodes'])} nodes and {len(execution['edges'])} edges "
+            f"at {execution['refresh_receipt']}"
+        )
 
 
 if __name__ == "__main__":

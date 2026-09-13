@@ -6,6 +6,9 @@ EXCLUDED = re.compile(r"phoenix|phenix|firebase|h5phx", re.I)
 
 def chinese(text):
     replacements = [
+        ("成功支付率", "付费率"),
+        ("支付覆盖", "付费率"),
+        ("支付率", "付费率"),
         ("Executive Summary", "执行摘要"),
         ("Recommended next steps", "后续行动"),
         ("Further Questions", "待核实事项"),

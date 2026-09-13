@@ -1,0 +1,17 @@
+import fs from "node:fs/promises";
+import path from "node:path";
+import {FileBlob,SpreadsheetFile}from"@oai/artifact-tool";
+const root=path.resolve("analysis/top30_tc_uidlog_2026_09_10"),file=path.resolve("outputs/019fc549-3241-7d52-90f5-0b39c2e03530/9月10日资产变动汇总_前30.xlsx");
+const wb=await SpreadsheetFile.importXlsx(await FileBlob.load(file)),summary=wb.worksheets.getItem("摘要");
+const before=await wb.inspect({kind:"table",range:"摘要!A5:I6",include:"values,formulas",tableMaxRows:4,tableMaxCols:12,maxChars:3000});
+const imageBefore=await wb.render({sheetName:"摘要",autoCrop:"all",scale:1,format:"png"});await fs.writeFile(path.join(root,"preview-摘要-删除扫描-before.png"),new Uint8Array(await imageBefore.arrayBuffer()));
+summary.getRange("H5:H6").values=[[null],[null]];
+const after=await wb.inspect({kind:"table",range:"摘要!A5:I6",include:"values,formulas",tableMaxRows:4,tableMaxCols:12,maxChars:3000});
+const errors=await wb.inspect({kind:"match",searchTerm:"#REF!|#DIV/0!|#VALUE!|#NAME\\?|#N/A|#NUM!|#NULL!|#SPILL!|#CALC!",options:{useRegex:true,maxResults:300},summary:"summary scan removal error check"});
+const drawings=await wb.inspect({kind:"drawing",sheetId:"摘要",maxChars:4000});
+const imageAfter=await wb.render({sheetName:"摘要",autoCrop:"all",scale:1,format:"png"});await fs.writeFile(path.join(root,"preview-摘要-删除扫描.png"),new Uint8Array(await imageAfter.arrayBuffer()));
+const out=await SpreadsheetFile.exportXlsx(wb);await out.save(file);
+const receipt={scope:"摘要!H5:H6",operation:"clear all",before:before.ndjson,after:after.ndjson,errorScan:errors.ndjson,drawings:drawings.ndjson,expected:{header:null,value:null,charts:2}};await fs.writeFile(path.join(root,"remove-summary-scan-verification.json"),JSON.stringify(receipt,null,2));
+if(after.ndjson.includes("最终SQL扫描")||after.ndjson.includes("2633.15M bytes"))throw new Error("Target content remains");
+if(!errors.ndjson.includes("matched 0")||!drawings.ndjson.includes("chart"))throw new Error("Verification failed");
+console.log(JSON.stringify({file,cleared:"摘要!H5:H6",formulaErrors:0,chartsPreserved:true}));

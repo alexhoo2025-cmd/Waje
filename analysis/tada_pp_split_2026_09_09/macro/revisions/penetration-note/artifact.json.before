@@ -1,0 +1,842 @@
+{
+  "surface": "report",
+  "manifest": {
+    "version": 1,
+    "surface": "report",
+    "title": "Tada与PP宏观对比｜新老用户、下注与回访",
+    "description": "宏观篇：只看规模、参与与回访；2026年8月1日—9月7日",
+    "generatedAt": "2026-09-09T10:33:58.309204+00:00",
+    "sources": [
+      {
+        "id": "split",
+        "label": "双报告独立复算与关联分析",
+        "path": "analysis/tada_pp_split_2026_09_09/analyze.py",
+        "query": {
+          "engine": "Python standard-library aggregate recomputation",
+          "description": "读取冻结的核心、游戏、回访聚合与重复扣减结果。新统计与相关系数由analyze.py复算；非新增线上查询。游戏关联按渠道厂商分层、无用户级因果解释。 所附SQL为原期真实执行的核心聚合与支持查询；新增表和关联由Python对这些结果复算，主SQL不单独包含全部后续变换。",
+          "tables_used": [
+            "analysis/tada_pp_app_h5_actual_2026_09_08/core-corrected.json",
+            "analysis/tada_pp_app_h5_actual_2026_09_08/analysis-results.json",
+            "analysis/tada_pp_app_h5_actual_2026_09_08/queries/18_full_return.result.json"
+          ],
+          "metric_definitions": [
+            "人均下注额=有效下注额/去重下注人数；有效局次不等于原始下注笔数",
+            "RTP=对应结算派奖/有效下注额；现金奖励未分离",
+            "Spearman为游戏级等权秩相关；100名下注者与14个观察到下注的业务日为主筛选阈值",
+            "下注活跃天数/下注人数是复玩强度代理，不是定日回访率"
+          ],
+          "executed_at": "2026-09-09T10:33:58.309204+00:00",
+          "sql": "WITH profile_candidates AS (\n SELECT user_id,register_time,xlid_time,download_channel,first_channel\n FROM `wajenigeria.origin_hfyl.user_xlid`\n WHERE target_day BETWEEN DATE '2019-01-01' AND DATE '2026-09-07'\n   AND app_id=90006 AND user_id IS NOT NULL AND user_id!=''\n), profiles AS (\n SELECT user_id,\n        CASE WHEN register_time BETWEEN 1262304000000 AND UNIX_MILLIS(TIMESTAMP(DATE '2026-09-09','Africa/Lagos'))-1\n             THEN DATE(TIMESTAMP_MILLIS(register_time),'Africa/Lagos') END AS registration_date,\n        COALESCE(NULLIF(download_channel,''),NULLIF(first_channel,''),'UNKNOWN') AS channel_name\n FROM profile_candidates\n QUALIFY ROW_NUMBER() OVER(PARTITION BY user_id ORDER BY IF(register_time>0,0,1),register_time,xlid_time,COALESCE(download_channel,first_channel,''))=1\n), mapped_profiles AS (\n SELECT user_id,registration_date,channel_name,CASE WHEN channel_name IN ('PACHAMPIONS','PAPAWJBETCY2','PAWAJEPALM2','PAWAJEPALMS','PAWAJESPOPAY','PAWAJEXENDER','PAWajespecia','PAgoogleplay','WajeSpecial') THEN 'APP_Android'\nWHEN channel_name IN ('1016246163569761','1163272865598617','1679734739569802','1693027911335063','1760719951146036','1807677293050348','1817271422343789','927128656153268','PAWAJEIOS','adjustqiqdbtawmebkFacebook','adjustqiqdbtawmebkGoogleAds','adjustqiqdbtawmebkOrganic') THEN 'APP_iOS'\nWHEN channel_name IN ('1057805740332057','1086073807708718','1268361438340480','1360891245684659','1488400826662700','1545741160000078','1584420786411834','1603683537460322','1707128760547457','1747604103','1752545802277475','2319680875136934','2545521782446776','2730368513961225','4308954285992033','4888457997','5214811898','5725818139','6143498115','771602205049164','9281932950','PAOPAYLIANYU','PAPAWAJECJ','PAPAWAJEH5GA','PAPAWAJEH5SU','PAWAJEBETH5','PAWAJEH5','PAWAJEH5APL','PAWAJEH5CY','PAWAJEH5DXYQ','PAWAJEH5FB','PAWAJEH5FUN','PAWAJEH5GEO','PAWAJEH5GG','PAWAJEH5JOY','PAWAJEH5LD','PAWAJEH5M01','PAWAJEH5M02','PAWAJEH5M03','PAWAJEH5M04','PAWAJEH5M05','PAWAJEH5M06','PAWAJEH5M07','PAWAJEH5M08','PAWAJEH5M09','PAWAJEH5M10','PAWAJEH5MB','PAWAJEH5MB2','PAWAJEH5MB3','PAWAJEH5MB4','PAWAJEH5MB5','PAWAJEH5NAT','PAWAJEH5OP','PAWAJEH5OP2','PAWAJEH5OP3','PAWAJEH5OP4','PAWAJEH5OP5','PAWAJEH5OP6','PAWAJEH5OP7','PAWAJEH5OP8','PAWAJEH5OPAD','PAWAJEH5PALM','PAWAJEH5PHX','PAWAJEH5PLAY','PAWAJEH5PP','PAWAJEH5PW','PAWAJEH5PW2','PAWAJEH5PW3','PAWAJEH5PWCY','PAWAJEH5PWIN','PAWAJEH5PWW','PAWAJEH5SU','PAWAJEH5TG01','PAWAJEH5TG02','PAWAJEH5TG03','PAXENDERH5') THEN 'H5'\nWHEN channel_name IN ('1150288483928367','1205296008205924','PAPWAT031224','PAWAJEH5PWA','PAWAJEH5PWAT') THEN 'PWA_named' ELSE 'unmapped' END AS channel_platform\n FROM profiles\n), events AS (\n SELECT target_day AS stat_date,user_id,play_id,mode_id,bet_num,cash_settlement,refund_num,\n        extra_num,bet_count,is_robot,is_test_uid\n FROM `wajenigeria.origin_hfyl.realtime_event_server`\n WHERE target_day BETWEEN DATE '2026-08-01' AND DATE '2026-09-07'\n   AND app_id=90006 AND event_type='GAMEEND'\n), labelled AS (\n SELECT e.stat_date,DATE_TRUNC(e.stat_date,WEEK(MONDAY)) AS week_start,e.user_id,\n        SAFE_CAST(e.play_id AS INT64) AS play_id,\n        CASE WHEN e.mode_id=11 THEN 'Waje' WHEN e.mode_id=100 THEN 'WajeCoin' ELSE 'other_or_unknown_mode' END AS product_mode,\n        COALESCE(p.channel_platform,'unmapped') AS channel_platform,\n        CASE WHEN p.channel_platform IN ('APP_Android','APP_iOS') THEN 'APP' ELSE COALESCE(p.channel_platform,'unmapped') END AS platform,\n        COALESCE(p.channel_name,'UNKNOWN') AS channel_name,\n        CASE WHEN p.registration_date IS NULL THEN 'unknown_registration'\n             WHEN DATE_DIFF(e.stat_date,p.registration_date,DAY)<0 THEN 'invalid_registration'\n             WHEN DATE_DIFF(e.stat_date,p.registration_date,DAY)<30 THEN 'new_30d'\n             ELSE 'old_over_30d' END AS age_group,\n        CASE WHEN SAFE_CAST(e.play_id AS INT64) BETWEEN 9150001 AND 9159999 THEN 'Tada'\n             WHEN SAFE_CAST(e.play_id AS INT64) BETWEEN 9160001 AND 9169999 THEN 'PP'\n             ELSE 'other_games' END AS provider,\n        CAST(e.bet_num AS BIGNUMERIC)-COALESCE(e.refund_num,0) AS effective_stake,\n        CAST(e.cash_settlement AS BIGNUMERIC) AS settlement,\n        e.refund_num,e.extra_num,e.bet_count\n FROM events e LEFT JOIN mapped_profiles p ON p.user_id=e.user_id\n WHERE e.stat_date BETWEEN DATE '2026-08-01' AND DATE '2026-09-07'\n   AND e.is_robot IS FALSE AND (e.is_test_uid IS NULL OR e.is_test_uid!=1)\n)\nSELECT\n CASE WHEN GROUPING(stat_date)=0 THEN 'daily' WHEN GROUPING(week_start)=0 THEN 'weekly' ELSE 'period' END AS time_grain,\n COALESCE(stat_date,week_start,DATE '2026-08-01') AS date_key,\n product_mode,\n CASE WHEN GROUPING(platform)=0 THEN 'platform' WHEN GROUPING(channel_platform)=0 THEN 'subplatform' ELSE 'all_platforms' END AS segment_grain,\n COALESCE(platform,channel_platform,'all_platforms') AS platform_group,\n IF(GROUPING(provider)=1,'all_games',provider) AS provider_group,\n IF(GROUPING(age_group)=1,'all_ages',age_group) AS age_segment,\n COUNT(1) AS settlement_records,\n COUNT(DISTINCT user_id) AS settlement_users,\n COUNT(DISTINCT IF(effective_stake>0,user_id,NULL)) AS bettors,\n COUNT(DISTINCT IF(effective_stake>0,CONCAT(user_id,'|',CAST(stat_date AS STRING)),NULL)) AS betting_user_days,\n COUNTIF(effective_stake>0) AS positive_stake_records,\n SUM(effective_stake) AS effective_stake_source_units,\n SUM(settlement) AS settlement_source_units,\n SUM(COALESCE(extra_num,0)) AS extra_source_units,\n SUM(COALESCE(refund_num,0)) AS refund_source_units,\n SUM(bet_count) AS reported_bet_count,\n COUNTIF(bet_count IS NULL) AS missing_bet_count_records,\n COUNTIF(effective_stake IS NULL OR settlement IS NULL) AS missing_amount_records,\n COUNTIF(effective_stake<0) AS negative_effective_stake_records,\n COUNT(DISTINCT IF(effective_stake>0,play_id,NULL)) AS played_game_count\nFROM labelled\nGROUP BY GROUPING SETS (\n (product_mode,platform,provider,age_group),(product_mode,platform,age_group),\n (product_mode,platform,provider),(product_mode,platform),\n (product_mode,channel_platform,provider,age_group),(product_mode,channel_platform,age_group),\n (product_mode,channel_platform,provider),(product_mode,channel_platform),\n (product_mode,stat_date,platform,provider),(product_mode,stat_date,platform),\n (product_mode,week_start,platform,provider,age_group),(product_mode,week_start,platform,age_group),\n (product_mode,stat_date,provider),(product_mode,stat_date),\n (product_mode,provider,age_group),(product_mode,age_group),(product_mode,provider),(product_mode)\n)\nHAVING COUNT(DISTINCT user_id)>=10\nORDER BY product_mode,time_grain,date_key,segment_grain,platform_group,age_segment,provider_group\nLIMIT 3000;\n",
+          "language": "sql",
+          "supporting_queries": [
+            {
+              "path": "analysis/tada_pp_app_h5_actual_2026_09_08/sql/16_full_active_base.sql",
+              "sql": "WITH profile_candidates AS (\n SELECT user_id,register_time,xlid_time,download_channel,first_channel\n FROM `wajenigeria.origin_hfyl.user_xlid`\n WHERE target_day BETWEEN DATE '2019-01-01' AND DATE '2026-09-07'\n   AND app_id=90006 AND user_id IS NOT NULL AND user_id!=''\n), profiles AS (\n SELECT user_id,\n        CASE WHEN register_time BETWEEN 1262304000000 AND UNIX_MILLIS(TIMESTAMP(DATE '2026-09-09','Africa/Lagos'))-1\n             THEN DATE(TIMESTAMP_MILLIS(register_time),'Africa/Lagos') END AS registration_date,\n        COALESCE(NULLIF(download_channel,''),NULLIF(first_channel,''),'UNKNOWN') AS channel_name\n FROM profile_candidates\n QUALIFY ROW_NUMBER() OVER(PARTITION BY user_id ORDER BY IF(register_time>0,0,1),register_time,xlid_time,COALESCE(download_channel,first_channel,''))=1\n), mapped_profiles AS (\n SELECT user_id,registration_date,channel_name,CASE WHEN channel_name IN ('PACHAMPIONS','PAPAWJBETCY2','PAWAJEPALM2','PAWAJEPALMS','PAWAJESPOPAY','PAWAJEXENDER','PAWajespecia','PAgoogleplay','WajeSpecial') THEN 'APP_Android'\nWHEN channel_name IN ('1016246163569761','1163272865598617','1679734739569802','1693027911335063','1760719951146036','1807677293050348','1817271422343789','927128656153268','PAWAJEIOS','adjustqiqdbtawmebkFacebook','adjustqiqdbtawmebkGoogleAds','adjustqiqdbtawmebkOrganic') THEN 'APP_iOS'\nWHEN channel_name IN ('1057805740332057','1086073807708718','1268361438340480','1360891245684659','1488400826662700','1545741160000078','1584420786411834','1603683537460322','1707128760547457','1747604103','1752545802277475','2319680875136934','2545521782446776','2730368513961225','4308954285992033','4888457997','5214811898','5725818139','6143498115','771602205049164','9281932950','PAOPAYLIANYU','PAPAWAJECJ','PAPAWAJEH5GA','PAPAWAJEH5SU','PAWAJEBETH5','PAWAJEH5','PAWAJEH5APL','PAWAJEH5CY','PAWAJEH5DXYQ','PAWAJEH5FB','PAWAJEH5FUN','PAWAJEH5GEO','PAWAJEH5GG','PAWAJEH5JOY','PAWAJEH5LD','PAWAJEH5M01','PAWAJEH5M02','PAWAJEH5M03','PAWAJEH5M04','PAWAJEH5M05','PAWAJEH5M06','PAWAJEH5M07','PAWAJEH5M08','PAWAJEH5M09','PAWAJEH5M10','PAWAJEH5MB','PAWAJEH5MB2','PAWAJEH5MB3','PAWAJEH5MB4','PAWAJEH5MB5','PAWAJEH5NAT','PAWAJEH5OP','PAWAJEH5OP2','PAWAJEH5OP3','PAWAJEH5OP4','PAWAJEH5OP5','PAWAJEH5OP6','PAWAJEH5OP7','PAWAJEH5OP8','PAWAJEH5OPAD','PAWAJEH5PALM','PAWAJEH5PHX','PAWAJEH5PLAY','PAWAJEH5PP','PAWAJEH5PW','PAWAJEH5PW2','PAWAJEH5PW3','PAWAJEH5PWCY','PAWAJEH5PWIN','PAWAJEH5PWW','PAWAJEH5SU','PAWAJEH5TG01','PAWAJEH5TG02','PAWAJEH5TG03','PAXENDERH5') THEN 'H5'\nWHEN channel_name IN ('1150288483928367','1205296008205924','PAPWAT031224','PAWAJEH5PWA','PAWAJEH5PWAT') THEN 'PWA_named' ELSE 'unmapped' END AS channel_platform\n FROM profiles\n), active AS (\n SELECT target_day AS stat_date,user_id\n FROM `wajenigeria.origin_hfyl.realtime_edw_user_version_daily`\n WHERE target_day BETWEEN DATE '2026-08-01' AND DATE '2026-09-07' AND app_id=90006\n), labelled AS (\n SELECT a.stat_date,a.user_id,COALESCE(p.channel_platform,'unmapped') AS channel_platform,\n   CASE WHEN p.channel_platform IN ('APP_Android','APP_iOS') THEN 'APP' ELSE COALESCE(p.channel_platform,'unmapped') END AS platform,\n   CASE WHEN p.registration_date IS NULL THEN 'unknown_registration'\n        WHEN DATE_DIFF(a.stat_date,p.registration_date,DAY)<0 THEN 'invalid_registration'\n        WHEN DATE_DIFF(a.stat_date,p.registration_date,DAY)<30 THEN 'new_30d' ELSE 'old_over_30d' END AS age_group\n FROM active a LEFT JOIN mapped_profiles p ON p.user_id=a.user_id\n WHERE a.stat_date BETWEEN DATE '2026-08-01' AND DATE '2026-09-07'\n)\nSELECT IF(GROUPING(stat_date)=1,'period','daily') AS time_grain,COALESCE(stat_date,DATE '2026-08-01') AS date_key,\n CASE WHEN GROUPING(platform)=0 THEN 'platform' WHEN GROUPING(channel_platform)=0 THEN 'subplatform' ELSE 'all_platforms' END AS segment_grain,\n COALESCE(platform,channel_platform,'all_platforms') AS platform_group,\n IF(GROUPING(age_group)=1,'all_ages',age_group) AS age_segment,\n COUNT(DISTINCT user_id) AS active_accounts,\n COUNT(DISTINCT CONCAT(user_id,'|',CAST(stat_date AS STRING))) AS active_account_days,\n COUNT(1) AS daily_version_rows\nFROM labelled GROUP BY GROUPING SETS(\n (platform,age_group),(platform),(channel_platform,age_group),(channel_platform),\n (stat_date,platform,age_group),(stat_date,platform),(stat_date),(age_group),()\n)\nHAVING COUNT(DISTINCT user_id)>=10\nORDER BY time_grain,date_key,segment_grain,platform_group,age_segment\nLIMIT 1500;\n",
+              "id": "fd6fd55c-f096-4137-a58a-7fa5f6574055"
+            },
+            {
+              "path": "analysis/tada_pp_app_h5_actual_2026_09_08/sql/17_full_games.sql",
+              "sql": "WITH profile_candidates AS (\n SELECT user_id,register_time,xlid_time,download_channel,first_channel\n FROM `wajenigeria.origin_hfyl.user_xlid`\n WHERE target_day BETWEEN DATE '2019-01-01' AND DATE '2026-09-07'\n   AND app_id=90006 AND user_id IS NOT NULL AND user_id!=''\n), profiles AS (\n SELECT user_id,\n        CASE WHEN register_time BETWEEN 1262304000000 AND UNIX_MILLIS(TIMESTAMP(DATE '2026-09-09','Africa/Lagos'))-1\n             THEN DATE(TIMESTAMP_MILLIS(register_time),'Africa/Lagos') END AS registration_date,\n        COALESCE(NULLIF(download_channel,''),NULLIF(first_channel,''),'UNKNOWN') AS channel_name\n FROM profile_candidates\n QUALIFY ROW_NUMBER() OVER(PARTITION BY user_id ORDER BY IF(register_time>0,0,1),register_time,xlid_time,COALESCE(download_channel,first_channel,''))=1\n), mapped_profiles AS (\n SELECT user_id,registration_date,channel_name,CASE WHEN channel_name IN ('PACHAMPIONS','PAPAWJBETCY2','PAWAJEPALM2','PAWAJEPALMS','PAWAJESPOPAY','PAWAJEXENDER','PAWajespecia','PAgoogleplay','WajeSpecial') THEN 'APP_Android'\nWHEN channel_name IN ('1016246163569761','1163272865598617','1679734739569802','1693027911335063','1760719951146036','1807677293050348','1817271422343789','927128656153268','PAWAJEIOS','adjustqiqdbtawmebkFacebook','adjustqiqdbtawmebkGoogleAds','adjustqiqdbtawmebkOrganic') THEN 'APP_iOS'\nWHEN channel_name IN ('1057805740332057','1086073807708718','1268361438340480','1360891245684659','1488400826662700','1545741160000078','1584420786411834','1603683537460322','1707128760547457','1747604103','1752545802277475','2319680875136934','2545521782446776','2730368513961225','4308954285992033','4888457997','5214811898','5725818139','6143498115','771602205049164','9281932950','PAOPAYLIANYU','PAPAWAJECJ','PAPAWAJEH5GA','PAPAWAJEH5SU','PAWAJEBETH5','PAWAJEH5','PAWAJEH5APL','PAWAJEH5CY','PAWAJEH5DXYQ','PAWAJEH5FB','PAWAJEH5FUN','PAWAJEH5GEO','PAWAJEH5GG','PAWAJEH5JOY','PAWAJEH5LD','PAWAJEH5M01','PAWAJEH5M02','PAWAJEH5M03','PAWAJEH5M04','PAWAJEH5M05','PAWAJEH5M06','PAWAJEH5M07','PAWAJEH5M08','PAWAJEH5M09','PAWAJEH5M10','PAWAJEH5MB','PAWAJEH5MB2','PAWAJEH5MB3','PAWAJEH5MB4','PAWAJEH5MB5','PAWAJEH5NAT','PAWAJEH5OP','PAWAJEH5OP2','PAWAJEH5OP3','PAWAJEH5OP4','PAWAJEH5OP5','PAWAJEH5OP6','PAWAJEH5OP7','PAWAJEH5OP8','PAWAJEH5OPAD','PAWAJEH5PALM','PAWAJEH5PHX','PAWAJEH5PLAY','PAWAJEH5PP','PAWAJEH5PW','PAWAJEH5PW2','PAWAJEH5PW3','PAWAJEH5PWCY','PAWAJEH5PWIN','PAWAJEH5PWW','PAWAJEH5SU','PAWAJEH5TG01','PAWAJEH5TG02','PAWAJEH5TG03','PAXENDERH5') THEN 'H5'\nWHEN channel_name IN ('1150288483928367','1205296008205924','PAPWAT031224','PAWAJEH5PWA','PAWAJEH5PWAT') THEN 'PWA_named' ELSE 'unmapped' END AS channel_platform\n FROM profiles\n), events AS (\n SELECT target_day AS stat_date,user_id,play_id,mode_id,bet_num,cash_settlement,refund_num,\n        extra_num,bet_count,is_robot,is_test_uid\n FROM `wajenigeria.origin_hfyl.realtime_event_server`\n WHERE target_day BETWEEN DATE '2026-08-01' AND DATE '2026-09-07'\n   AND app_id=90006 AND event_type='GAMEEND'\n), labelled AS (\n SELECT e.stat_date,DATE_TRUNC(e.stat_date,WEEK(MONDAY)) AS week_start,e.user_id,\n        SAFE_CAST(e.play_id AS INT64) AS play_id,\n        CASE WHEN e.mode_id=11 THEN 'Waje' WHEN e.mode_id=100 THEN 'WajeCoin' ELSE 'other_or_unknown_mode' END AS product_mode,\n        COALESCE(p.channel_platform,'unmapped') AS channel_platform,\n        CASE WHEN p.channel_platform IN ('APP_Android','APP_iOS') THEN 'APP' ELSE COALESCE(p.channel_platform,'unmapped') END AS platform,\n        COALESCE(p.channel_name,'UNKNOWN') AS channel_name,\n        CASE WHEN p.registration_date IS NULL THEN 'unknown_registration'\n             WHEN DATE_DIFF(e.stat_date,p.registration_date,DAY)<0 THEN 'invalid_registration'\n             WHEN DATE_DIFF(e.stat_date,p.registration_date,DAY)<30 THEN 'new_30d'\n             ELSE 'old_over_30d' END AS age_group,\n        CASE WHEN SAFE_CAST(e.play_id AS INT64) BETWEEN 9150001 AND 9159999 THEN 'Tada'\n             WHEN SAFE_CAST(e.play_id AS INT64) BETWEEN 9160001 AND 9169999 THEN 'PP'\n             ELSE 'other_games' END AS provider,\n        CAST(e.bet_num AS BIGNUMERIC)-COALESCE(e.refund_num,0) AS effective_stake,\n        CAST(e.cash_settlement AS BIGNUMERIC) AS settlement,\n        e.refund_num,e.extra_num,e.bet_count\n FROM events e LEFT JOIN mapped_profiles p ON p.user_id=e.user_id\n WHERE e.stat_date BETWEEN DATE '2026-08-01' AND DATE '2026-09-07'\n   AND e.is_robot IS FALSE AND (e.is_test_uid IS NULL OR e.is_test_uid!=1)\n)\nSELECT\n IF(GROUPING(platform)=1,'APP_H5_combined',platform) AS platform_group,provider,play_id,\n COUNT(DISTINCT user_id) AS settlement_users,\n COUNT(DISTINCT IF(effective_stake>0,user_id,NULL)) AS bettors,\n COUNT(DISTINCT IF(effective_stake>0,CONCAT(user_id,'|',CAST(stat_date AS STRING)),NULL)) AS betting_user_days,\n COUNTIF(effective_stake>0) AS positive_stake_records,\n SUM(effective_stake) AS effective_stake_source_units,SUM(settlement) AS settlement_source_units,\n MIN(IF(effective_stake>0,stat_date,NULL)) AS first_observed_bet_date,\n MAX(IF(effective_stake>0,stat_date,NULL)) AS last_observed_bet_date,\n COUNT(DISTINCT IF(effective_stake>0,stat_date,NULL)) AS observed_betting_days\nFROM labelled\nWHERE product_mode='Waje' AND provider IN ('Tada','PP') AND platform IN ('APP','H5')\nGROUP BY GROUPING SETS((platform,provider,play_id),(provider,play_id))\nHAVING COUNT(DISTINCT user_id)>=10\nORDER BY provider,play_id,platform_group\nLIMIT 2000;\n",
+              "id": "e45c5a13-faa6-42e0-829c-492b9a917e1a"
+            },
+            {
+              "path": "analysis/tada_pp_app_h5_actual_2026_09_08/sql/18_full_return.sql",
+              "sql": "WITH profile_candidates AS (\n SELECT user_id,register_time,xlid_time,download_channel,first_channel\n FROM `wajenigeria.origin_hfyl.user_xlid`\n WHERE target_day BETWEEN DATE '2019-01-01' AND DATE '2026-09-07'\n   AND app_id=90006 AND user_id IS NOT NULL AND user_id!=''\n), profiles AS (\n SELECT user_id,\n        CASE WHEN register_time BETWEEN 1262304000000 AND UNIX_MILLIS(TIMESTAMP(DATE '2026-09-09','Africa/Lagos'))-1\n             THEN DATE(TIMESTAMP_MILLIS(register_time),'Africa/Lagos') END AS registration_date,\n        COALESCE(NULLIF(download_channel,''),NULLIF(first_channel,''),'UNKNOWN') AS channel_name\n FROM profile_candidates\n QUALIFY ROW_NUMBER() OVER(PARTITION BY user_id ORDER BY IF(register_time>0,0,1),register_time,xlid_time,COALESCE(download_channel,first_channel,''))=1\n), mapped_profiles AS (\n SELECT user_id,registration_date,channel_name,CASE WHEN channel_name IN ('PACHAMPIONS','PAPAWJBETCY2','PAWAJEPALM2','PAWAJEPALMS','PAWAJESPOPAY','PAWAJEXENDER','PAWajespecia','PAgoogleplay','WajeSpecial') THEN 'APP_Android'\nWHEN channel_name IN ('1016246163569761','1163272865598617','1679734739569802','1693027911335063','1760719951146036','1807677293050348','1817271422343789','927128656153268','PAWAJEIOS','adjustqiqdbtawmebkFacebook','adjustqiqdbtawmebkGoogleAds','adjustqiqdbtawmebkOrganic') THEN 'APP_iOS'\nWHEN channel_name IN ('1057805740332057','1086073807708718','1268361438340480','1360891245684659','1488400826662700','1545741160000078','1584420786411834','1603683537460322','1707128760547457','1747604103','1752545802277475','2319680875136934','2545521782446776','2730368513961225','4308954285992033','4888457997','5214811898','5725818139','6143498115','771602205049164','9281932950','PAOPAYLIANYU','PAPAWAJECJ','PAPAWAJEH5GA','PAPAWAJEH5SU','PAWAJEBETH5','PAWAJEH5','PAWAJEH5APL','PAWAJEH5CY','PAWAJEH5DXYQ','PAWAJEH5FB','PAWAJEH5FUN','PAWAJEH5GEO','PAWAJEH5GG','PAWAJEH5JOY','PAWAJEH5LD','PAWAJEH5M01','PAWAJEH5M02','PAWAJEH5M03','PAWAJEH5M04','PAWAJEH5M05','PAWAJEH5M06','PAWAJEH5M07','PAWAJEH5M08','PAWAJEH5M09','PAWAJEH5M10','PAWAJEH5MB','PAWAJEH5MB2','PAWAJEH5MB3','PAWAJEH5MB4','PAWAJEH5MB5','PAWAJEH5NAT','PAWAJEH5OP','PAWAJEH5OP2','PAWAJEH5OP3','PAWAJEH5OP4','PAWAJEH5OP5','PAWAJEH5OP6','PAWAJEH5OP7','PAWAJEH5OP8','PAWAJEH5OPAD','PAWAJEH5PALM','PAWAJEH5PHX','PAWAJEH5PLAY','PAWAJEH5PP','PAWAJEH5PW','PAWAJEH5PW2','PAWAJEH5PW3','PAWAJEH5PWCY','PAWAJEH5PWIN','PAWAJEH5PWW','PAWAJEH5SU','PAWAJEH5TG01','PAWAJEH5TG02','PAWAJEH5TG03','PAXENDERH5') THEN 'H5'\nWHEN channel_name IN ('1150288483928367','1205296008205924','PAPWAT031224','PAWAJEH5PWA','PAWAJEH5PWAT') THEN 'PWA_named' ELSE 'unmapped' END AS channel_platform\n FROM profiles\n), events AS (\n SELECT target_day AS stat_date,user_id,play_id,mode_id,bet_num,cash_settlement,refund_num,\n        extra_num,bet_count,is_robot,is_test_uid\n FROM `wajenigeria.origin_hfyl.realtime_event_server`\n WHERE target_day BETWEEN DATE '2026-08-01' AND DATE '2026-09-07'\n   AND app_id=90006 AND event_type='GAMEEND'\n), labelled AS (\n SELECT e.stat_date,DATE_TRUNC(e.stat_date,WEEK(MONDAY)) AS week_start,e.user_id,\n        SAFE_CAST(e.play_id AS INT64) AS play_id,\n        CASE WHEN e.mode_id=11 THEN 'Waje' WHEN e.mode_id=100 THEN 'WajeCoin' ELSE 'other_or_unknown_mode' END AS product_mode,\n        COALESCE(p.channel_platform,'unmapped') AS channel_platform,\n        CASE WHEN p.channel_platform IN ('APP_Android','APP_iOS') THEN 'APP' ELSE COALESCE(p.channel_platform,'unmapped') END AS platform,\n        COALESCE(p.channel_name,'UNKNOWN') AS channel_name,\n        CASE WHEN p.registration_date IS NULL THEN 'unknown_registration'\n             WHEN DATE_DIFF(e.stat_date,p.registration_date,DAY)<0 THEN 'invalid_registration'\n             WHEN DATE_DIFF(e.stat_date,p.registration_date,DAY)<30 THEN 'new_30d'\n             ELSE 'old_over_30d' END AS age_group,\n        CASE WHEN SAFE_CAST(e.play_id AS INT64) BETWEEN 9150001 AND 9159999 THEN 'Tada'\n             WHEN SAFE_CAST(e.play_id AS INT64) BETWEEN 9160001 AND 9169999 THEN 'PP'\n             ELSE 'other_games' END AS provider,\n        CAST(e.bet_num AS BIGNUMERIC)-COALESCE(e.refund_num,0) AS effective_stake,\n        CAST(e.cash_settlement AS BIGNUMERIC) AS settlement,\n        e.refund_num,e.extra_num,e.bet_count\n FROM events e LEFT JOIN mapped_profiles p ON p.user_id=e.user_id\n WHERE e.stat_date BETWEEN DATE '2026-08-01' AND DATE '2026-09-07'\n   AND e.is_robot IS FALSE AND (e.is_test_uid IS NULL OR e.is_test_uid!=1)\n)\n, daily_bets AS (\n SELECT stat_date,user_id,platform,channel_platform,provider,age_group,play_id\n FROM labelled WHERE product_mode='Waje' AND effective_stake>0\n GROUP BY stat_date,user_id,platform,channel_platform,provider,age_group,play_id\n), origins AS (\n SELECT user_id,platform,provider,MIN(stat_date) AS origin_date,\n        ARRAY_AGG(age_group ORDER BY stat_date,age_group LIMIT 1)[OFFSET(0)] AS origin_age\n FROM daily_bets WHERE provider IN ('Tada','PP') GROUP BY user_id,platform,provider\n), origin_games AS (\n SELECT o.user_id,o.platform,o.provider,o.origin_date,o.origin_age,ARRAY_AGG(DISTINCT d.play_id) AS initial_games\n FROM origins o JOIN daily_bets d ON d.user_id=o.user_id AND d.provider=o.provider AND d.stat_date=o.origin_date\n GROUP BY o.user_id,o.platform,o.provider,o.origin_date,o.origin_age\n), states AS (\n SELECT o.user_id,o.platform,o.provider,o.origin_date,o.origin_age,obs AS observation_day,sample_mode,\n        LOGICAL_OR(b.provider=o.provider) AS same_provider_return,\n        LOGICAL_OR(b.provider=o.provider AND b.play_id IN UNNEST(o.initial_games)) AS first_game_return,\n        COUNT(b.user_id)>0 AS any_game_return\n FROM origin_games o CROSS JOIN UNNEST([2,3,7,14,30]) obs\n CROSS JOIN UNNEST(['max_mature','common_30d']) sample_mode\n LEFT JOIN daily_bets b ON b.user_id=o.user_id AND b.stat_date=DATE_ADD(o.origin_date,INTERVAL (obs-1) DAY)\n WHERE DATE_ADD(o.origin_date,INTERVAL (obs-1) DAY)<=DATE '2026-09-07'\n   AND (sample_mode='max_mature' OR o.origin_date<=DATE_SUB(DATE '2026-09-07',INTERVAL 29 DAY))\n GROUP BY o.user_id,o.platform,o.provider,o.origin_date,o.origin_age,observation_day,sample_mode\n)\nSELECT platform,provider,IF(GROUPING(origin_age)=1,'all_ages',origin_age) AS age_segment,\n observation_day,sample_mode,IF(GROUPING(origin_date)=1,'summary','daily_cohort') AS cohort_scope,\n MIN(origin_date) AS first_origin_date,MAX(origin_date) AS last_origin_date,\n COUNT(1) AS eligible_accounts,\n COUNTIF(same_provider_return) AS same_provider_return_accounts,\n COUNTIF(first_game_return) AS any_origin_day_game_return_accounts,\n COUNTIF(any_game_return AND NOT COALESCE(same_provider_return,FALSE)) AS other_provider_only_accounts,\n COUNTIF(NOT any_game_return) AS no_observed_bet_accounts\nFROM states\nGROUP BY GROUPING SETS((platform,provider,origin_age,observation_day,sample_mode),(platform,provider,observation_day,sample_mode),\n (platform,provider,origin_date,observation_day,sample_mode))\nHAVING COUNT(1)>=10 AND (sample_mode='max_mature' OR GROUPING(origin_date)=1)\nORDER BY platform,provider,cohort_scope,age_segment,observation_day,first_origin_date\nLIMIT 2500;\n",
+              "id": "96b07836-e589-4fb8-9cea-3c96ec425500"
+            },
+            {
+              "path": "analysis/tada_pp_app_h5_actual_2026_09_08/sql/21_targeted_duplicate_corrections.sql",
+              "sql": "WITH profile_candidates AS (\n SELECT user_id,register_time,xlid_time,download_channel,first_channel\n FROM `wajenigeria.origin_hfyl.user_xlid`\n WHERE target_day BETWEEN DATE '2019-01-01' AND DATE '2026-09-07'\n   AND app_id=90006 AND user_id IS NOT NULL AND user_id!=''\n), profiles AS (\n SELECT user_id,\n        CASE WHEN register_time BETWEEN 1262304000000 AND UNIX_MILLIS(TIMESTAMP(DATE '2026-09-09','Africa/Lagos'))-1\n             THEN DATE(TIMESTAMP_MILLIS(register_time),'Africa/Lagos') END AS registration_date,\n        COALESCE(NULLIF(download_channel,''),NULLIF(first_channel,''),'UNKNOWN') AS channel_name\n FROM profile_candidates\n QUALIFY ROW_NUMBER() OVER(PARTITION BY user_id ORDER BY IF(register_time>0,0,1),register_time,xlid_time,COALESCE(download_channel,first_channel,''))=1\n), mapped_profiles AS (\n SELECT user_id,registration_date,channel_name,CASE WHEN channel_name IN ('PACHAMPIONS','PAPAWJBETCY2','PAWAJEPALM2','PAWAJEPALMS','PAWAJESPOPAY','PAWAJEXENDER','PAWajespecia','PAgoogleplay','WajeSpecial') THEN 'APP_Android'\nWHEN channel_name IN ('1016246163569761','1163272865598617','1679734739569802','1693027911335063','1760719951146036','1807677293050348','1817271422343789','927128656153268','PAWAJEIOS','adjustqiqdbtawmebkFacebook','adjustqiqdbtawmebkGoogleAds','adjustqiqdbtawmebkOrganic') THEN 'APP_iOS'\nWHEN channel_name IN ('1057805740332057','1086073807708718','1268361438340480','1360891245684659','1488400826662700','1545741160000078','1584420786411834','1603683537460322','1707128760547457','1747604103','1752545802277475','2319680875136934','2545521782446776','2730368513961225','4308954285992033','4888457997','5214811898','5725818139','6143498115','771602205049164','9281932950','PAOPAYLIANYU','PAPAWAJECJ','PAPAWAJEH5GA','PAPAWAJEH5SU','PAWAJEBETH5','PAWAJEH5','PAWAJEH5APL','PAWAJEH5CY','PAWAJEH5DXYQ','PAWAJEH5FB','PAWAJEH5FUN','PAWAJEH5GEO','PAWAJEH5GG','PAWAJEH5JOY','PAWAJEH5LD','PAWAJEH5M01','PAWAJEH5M02','PAWAJEH5M03','PAWAJEH5M04','PAWAJEH5M05','PAWAJEH5M06','PAWAJEH5M07','PAWAJEH5M08','PAWAJEH5M09','PAWAJEH5M10','PAWAJEH5MB','PAWAJEH5MB2','PAWAJEH5MB3','PAWAJEH5MB4','PAWAJEH5MB5','PAWAJEH5NAT','PAWAJEH5OP','PAWAJEH5OP2','PAWAJEH5OP3','PAWAJEH5OP4','PAWAJEH5OP5','PAWAJEH5OP6','PAWAJEH5OP7','PAWAJEH5OP8','PAWAJEH5OPAD','PAWAJEH5PALM','PAWAJEH5PHX','PAWAJEH5PLAY','PAWAJEH5PP','PAWAJEH5PW','PAWAJEH5PW2','PAWAJEH5PW3','PAWAJEH5PWCY','PAWAJEH5PWIN','PAWAJEH5PWW','PAWAJEH5SU','PAWAJEH5TG01','PAWAJEH5TG02','PAWAJEH5TG03','PAXENDERH5') THEN 'H5'\nWHEN channel_name IN ('1150288483928367','1205296008205924','PAPWAT031224','PAWAJEH5PWA','PAWAJEH5PWAT') THEN 'PWA_named' ELSE 'unmapped' END AS channel_platform\n FROM profiles\n), events AS (\n SELECT target_day AS stat_date,user_id,play_id,mode_id,bet_num,cash_settlement,refund_num,\n        extra_num,bet_count,is_robot,is_test_uid,salt_key,unique_id,unique_id_bar,server_time\n FROM `wajenigeria.origin_hfyl.realtime_event_server`\n WHERE target_day BETWEEN DATE '2026-08-01' AND DATE '2026-09-07'\n   AND app_id=90006 AND event_type='GAMEEND' AND target_day IN (DATE '2026-08-05',DATE '2026-08-25',DATE '2026-08-30')\n), ranked_events AS (\n SELECT stat_date,user_id,play_id,mode_id,bet_num,cash_settlement,refund_num,extra_num,bet_count,is_robot,is_test_uid,\n ROW_NUMBER() OVER(PARTITION BY stat_date,user_id,play_id,unique_id,unique_id_bar ORDER BY SAFE_CAST(server_time AS INT64) DESC,salt_key DESC) AS round_rank,\n COUNT(DISTINCT TO_JSON_STRING(STRUCT(bet_num,cash_settlement,refund_num,extra_num,mode_id))) OVER(PARTITION BY stat_date,user_id,play_id,unique_id,unique_id_bar) AS amount_variants\n FROM events\n), labelled AS (\n SELECT e.stat_date,DATE_TRUNC(e.stat_date,WEEK(MONDAY)) AS week_start,e.user_id,\n        SAFE_CAST(e.play_id AS INT64) AS play_id,\n        CASE WHEN e.mode_id=11 THEN 'Waje' WHEN e.mode_id=100 THEN 'WajeCoin' ELSE 'other_or_unknown_mode' END AS product_mode,\n        COALESCE(p.channel_platform,'unmapped') AS channel_platform,\n        CASE WHEN p.channel_platform IN ('APP_Android','APP_iOS') THEN 'APP' ELSE COALESCE(p.channel_platform,'unmapped') END AS platform,\n        COALESCE(p.channel_name,'UNKNOWN') AS channel_name,\n        CASE WHEN p.registration_date IS NULL THEN 'unknown_registration'\n             WHEN DATE_DIFF(e.stat_date,p.registration_date,DAY)<0 THEN 'invalid_registration'\n             WHEN DATE_DIFF(e.stat_date,p.registration_date,DAY)<30 THEN 'new_30d'\n             ELSE 'old_over_30d' END AS age_group,\n        CASE WHEN SAFE_CAST(e.play_id AS INT64) BETWEEN 9150001 AND 9159999 THEN 'Tada'\n             WHEN SAFE_CAST(e.play_id AS INT64) BETWEEN 9160001 AND 9169999 THEN 'PP'\n             ELSE 'other_games' END AS provider,\n        CAST(e.bet_num AS BIGNUMERIC)-COALESCE(e.refund_num,0) AS effective_stake,\n        CAST(e.cash_settlement AS BIGNUMERIC) AS settlement,\n        e.refund_num,e.extra_num,e.bet_count,e.round_rank,e.amount_variants\n FROM ranked_events e LEFT JOIN mapped_profiles p ON p.user_id=e.user_id\n WHERE e.stat_date BETWEEN DATE '2026-08-01' AND DATE '2026-09-07'\n   AND e.is_robot IS FALSE AND (e.is_test_uid IS NULL OR e.is_test_uid!=1)\n)\nSELECT\n CASE WHEN GROUPING(stat_date)=0 THEN 'core_correction' WHEN GROUPING(play_id)=0 THEN 'game_correction' ELSE 'quality_total' END AS correction_grain,\n stat_date,product_mode,channel_platform,platform,provider,age_group,play_id,\n COUNT(DISTINCT user_id) AS population_accounts,\n COUNTIF(round_rank>1) AS duplicate_records,\n COUNTIF(round_rank>1 AND effective_stake>0) AS duplicate_positive_records,\n SUM(IF(round_rank>1,effective_stake,0)) AS duplicate_stake_source_units,\n SUM(IF(round_rank>1,settlement,0)) AS duplicate_settlement_source_units,\n SUM(IF(round_rank>1,COALESCE(extra_num,0),0)) AS duplicate_extra_source_units,\n SUM(IF(round_rank>1,COALESCE(refund_num,0),0)) AS duplicate_refund_source_units,\n COUNTIF(round_rank>1 AND amount_variants>1) AS duplicate_records_with_conflicting_amounts\nFROM labelled\nGROUP BY GROUPING SETS((stat_date,product_mode,channel_platform,platform,provider,age_group),\n (product_mode,platform,provider,play_id),(product_mode,provider))\nHAVING COUNT(DISTINCT user_id)>=10 AND COUNTIF(round_rank>1)>0\nORDER BY correction_grain,stat_date,product_mode,platform,provider,play_id\nLIMIT 500;\n",
+              "id": "e1fcd374-e4de-475e-96e7-ba74dadef82c"
+            }
+          ],
+          "transformation_path": "analysis/tada_pp_split_2026_09_09/analyze.py"
+        }
+      }
+    ],
+    "cards": [],
+    "charts": [
+      {
+        "id": "macro-share",
+        "title": "厂商占同渠道全部游戏的下注份额",
+        "subtitle": "同渠道全部Waje游戏下注额为100%；全体用户。",
+        "showDescription": true,
+        "type": "bar",
+        "dataset": "macro-share",
+        "sourceId": "split",
+        "layout": "full",
+        "intent": "comparison",
+        "question": "厂商占同渠道全部游戏的下注份额",
+        "rationale": "按本报告同口径聚合展示；数据保留对应分子分母，正文紧邻解释。",
+        "encodings": {
+          "x": {
+            "field": "渠道",
+            "type": "nominal",
+            "label": "渠道"
+          },
+          "y": {
+            "fields": [
+              "Tada",
+              "PP"
+            ],
+            "type": "quantitative",
+            "format": "number",
+            "label": "下注份额（%）"
+          }
+        },
+        "palette": {
+          "kind": "categorical",
+          "name": "blue-gold-orange-olive"
+        },
+        "labels": {
+          "values": "all"
+        },
+        "legend": {
+          "position": "bottom",
+          "sort": "spec"
+        },
+        "settings": {
+          "sort": "none",
+          "categoryLabelPolicy": "wrap"
+        },
+        "valueFormat": "number",
+        "unit": "%"
+      },
+      {
+        "id": "pen-new_30d",
+        "title": "新用户下注渗透率",
+        "subtitle": "厂商去重下注人数÷同渠道同年龄组平台活跃人数。",
+        "showDescription": true,
+        "type": "bar",
+        "dataset": "pen-new_30d",
+        "sourceId": "split",
+        "layout": "full",
+        "intent": "comparison",
+        "question": "新用户下注渗透率",
+        "rationale": "按本报告同口径聚合展示；数据保留对应分子分母，正文紧邻解释。",
+        "encodings": {
+          "x": {
+            "field": "渠道",
+            "type": "nominal",
+            "label": "渠道"
+          },
+          "y": {
+            "fields": [
+              "Tada",
+              "PP"
+            ],
+            "type": "quantitative",
+            "format": "number",
+            "label": "下注渗透率（%）"
+          }
+        },
+        "palette": {
+          "kind": "categorical",
+          "name": "blue-gold-orange-olive"
+        },
+        "labels": {
+          "values": "all"
+        },
+        "legend": {
+          "position": "bottom",
+          "sort": "spec"
+        },
+        "settings": {
+          "sort": "none",
+          "categoryLabelPolicy": "wrap"
+        },
+        "valueFormat": "number",
+        "unit": "%"
+      },
+      {
+        "id": "pen-old_over_30d",
+        "title": "老用户下注渗透率",
+        "subtitle": "厂商去重下注人数÷同渠道同年龄组平台活跃人数。",
+        "showDescription": true,
+        "type": "bar",
+        "dataset": "pen-old_over_30d",
+        "sourceId": "split",
+        "layout": "full",
+        "intent": "comparison",
+        "question": "老用户下注渗透率",
+        "rationale": "按本报告同口径聚合展示；数据保留对应分子分母，正文紧邻解释。",
+        "encodings": {
+          "x": {
+            "field": "渠道",
+            "type": "nominal",
+            "label": "渠道"
+          },
+          "y": {
+            "fields": [
+              "Tada",
+              "PP"
+            ],
+            "type": "quantitative",
+            "format": "number",
+            "label": "下注渗透率（%）"
+          }
+        },
+        "palette": {
+          "kind": "categorical",
+          "name": "blue-gold-orange-olive"
+        },
+        "labels": {
+          "values": "all"
+        },
+        "legend": {
+          "position": "bottom",
+          "sort": "spec"
+        },
+        "settings": {
+          "sort": "none",
+          "categoryLabelPolicy": "wrap"
+        },
+        "valueFormat": "number",
+        "unit": "%"
+      },
+      {
+        "id": "ret-new_30d",
+        "title": "新用户同厂商再次下注率",
+        "subtitle": "8月1—9日起点；不是实际端内回访；百分比逐柱显示。",
+        "showDescription": true,
+        "type": "bar",
+        "dataset": "ret-new_30d",
+        "sourceId": "split",
+        "layout": "full",
+        "intent": "comparison",
+        "question": "新用户同厂商再次下注率",
+        "rationale": "按本报告同口径聚合展示；数据保留对应分子分母，正文紧邻解释。",
+        "encodings": {
+          "x": {
+            "field": "观察日",
+            "type": "nominal",
+            "label": "观察日"
+          },
+          "y": {
+            "fields": [
+              "APP·Tada",
+              "H5·Tada",
+              "APP·PP",
+              "H5·PP"
+            ],
+            "type": "quantitative",
+            "format": "number",
+            "label": "回访率（%）"
+          }
+        },
+        "palette": {
+          "kind": "categorical",
+          "name": "blue-gold-orange-olive"
+        },
+        "labels": {
+          "values": "all"
+        },
+        "legend": {
+          "position": "bottom",
+          "sort": "spec"
+        },
+        "settings": {
+          "sort": "none",
+          "categoryLabelPolicy": "wrap"
+        },
+        "valueFormat": "number",
+        "unit": "%"
+      },
+      {
+        "id": "ret-old_over_30d",
+        "title": "老用户同厂商再次下注率",
+        "subtitle": "8月1—9日起点；不是实际端内回访；百分比逐柱显示。",
+        "showDescription": true,
+        "type": "bar",
+        "dataset": "ret-old_over_30d",
+        "sourceId": "split",
+        "layout": "full",
+        "intent": "comparison",
+        "question": "老用户同厂商再次下注率",
+        "rationale": "按本报告同口径聚合展示；数据保留对应分子分母，正文紧邻解释。",
+        "encodings": {
+          "x": {
+            "field": "观察日",
+            "type": "nominal",
+            "label": "观察日"
+          },
+          "y": {
+            "fields": [
+              "APP·Tada",
+              "H5·Tada",
+              "APP·PP",
+              "H5·PP"
+            ],
+            "type": "quantitative",
+            "format": "number",
+            "label": "回访率（%）"
+          }
+        },
+        "palette": {
+          "kind": "categorical",
+          "name": "blue-gold-orange-olive"
+        },
+        "labels": {
+          "values": "all"
+        },
+        "legend": {
+          "position": "bottom",
+          "sort": "spec"
+        },
+        "settings": {
+          "sort": "none",
+          "categoryLabelPolicy": "wrap"
+        },
+        "valueFormat": "number",
+        "unit": "%"
+      }
+    ],
+    "tables": [],
+    "blocks": [
+      {
+        "id": "title",
+        "type": "markdown",
+        "body": "# Tada与PP宏观对比｜新老用户、下注与回访"
+      },
+      {
+        "id": "summary",
+        "type": "markdown",
+        "body": "## 执行摘要\n\n**Tada的下注规模在APP、H5都更大。** 全体下注额分别为PP的28.7倍、19.4倍；只比较Tada与PP，PP占两家合计下注额的比例在H5为4.90%，高于APP的3.37%。\n\n**PP老用户在H5参与更广，Tada新用户在APP参与更广。** 按下注渗透率比较，PP老用户为H5 **8.9%**、APP **6.0%**；Tada新用户为APP **6.7%**、H5 **4.5%**。作为对照，PP新用户为APP 1.4%、H5 1.2%；Tada老用户为APP 22.3%、H5 22.5%，两端接近。\n\n**两家新下注用户的第7日回访率，APP均高于H5。** 同为8月1—9日起点批次，Tada为APP **13.9%**、H5 **8.2%**；PP为APP **8.2%**、H5 **6.7%**。优先核验两家H5新下注用户的首周回访路径。",
+        "sourceId": "split"
+      },
+      {
+        "id": "scope",
+        "type": "markdown",
+        "body": "## 01｜先看全体：规模和份额是两件事\n\n统计期为2026年8月1日—9月7日，共38个完整业务日，拉各斯时间。APP／H5按已核对的注册渠道归属，不是逐笔实际运行端；金额沿用报表单位，排除WajeCoin。\n\n新用户为行为日注册0—29天，老用户为30天及以上，不按充值筛选。局次是已去重的有效下注用户游戏局回合记录，不能当作原始下注笔数。两项份额分别使用同渠道同人群的全部游戏、Tada＋PP下注额作分母。\n\n**Tada：** APP下注额为386.02亿，占同渠道全部游戏下注额的35.8%；H5为90.59亿，占42.4%。\n\n**PP：** APP下注额为13.44亿，占同渠道全部游戏下注额的1.2%；H5为4.67亿，占2.2%。\n\n以上为8月1日—9月7日全体用户数据，金额沿用报表单位。两家厂商在APP的下注金额更大，在H5占全部游戏下注额的比例更高。",
+        "sourceId": "split"
+      },
+      {
+        "id": "macro-all",
+        "type": "markdown",
+        "body": "### 全体用户四组合\n\n全体含注册日期未知者；峰值仅比较当前列。\n\n| 组合 | 下注额（亿） | 有效局次（万） | 下注人数 | 占全部游戏 | 占两厂商 |\n| --- | --- | --- | --- | --- | --- |\n| APP·Tada | **386.02** | 29,654.47 | 144,929 | 35.78% | 96.63% |\n| APP·PP | 13.44 | 2,111.41 | 35,414 | 1.25% | 3.37% |\n| H5·Tada | 90.59 | 7,230.99 | 36,669 | 42.42% | 95.10% |\n| H5·PP | 4.67 | 997.35 | 12,076 | 2.19% | 4.90% |",
+        "sourceId": "split"
+      },
+      {
+        "id": "macro-share-block",
+        "type": "chart",
+        "chartId": "macro-share"
+      },
+      {
+        "id": "new_30d",
+        "type": "markdown",
+        "body": "## 02｜新用户：金额份额与参与比例分开读\n\nPP在H5的两厂商金额份额为7.57%，高于APP的2.96%；但下注渗透率为1.23%，略低于APP的1.36%。金额份额高，不等于参与人数比例高。\n\n同组平台活跃人数：APP 899,442人，H5 458,169人。渗透率使用同组活跃人数作分母。",
+        "sourceId": "split"
+      },
+      {
+        "id": "table-new_30d",
+        "type": "markdown",
+        "body": "### 新用户下注对照\n\n| 组合 | 下注额（亿） | 有效局次（万） | 下注人数 | 占同组全部游戏 | 占同组两厂商 | 下注渗透率 |\n| --- | --- | --- | --- | --- | --- | --- |\n| APP·Tada | 59.96 | 5,015.38 | 60,688 | 30.30% | 97.04% | 6.75% |\n| APP·PP | 1.83 | 342.30 | 12,213 | 0.92% | 2.96% | 1.36% |\n| H5·Tada | 16.52 | 1,596.27 | 20,644 | 31.01% | 92.43% | 4.51% |\n| H5·PP | 1.35 | 304.74 | 5,628 | 2.54% | 7.57% | 1.23% |",
+        "sourceId": "split"
+      },
+      {
+        "id": "pen-new_30d-block",
+        "type": "chart",
+        "chartId": "pen-new_30d"
+      },
+      {
+        "id": "old_over_30d",
+        "type": "markdown",
+        "body": "## 03｜老用户：H5的PP参与比例更高\n\nPP在H5的下注渗透率为8.86%，高于APP的6.00%；Tada为22.50%和22.27%，两端接近。新老用户的渠道差异方向不同。\n\n同组平台活跃人数：APP 402,803人，H5 75,479人。渗透率使用同组活跃人数作分母。",
+        "sourceId": "split"
+      },
+      {
+        "id": "table-old_over_30d",
+        "type": "markdown",
+        "body": "### 老用户下注对照\n\n| 组合 | 下注额（亿） | 有效局次（万） | 下注人数 | 占同组全部游戏 | 占同组两厂商 | 下注渗透率 |\n| --- | --- | --- | --- | --- | --- | --- |\n| APP·Tada | 325.37 | 24,553.30 | 89,714 | 37.03% | 96.56% | 22.27% |\n| APP·PP | 11.59 | 1,766.61 | 24,179 | 1.32% | 3.44% | 6.00% |\n| H5·Tada | 73.97 | 5,624.08 | 16,985 | 46.28% | 95.72% | 22.50% |\n| H5·PP | 3.31 | 690.95 | 6,689 | 2.07% | 4.28% | 8.86% |",
+        "sourceId": "split"
+      },
+      {
+        "id": "pen-old_over_30d-block",
+        "type": "chart",
+        "chartId": "pen-old_over_30d"
+      },
+      {
+        "id": "returns",
+        "type": "markdown",
+        "body": "## 04｜回访：新用户差距更值得优先排查\n\n回访起点是窗口内首次有效下注该厂商的当天（第1日），第N日再次下注同厂商才计入。这里不是全部新增注册用户留存，也不是新增付费用户留存。\n\n下图统一使用8月1—9日起点批次；每组第7、14、30日采用同一分母。新老年龄在起点固定，不把各日留存率之差当作真实流失人数。",
+        "sourceId": "split"
+      },
+      {
+        "id": "ret-note-new_30d",
+        "type": "markdown",
+        "body": "**新下注用户：两家H5均低于APP。** 第30日Tada为APP 7.33%、H5 4.45%；PP为4.66%、3.24%。",
+        "sourceId": "split"
+      },
+      {
+        "id": "ret-new_30d-block",
+        "type": "chart",
+        "chartId": "ret-new_30d"
+      },
+      {
+        "id": "ret-note-old_over_30d",
+        "type": "markdown",
+        "body": "**老下注用户：Tada第30日两端接近。** APP 18.48%、H5 18.57%；PP为10.04%、11.53%。不能将新用户的渠道差距直接套用到老用户。",
+        "sourceId": "split"
+      },
+      {
+        "id": "ret-old_over_30d-block",
+        "type": "chart",
+        "chartId": "ret-old_over_30d"
+      },
+      {
+        "id": "ret-exact",
+        "type": "markdown",
+        "body": "### 同批回访精确值与分母\n\n| 人群 | 组合 | 成熟起点人数 | 第7日 | 第14日 | 第30日 |\n| --- | --- | --- | --- | --- | --- |\n| 新用户 | APP·Tada | 19,019 | 13.93% | 10.47% | 7.33% |\n| 新用户 | APP·PP | 3,758 | 8.17% | 5.67% | 4.66% |\n| 新用户 | H5·Tada | 5,861 | 8.21% | 5.94% | 4.45% |\n| 新用户 | H5·PP | 1,483 | 6.68% | 3.84% | 3.24% |\n| 老用户 | APP·Tada | 39,036 | 23.07% | 21.21% | 18.48% |\n| 老用户 | APP·PP | 9,214 | 13.25% | 11.42% | 10.04% |\n| 老用户 | H5·Tada | 7,390 | 22.37% | 20.91% | 18.57% |\n| 老用户 | H5·PP | 2,420 | 14.09% | 11.90% | 11.53% |",
+        "sourceId": "split"
+      },
+      {
+        "id": "actions",
+        "type": "markdown",
+        "body": "## 05｜先做什么\n\n1. 新用户：同时排查Tada、PP在H5的首周进入与持续下注路径，按游戏和入口继续细分。\n2. 老用户：分别评估PP在H5的较高参与比例，以及Tada两端相近的回访；不只看全体平均。\n3. 游戏、头部集中度、人均深度及RTP关联，转到《Tada与PP细分诊断》阅读，宏观篇不据此直接调整推荐或RTP。\n\n新老用户可在期内跨组，人数不相加；金额中注册日期未知部分保留在全体口径。原报告与原飞书保留，本篇为独立拆分稿。",
+        "sourceId": "split"
+      }
+    ],
+    "reportContract": {
+      "type": "business",
+      "language": "zh",
+      "population": "Waje真金产品；按注册渠道归属APP/H5；新为行为日注册0—29天，老30天及以上；回访按起点固定账号龄，不按付费状态筛选。",
+      "period": "2026-08-01至2026-09-07；38个完整业务日；回访共同起点2026-08-01至2026-08-09",
+      "timezone": "Africa/Lagos",
+      "metrics": [
+        {
+          "dataset": "calculation_core",
+          "field": "penetration",
+          "unit": "%",
+          "definition": "同组厂商去重下注人数÷同组平台活跃人数",
+          "kind": "ratio",
+          "denominator": "同渠道同年龄组平台活跃人数",
+          "scale": "fraction",
+          "min": 0,
+          "max": 1
+        },
+        {
+          "dataset": "calculation_core",
+          "field": "rtp",
+          "unit": "%",
+          "definition": "对应派奖÷有效下注额",
+          "kind": "ratio",
+          "denominator": "有效下注额",
+          "scale": "fraction",
+          "min": 0
+        }
+      ],
+      "assertions": [
+        {
+          "kind": "ratio",
+          "dataset": "calculation_core",
+          "numerator": "bettors",
+          "denominator": "active",
+          "actual": "penetration"
+        },
+        {
+          "kind": "ratio",
+          "dataset": "calculation_core",
+          "numerator": "payout",
+          "denominator": "stake",
+          "actual": "rtp"
+        },
+        {
+          "kind": "ratio",
+          "dataset": "calculation_core",
+          "numerator": "stake",
+          "denominator": "bettors",
+          "actual": "per_bettor"
+        }
+      ],
+      "decisions": {},
+      "openQuestions": []
+    }
+  },
+  "snapshot": {
+    "version": 1,
+    "generatedAt": "2026-09-09T10:33:58.309204+00:00",
+    "status": "ready",
+    "datasets": {
+      "calculation_core": [
+        {
+          "group": "APP·Tada·all_ages",
+          "stake": 38602250189.6,
+          "bettors": 144929,
+          "active": 1267663,
+          "penetration": 0.11432770381402628,
+          "per_bettor": 266352.83614459494,
+          "payout": 37420891101.65,
+          "rtp": 0.969396626306819
+        },
+        {
+          "group": "APP·PP·all_ages",
+          "stake": 1344452251.5,
+          "bettors": 35414,
+          "active": 1267663,
+          "penetration": 0.027936446831689495,
+          "per_bettor": 37963.8632038177,
+          "payout": 1290529933.0,
+          "rtp": 0.9598927232708793
+        },
+        {
+          "group": "APP·Tada·new_30d",
+          "stake": 5995949181.6,
+          "bettors": 60688,
+          "active": 899442,
+          "penetration": 0.0674729443365998,
+          "per_bettor": 98799.5844582125,
+          "payout": 5816885886.68,
+          "rtp": 0.9701359552096441
+        },
+        {
+          "group": "APP·PP·new_30d",
+          "stake": 182831607.25,
+          "bettors": 12213,
+          "active": 899442,
+          "penetration": 0.013578418619544117,
+          "per_bettor": 14970.245414722018,
+          "payout": 174871617.5,
+          "rtp": 0.9564627261679339
+        },
+        {
+          "group": "APP·Tada·old_over_30d",
+          "stake": 32537051732.0,
+          "bettors": 89714,
+          "active": 402803,
+          "penetration": 0.22272425974980326,
+          "per_bettor": 362675.2985264284,
+          "payout": 31536967324.62,
+          "rtp": 0.9692632136550828
+        },
+        {
+          "group": "APP·PP·old_over_30d",
+          "stake": 1159148849.25,
+          "bettors": 24179,
+          "active": 402803,
+          "penetration": 0.06002686176617354,
+          "per_bettor": 47940.31387774515,
+          "payout": 1112935606.5,
+          "rtp": 0.9601317442708922
+        },
+        {
+          "group": "H5·Tada·all_ages",
+          "stake": 9058960350.6,
+          "bettors": 36669,
+          "active": 528092,
+          "penetration": 0.06943676480613227,
+          "per_bettor": 247046.83385420928,
+          "payout": 8791418129.99,
+          "rtp": 0.9704665645663986
+        },
+        {
+          "group": "H5·PP·all_ages",
+          "stake": 466809000.25,
+          "bettors": 12076,
+          "active": 528092,
+          "penetration": 0.02286722768002545,
+          "per_bettor": 38655.92913630341,
+          "payout": 446166926.25,
+          "rtp": 0.9557804712656673
+        },
+        {
+          "group": "H5·Tada·new_30d",
+          "stake": 1652345040.0,
+          "bettors": 20644,
+          "active": 458169,
+          "penetration": 0.04505760974662188,
+          "per_bettor": 80039.96512303817,
+          "payout": 1603363860.9,
+          "rtp": 0.9703565672336815
+        },
+        {
+          "group": "H5·PP·new_30d",
+          "stake": 135324566.75,
+          "bettors": 5628,
+          "active": 458169,
+          "penetration": 0.012283676983820381,
+          "per_bettor": 24044.876821250888,
+          "payout": 129843663.0,
+          "rtp": 0.9594980875857857
+        },
+        {
+          "group": "H5·Tada·old_over_30d",
+          "stake": 7397003832.6,
+          "bettors": 16985,
+          "active": 75479,
+          "penetration": 0.225029478397965,
+          "per_bettor": 435502.1390992052,
+          "payout": 7178756861.81,
+          "rtp": 0.9704952199932432
+        },
+        {
+          "group": "H5·PP·old_over_30d",
+          "stake": 331039722.5,
+          "bettors": 6689,
+          "active": 75479,
+          "penetration": 0.08862067594960188,
+          "per_bettor": 49490.166317835254,
+          "payout": 315826666.25,
+          "rtp": 0.9540446199775919
+        }
+      ],
+      "macro-all": [
+        {
+          "组合": "APP·Tada",
+          "下注额（亿）": "386.02",
+          "有效局次（万）": "29,654.47",
+          "下注人数": "144,929",
+          "占全部游戏": "35.78%",
+          "占两厂商": "96.63%"
+        },
+        {
+          "组合": "APP·PP",
+          "下注额（亿）": "13.44",
+          "有效局次（万）": "2,111.41",
+          "下注人数": "35,414",
+          "占全部游戏": "1.25%",
+          "占两厂商": "3.37%"
+        },
+        {
+          "组合": "H5·Tada",
+          "下注额（亿）": "90.59",
+          "有效局次（万）": "7,230.99",
+          "下注人数": "36,669",
+          "占全部游戏": "42.42%",
+          "占两厂商": "95.10%"
+        },
+        {
+          "组合": "H5·PP",
+          "下注额（亿）": "4.67",
+          "有效局次（万）": "997.35",
+          "下注人数": "12,076",
+          "占全部游戏": "2.19%",
+          "占两厂商": "4.90%"
+        }
+      ],
+      "macro-share": [
+        {
+          "渠道": "APP",
+          "Tada": 35.779958071477694,
+          "PP": 1.2461565051649193
+        },
+        {
+          "渠道": "H5",
+          "Tada": 42.41510500936607,
+          "PP": 2.1856539822044314
+        }
+      ],
+      "table-new_30d": [
+        {
+          "组合": "APP·Tada",
+          "下注额（亿）": "59.96",
+          "有效局次（万）": "5,015.38",
+          "下注人数": "60,688",
+          "占同组全部游戏": "30.30%",
+          "占同组两厂商": "97.04%",
+          "下注渗透率": "6.75%"
+        },
+        {
+          "组合": "APP·PP",
+          "下注额（亿）": "1.83",
+          "有效局次（万）": "342.30",
+          "下注人数": "12,213",
+          "占同组全部游戏": "0.92%",
+          "占同组两厂商": "2.96%",
+          "下注渗透率": "1.36%"
+        },
+        {
+          "组合": "H5·Tada",
+          "下注额（亿）": "16.52",
+          "有效局次（万）": "1,596.27",
+          "下注人数": "20,644",
+          "占同组全部游戏": "31.01%",
+          "占同组两厂商": "92.43%",
+          "下注渗透率": "4.51%"
+        },
+        {
+          "组合": "H5·PP",
+          "下注额（亿）": "1.35",
+          "有效局次（万）": "304.74",
+          "下注人数": "5,628",
+          "占同组全部游戏": "2.54%",
+          "占同组两厂商": "7.57%",
+          "下注渗透率": "1.23%"
+        }
+      ],
+      "pen-new_30d": [
+        {
+          "渠道": "APP",
+          "Tada": 6.74729443365998,
+          "PP": 1.3578418619544117
+        },
+        {
+          "渠道": "H5",
+          "Tada": 4.505760974662188,
+          "PP": 1.2283676983820382
+        }
+      ],
+      "table-old_over_30d": [
+        {
+          "组合": "APP·Tada",
+          "下注额（亿）": "325.37",
+          "有效局次（万）": "24,553.30",
+          "下注人数": "89,714",
+          "占同组全部游戏": "37.03%",
+          "占同组两厂商": "96.56%",
+          "下注渗透率": "22.27%"
+        },
+        {
+          "组合": "APP·PP",
+          "下注额（亿）": "11.59",
+          "有效局次（万）": "1,766.61",
+          "下注人数": "24,179",
+          "占同组全部游戏": "1.32%",
+          "占同组两厂商": "3.44%",
+          "下注渗透率": "6.00%"
+        },
+        {
+          "组合": "H5·Tada",
+          "下注额（亿）": "73.97",
+          "有效局次（万）": "5,624.08",
+          "下注人数": "16,985",
+          "占同组全部游戏": "46.28%",
+          "占同组两厂商": "95.72%",
+          "下注渗透率": "22.50%"
+        },
+        {
+          "组合": "H5·PP",
+          "下注额（亿）": "3.31",
+          "有效局次（万）": "690.95",
+          "下注人数": "6,689",
+          "占同组全部游戏": "2.07%",
+          "占同组两厂商": "4.28%",
+          "下注渗透率": "8.86%"
+        }
+      ],
+      "pen-old_over_30d": [
+        {
+          "渠道": "APP",
+          "Tada": 22.272425974980326,
+          "PP": 6.002686176617354
+        },
+        {
+          "渠道": "H5",
+          "Tada": 22.5029478397965,
+          "PP": 8.862067594960187
+        }
+      ],
+      "ret-new_30d": [
+        {
+          "观察日": "第7日",
+          "APP·Tada": 13.933434986066565,
+          "APP·PP": 8.169238956891963,
+          "H5·Tada": 8.206790650059718,
+          "H5·PP": 6.67565745111261
+        },
+        {
+          "观察日": "第14日",
+          "APP·Tada": 10.473736789526262,
+          "APP·PP": 5.667908461947844,
+          "H5·Tada": 5.937553318546323,
+          "H5·PP": 3.8435603506405935
+        },
+        {
+          "观察日": "第30日",
+          "APP·Tada": 7.334770492665229,
+          "APP·PP": 4.656732304417243,
+          "H5·Tada": 4.453164988909742,
+          "H5·PP": 3.236682400539447
+        }
+      ],
+      "ret-old_over_30d": [
+        {
+          "观察日": "第7日",
+          "APP·Tada": 23.07357311199918,
+          "APP·PP": 13.251573692207511,
+          "H5·Tada": 22.3680649526387,
+          "H5·PP": 14.09090909090909
+        },
+        {
+          "观察日": "第14日",
+          "APP·Tada": 21.213751408955837,
+          "APP·PP": 11.417408291729975,
+          "H5·Tada": 20.90663058186739,
+          "H5·PP": 11.900826446280991
+        },
+        {
+          "观察日": "第30日",
+          "APP·Tada": 18.475253612050416,
+          "APP·PP": 10.039070978945084,
+          "H5·Tada": 18.565629228687417,
+          "H5·PP": 11.52892561983471
+        }
+      ],
+      "ret-exact": [
+        {
+          "人群": "新用户",
+          "组合": "APP·Tada",
+          "成熟起点人数": "19,019",
+          "第7日": "13.93%",
+          "第14日": "10.47%",
+          "第30日": "7.33%"
+        },
+        {
+          "人群": "新用户",
+          "组合": "APP·PP",
+          "成熟起点人数": "3,758",
+          "第7日": "8.17%",
+          "第14日": "5.67%",
+          "第30日": "4.66%"
+        },
+        {
+          "人群": "新用户",
+          "组合": "H5·Tada",
+          "成熟起点人数": "5,861",
+          "第7日": "8.21%",
+          "第14日": "5.94%",
+          "第30日": "4.45%"
+        },
+        {
+          "人群": "新用户",
+          "组合": "H5·PP",
+          "成熟起点人数": "1,483",
+          "第7日": "6.68%",
+          "第14日": "3.84%",
+          "第30日": "3.24%"
+        },
+        {
+          "人群": "老用户",
+          "组合": "APP·Tada",
+          "成熟起点人数": "39,036",
+          "第7日": "23.07%",
+          "第14日": "21.21%",
+          "第30日": "18.48%"
+        },
+        {
+          "人群": "老用户",
+          "组合": "APP·PP",
+          "成熟起点人数": "9,214",
+          "第7日": "13.25%",
+          "第14日": "11.42%",
+          "第30日": "10.04%"
+        },
+        {
+          "人群": "老用户",
+          "组合": "H5·Tada",
+          "成熟起点人数": "7,390",
+          "第7日": "22.37%",
+          "第14日": "20.91%",
+          "第30日": "18.57%"
+        },
+        {
+          "人群": "老用户",
+          "组合": "H5·PP",
+          "成熟起点人数": "2,420",
+          "第7日": "14.09%",
+          "第14日": "11.90%",
+          "第30日": "11.53%"
+        }
+      ]
+    }
+  }
+}

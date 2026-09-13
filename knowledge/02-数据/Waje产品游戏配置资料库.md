@@ -3,8 +3,8 @@ type: configuration-reference
 domain: product-game-and-business-config
 product: Waje Special
 status: generated
-updated: 2026-09-04
-source_revision: 17947
+updated: 2026-09-11
+source_revision: 18181
 tags: [waje, 新包, 配置, 游戏, 数值, 风控, 生命周期]
 ---
 
@@ -15,9 +15,9 @@ tags: [waje, 新包, 配置, 游戏, 数值, 风控, 生命周期]
 ## 1. 同步状态
 
 - 来源：[飞书配置工作簿](https://ksg964l11fam.sg.larksuite.com/sheets/WWBBsLNl4hTFnbtI9arlmGsqgoc)
-- 当前 revision：`17947`；读取时间：`2026-09-04T15:01:52+08:00`。
-- 工作表：`70` 个，其中隐藏 ` 13` 个；结构化配置项：`26402` 条。
-- 本次差异：新增 `1765`、修改 `0`、删除 `0`。
+- 当前 revision：`18181`；读取时间：`2026-09-11T15:01:17+08:00`。
+- 工作表：`70` 个，其中隐藏 ` 12` 个；结构化配置项：`26557` 条。
+- 本次差异：新增 `234`、修改 `910`、删除 `79`。
 - 更新频率：每周五 15:00（Asia/Hong_Kong）；revision 未变化时不重写资料。
 
 ## 2. 阅读入口
@@ -32,14 +32,17 @@ tags: [waje, 新包, 配置, 游戏, 数值, 风控, 生命周期]
 
 | 工作表 | 新增 | 修改 | 删除 |
 | --- | ---: | ---: | ---: |
-| 轻量化whot配置 | 1765 | 0 | 0 |
+| 体彩新手体验优化配置 | 5 | 1 | 0 |
+| 带有效期Chip场景和配置 | 17 | 1 | 0 |
+| 弹窗队列 | 0 | 1 | 0 |
+| 轻量化whot配置 | 212 | 907 | 79 |
 
 ## 4. 全部工作表目录
 
 | # | 工作表 | 专题 | 可见性 | 证据状态 | 配置项 |
 | ---: | --- | --- | --- | --- | ---: |
 | 1 | 各个游戏配置  | 游戏与场次经济 | 可见 | `current_candidate` | 559 |
-| 2 | 弹窗队列(老版) | 任务运营与商业化 | 隐藏 | `historical_reference` | 374 |
+| 2 | 弹窗队列(老版) | 任务运营与商业化 | 可见 | `historical_reference` | 374 |
 | 3 | 新包充值体系（老表作废） | 支付提现与风控 | 隐藏 | `obsolete` | 1095 |
 | 4 | spribe游戏 | 游戏与场次经济 | 隐藏 | `historical_reference` | 83 |
 | 5 | omg游戏 | 游戏与场次经济 | 隐藏 | `historical_reference` | 1873 |
@@ -105,9 +108,9 @@ tags: [waje, 新包, 配置, 游戏, 数值, 风控, 生命周期]
 | 65 | 轻量游戏配置_Limbo | 游戏与场次经济 | 可见 | `current_candidate` | 150 |
 | 66 | 轻量游戏配置_通用 | 游戏与场次经济 | 可见 | `current_candidate` | 150 |
 | 67 | 轻量游戏Tower(9013) | 游戏与场次经济 | 可见 | `current_candidate` | 238 |
-| 68 | 2.18.0配置（三端） | 版本分包与平台配置 | 可见 | `current_candidate` | 73 |
-| 69 | 有效期Chip场景和配置 | 版本分包与平台配置 | 可见 | `current_candidate` | 94 |
-| 70 | 轻量化whot配置 | 游戏与场次经济 | 可见 | `current_candidate` | 1765 |
+| 68 | 体彩新手体验优化配置 | 游戏与场次经济 | 可见 | `current_candidate` | 78 |
+| 69 | 带有效期Chip场景和配置 | 版本分包与平台配置 | 可见 | `current_candidate` | 111 |
+| 70 | 轻量化whot配置 | 游戏与场次经济 | 可见 | `current_candidate` | 1898 |
 
 ## 5. 使用边界
 

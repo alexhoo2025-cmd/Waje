@@ -1,0 +1,47 @@
+{
+  "2026-09-04": {
+    "summary": "/Users/robin/Downloads/生命周期奖池汇总展示_20260907114830.xlsx",
+    "detail": "/Users/robin/Downloads/生命周期详细奖池_20260907114839.xlsx",
+    "game": "/Users/robin/Downloads/生命周期奖池分游戏汇总_20260907114934.xlsx",
+    "active": "/Users/robin/Downloads/（活跃用户）生命周期奖池分周期汇总_20260907115010.xlsx",
+    "source_url": "https://prod-ac.waje-special.com:8443/sys/dynamic/lifecyclev2/pool/co",
+    "page_title": "Lifecycle Pool v2 (Joint)",
+    "mode": "v2_joint",
+    "selected_date": "2026-09-04",
+    "query_completed_at": "2026-09-07T11:50:10+08:00",
+    "status": "complete",
+    "stable_reads": 2,
+    "loading_observed": true,
+    "verification_note": "The visible GM date field read 2026-09-04 and the four exports were downloaded after the stable page read. Exact button-click timestamp was not exposed by the browser receipt."
+  },
+  "2026-09-05": {
+    "summary": "/Users/robin/Downloads/生命周期奖池汇总展示_20260907113918.xlsx",
+    "detail": "/Users/robin/Downloads/生命周期详细奖池_20260907113926.xlsx",
+    "game": "/Users/robin/Downloads/生命周期奖池分游戏汇总_20260907113935.xlsx",
+    "active": "/Users/robin/Downloads/（活跃用户）生命周期奖池分周期汇总_20260907113942.xlsx",
+    "source_url": "https://prod-ac.waje-special.com:8443/sys/dynamic/lifecyclev2/pool/co",
+    "page_title": "Lifecycle Pool v2 (Joint)",
+    "mode": "v2_joint",
+    "selected_date": "2026-09-05",
+    "query_completed_at": "2026-09-07T11:39:42+08:00",
+    "status": "complete",
+    "stable_reads": 2,
+    "loading_observed": true,
+    "verification_note": "The visible GM date field read 2026-09-05 before the final four exports. Exact button-click timestamp was not exposed by the browser receipt."
+  },
+  "2026-09-06": {
+    "summary": "/Users/robin/Downloads/生命周期奖池汇总展示_20260907113136.xlsx",
+    "detail": "/Users/robin/Downloads/生命周期详细奖池_20260907113346.xlsx",
+    "game": "/Users/robin/Downloads/生命周期奖池分游戏汇总_20260907113349.xlsx",
+    "active": "/Users/robin/Downloads/（活跃用户）生命周期奖池分周期汇总_20260907113537.xlsx",
+    "source_url": "https://prod-ac.waje-special.com:8443/sys/dynamic/lifecyclev2/pool/co",
+    "page_title": "Lifecycle Pool v2 (Joint)",
+    "mode": "v2_joint",
+    "selected_date": "2026-09-06",
+    "query_completed_at": "2026-09-07T11:35:37+08:00",
+    "status": "complete",
+    "stable_reads": 2,
+    "loading_observed": true,
+    "verification_note": "The visible GM date field read 2026-09-06 and the final four exports were downloaded after the stable page read. Exact button-click timestamp was not exposed by the browser receipt."
+  }
+}

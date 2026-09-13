@@ -24,11 +24,14 @@ import os
 import re
 import shutil
 import subprocess
+import sys
 from pathlib import Path
 from typing import Any
 
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "tools"))
+from execution_graph_hook import emit as emit_execution_graph
 PLUGIN_ROOT = Path("/Users/robin/.codex/plugins/cache/openai-curated-remote/data-analytics/0.2.8-13ceeea1f599")
 DELIVER = PLUGIN_ROOT / "skills/build-report/scripts/deliver_portable_artifact.mjs"
 
@@ -1124,6 +1127,8 @@ def main() -> int:
     args = parser.parse_args()
     root = project_root()
     report_date = dt.date.fromisoformat(args.date)
+    execution_run_id = dt.datetime.now().astimezone().strftime("%Y%m%dT%H%M%S%z")
+    emit_execution_graph(root, job_id="weekly_intelligence_html", run_id=execution_run_id, phase="started", status="started")
     artifact, analysis = build_artifact(root, report_date)
     output_dir = root / "data/outputs/weekly" / report_date.isoformat()
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -1179,6 +1184,14 @@ def main() -> int:
     }
     (output_dir / "delivery-receipt.json").write_text(json.dumps(receipt, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     if result_returncode != 0:
+        emit_execution_graph(
+            root,
+            job_id="weekly_intelligence_html",
+            run_id=execution_run_id,
+            phase="finished",
+            status="failed",
+            receipts=[str((output_dir / "delivery-receipt.json").relative_to(root))],
+        )
         print(result_stdout, end="")
         print(result_stderr, end="")
         return result_returncode
@@ -1187,6 +1200,15 @@ def main() -> int:
     shutil.copyfile(report_path, preview_path)
     receipt["preview_html"] = str(preview_path.relative_to(root))
     (output_dir / "delivery-receipt.json").write_text(json.dumps(receipt, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    emit_execution_graph(
+        root,
+        job_id="weekly_intelligence_html",
+        run_id=execution_run_id,
+        phase="finished",
+        status="ok",
+        receipts=[str((output_dir / "delivery-receipt.json").relative_to(root))],
+        artifacts=[str(artifact_path.relative_to(root)), str(report_path.relative_to(root))],
+    )
     print(f"weekly HTML report: {report_path.relative_to(root)}")
     print(f"stable preview alias: {preview_path.relative_to(root)}")
     print(result_stdout.strip())

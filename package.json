@@ -3,7 +3,10 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "collect:play-reviews": "node scripts/collect_play_reviews.mjs"
+    "collect:play-reviews": "node scripts/collect_play_reviews.mjs",
+    "report:check": "node scripts/check_report_quality.mjs",
+    "report:deliver": "node scripts/deliver_readable_report.mjs",
+    "test:report-quality": "node --test tests/test_report_quality.mjs"
   },
   "dependencies": {
     "playwright": "^1.55.0"

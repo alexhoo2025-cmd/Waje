@@ -1,0 +1,29 @@
+/* Whot V2 summary emphasis requested during review. */
+.report-shell .report-markdown-block#summary_0,
+.portable-block[data-artifact-block-id='summary_0']>.portable-markdown {
+  background:var(--wr-tint)!important;
+  border-left:5px solid var(--wr-blue)!important;
+}
+.report-shell .report-markdown-block#summary_0 strong,
+.portable-block[data-artifact-block-id='summary_0']>.portable-markdown strong {
+  display:inline;
+  padding:2px 6px;
+  border-radius:5px;
+  background:color-mix(in srgb,var(--wr-blue) 14%,var(--wr-paper));
+  color:var(--wr-blue)!important;
+  box-decoration-break:clone;
+  -webkit-box-decoration-break:clone;
+  font-weight:750!important;
+}
+.report-shell .report-markdown-block#definitions_1 table td:first-child,
+.portable-block[data-artifact-block-id='definitions_1']>.portable-markdown table td:first-child {
+  background:color-mix(in srgb,var(--wr-blue) 10%,var(--wr-paper))!important;
+  color:var(--wr-blue)!important;
+  font-weight:750!important;
+}
+.report-shell .report-markdown-block#definitions_1 table td:nth-child(3),
+.portable-block[data-artifact-block-id='definitions_1']>.portable-markdown table td:nth-child(3) {
+  background:var(--wr-positive)!important;
+  color:var(--wr-ink)!important;
+  font-weight:700!important;
+}

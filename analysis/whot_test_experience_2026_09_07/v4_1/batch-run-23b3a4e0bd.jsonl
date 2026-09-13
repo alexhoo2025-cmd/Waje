@@ -1,0 +1,2 @@
+{"kind": "batch_resumed", "batch_id": "6001-fast-connectivity-batch-02", "at": "2026-09-10T10:07:55.068244+00:00", "completed": 6, "total": 51, "receipt": "/Users/robin/Documents/wajetan_analyst/analysis/whot_test_experience_2026_09_07/v4_1/batch-run-23b3a4e0bd.jsonl"}
+{"kind": "session_start", "batch_id": "6001-fast-connectivity-batch-02", "at": "2026-09-10T10:07:55.069086+00:00", "remaining": 4, "strategy": "fast_connectivity_v1_1", "bet": 1000}

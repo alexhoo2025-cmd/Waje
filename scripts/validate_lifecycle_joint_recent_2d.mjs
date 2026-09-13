@@ -39,7 +39,16 @@ const SAMPLE_9_2 = {
   game: { start: 5514, end: 5533 },
   active: { start: 953, end: 963 },
 };
-const SAMPLE = CURRENT_9_2 ? SAMPLE_9_2 : SAMPLE_2D;
+// The 2026-09-07 run appends a three-day block after the 2026-09-02 tail.
+// These samples deliberately straddle the insertion boundary so style and
+// date-format checks validate the rows written by this run, not an older run.
+const SAMPLE_3D = {
+  summary: { start: 177, end: 181 },
+  detail: { start: 5507, end: 5511 },
+  game: { start: 5550, end: 5554 },
+  active: { start: 962, end: 966 },
+};
+const SAMPLE = process.env.SAMPLE_NEW_WINDOW === "1" ? SAMPLE_3D : CURRENT_9_2 ? SAMPLE_9_2 : SAMPLE_2D;
 const SOURCE = {
   summary: ["总基础下注额", "总完全下注额", "总基础真实回报比", "总完全真实回报比", "总基础预期回报比", "总完全预期回报比", "总人数", "今日完全实际盈利调整幅度", "当前完全实际盈利扣除幅度", "修改"],
   detail: ["生命周期", "游戏类型", "差额", "预期回报比", "盈利比万分比", "实际回报比万分比", "基础预期盈利", "基础实际盈利", "基础下注额", "基础真实回报比", "总破产保护金额", "总个人盈利控制金额", "完全预期盈利", "完全实际盈利", "完全下注额", "完全下注额占比", "完全真实回报比", "今日完全实际盈利调整幅度", "当前完全实际盈利扣除幅度", "修改"],
@@ -261,7 +270,20 @@ for (const [kind, id] of Object.entries(IDS)) {
 }
 
 const formulaVerification = { schema_version: 1, checked_at: new Date().toISOString(), revision: REVISION_AFTER, scans: {} };
-const ranges = CURRENT_9_2
+const finalRows = {
+  summary: Number(process.env.FINAL_SUMMARY_ROW || (CURRENT_9_2 ? "215" : "214")),
+  detail: Number(process.env.FINAL_DETAIL_ROW || (CURRENT_9_2 ? "16795" : "16640")),
+  game: Number(process.env.FINAL_GAME_ROW || (CURRENT_9_2 ? "5550" : "5519")),
+  active: Number(process.env.FINAL_ACTIVE_ROW || (CURRENT_9_2 ? "1082" : "1078")),
+};
+const ranges = process.env.FULL_FINAL_RANGES === "1"
+  ? {
+    summary: [`A1:T${finalRows.summary}`],
+    detail: [`A1:AA${Math.min(7000, finalRows.detail)}`, `A7001:AA${Math.min(14000, finalRows.detail)}`, `A14001:AA${finalRows.detail}`],
+    game: [`A1:AE${finalRows.game}`],
+    active: [`A1:AC${finalRows.active}`],
+  }
+  : CURRENT_9_2
   ? { summary: ["A1:T215"], detail: ["A1:AA7000", "A7001:AA14000", "A14001:AA16795"], game: ["A1:AE5550"], active: ["A1:AC1082"] }
   : { summary: ["A1:T214"], detail: ["A1:AA7000", "A7001:AA14000", "A14001:AA16640"], game: ["A1:AE5519"], active: ["A1:AC1078"] };
 formulaVerification.scans.summary = await runFormulaVerify(IDS.summary, ranges.summary);
@@ -282,7 +304,7 @@ const localWorkbookValidation = {
   output_path: LOCAL_OUTPUT_PATH,
   output_sha256: await fileSha(LOCAL_OUTPUT_PATH),
   date_range: DATES,
-  written_rows: { summary: 2, detail: 310, game: 62, active: 8 },
+  written_rows: { summary: DATES.length, detail: DATES.length * EXPECTED.detail, game: DATES.length * EXPECTED.game, active: DATES.length * EXPECTED.active },
   cross_table_reconciliation_passed: true,
   duplicate_keys_absent: true,
   formula_error_scan_passed: true,

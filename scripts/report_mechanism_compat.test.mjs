@@ -1,0 +1,14 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {createRequire} from 'node:module';
+import {enableMechanismTables} from './report_mechanism_compat.mjs';
+const plugin=process.env.WAJE_ANALYTICS_PLUGIN_ROOT||'/Users/robin/.codex/plugins/cache/openai-curated-remote/data-analytics/0.2.10-13ceeea1f599';
+const source={id:'evidence',label:'Synthetic validation fixture',query:{engine:'sqlite',sql:"SELECT 'test' AS label",tables_used:[]}};
+const fixture={surface:'report',manifest:{version:1,surface:'report',title:'机制验证',reportContract:{type:'mechanism'},sources:[source],cards:[],charts:[],tables:[{id:'t',title:'验证表',dataset:'d',sourceId:'evidence',columns:[{field:'label',label:'项目',type:'text'}]}],blocks:[{id:'summary',type:'markdown',body:'## 执行摘要\n\n用于校验机制报告。'},{id:'table',type:'table',tableId:'t'}]},snapshot:{version:1,status:'ready',datasets:{d:[{label:'test'}]}},sources:[source]};
+enableMechanismTables(plugin,fixture);
+const server=createRequire(import.meta.url)(plugin+'/mcp/server.cjs');
+const validate=x=>server.callTool('validate_artifact',x);
+test('mechanism report with evidence table validates without a numerical chart',()=>assert.doesNotThrow(()=>validate(fixture)));
+test('business report still needs its chart',()=>{const x=structuredClone(fixture);x.manifest.reportContract.type='business';assert.throws(()=>validate(x),/chart block/)});
+test('invalid table reference is still rejected',()=>{const x=structuredClone(fixture);x.manifest.blocks[1].tableId='missing';assert.throws(()=>validate(x),/manifest table/)});
+test('missing dataset is still rejected',()=>{const x=structuredClone(fixture);delete x.snapshot.datasets.d;assert.throws(()=>validate(x),/dataset/i)});

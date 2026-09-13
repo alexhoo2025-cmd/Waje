@@ -373,11 +373,16 @@ GM Lifecycle Pool、Origin 新用户工作簿、飞书在线表格清空/格式/
 
 ### 7.1 默认格式
 
+2026-09-09补充：报告主规范已扩展为分析、表达和视觉规则，入口仍为原路径。四类骨架与检查接口见`knowledge/90-模板/分析报告/README.md`；交付前使用`npm run report:check -- --input <文件>`。HTML现有入口默认执行硬错误拦截与风格提示，不重算数据；Markdown/XML检查不替代业务复算及飞书回读。旧报告保持只读，后续修改时应用，不能统一覆盖不同报告的统计口径。
+
+2026-09-07用户明确要求：后续产出一律遵从 `knowledge/05-运行/报告排版与配色规范-2026-09-07.md`。HTML使用 `config/report_readability.css` 与 `scripts/deliver_readable_report.mjs` 保证阅读宽度、字号、表格和浅深配色；其他载体遵从相同阅读原则。
+
 依据 `config/report_output_policy.json`：
 
-- 飞书云文档是团队主阅读/评审版本，若有授权连接；
+- 2026-09-10用户确认：分析、评估和总结报告默认交付可读HTML，Markdown作为存档；
+- 飞书云文档仅在本报告已获创建或同步授权时交付；
 - Markdown 是项目存档、差异比较和知识库来源版本；
-- HTML/PDF 只有用户明确要求离线分享、打印、外部发送或归档时才追加；
+- PDF等其他格式按用户请求追加；当前任务最后确认版仍决定内容基准；
 - Claude Code 没有可用飞书连接时，明确记录 `not_run`/`blocked`，不能把本地 Markdown 当作已发布飞书文档。
 
 ### 7.2 Markdown 报告结构

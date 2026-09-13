@@ -22,10 +22,12 @@ CODE_ROOT = Path(__file__).resolve().parents[1]
 ROOT = Path(os.environ.get("WAJE_ANALYST_ROOT", str(CODE_ROOT))).resolve()
 SCRIPTS = CODE_ROOT / "scripts"
 sys.path.insert(0, str(SCRIPTS))
+sys.path.insert(0, str(CODE_ROOT / "tools"))
 
 from analyze_intelligence import freshness, score  # noqa: E402
 from collect_intelligence import fetch, safe_name, sha256  # noqa: E402
 from normalize_intelligence import TextParser, clean, is_stale, rss_items, topic  # noqa: E402
+from execution_graph_hook import emit as emit_execution_graph  # noqa: E402
 
 
 def read_json(path: Path, fallback: dict[str, Any] | None = None) -> dict[str, Any]:
@@ -320,18 +322,57 @@ def main() -> int:
     parser.add_argument("--force", action="store_true")
     args = parser.parse_args()
     collection_date = dt.date.fromisoformat(args.date)
+
+    def run_with_execution_event(job_id: str, action: Any) -> int:
+        run_id = dt.datetime.now().astimezone().strftime("%Y%m%dT%H%M%S%z")
+        emit_execution_graph(ROOT, job_id=job_id, run_id=run_id, phase="started", status="started")
+        status = "failed"
+        try:
+            code = action()
+            log_path = ROOT / "data/outputs/weekly" / collection_date.isoformat() / "run-log.json"
+            status = read_json(log_path, {}).get("status", "ok" if code == 0 else "failed")
+            return code
+        finally:
+            receipt_paths = []
+            log_path = ROOT / "data/outputs/weekly" / collection_date.isoformat() / "run-log.json"
+            if log_path.exists():
+                receipt_paths.append(str(log_path.relative_to(ROOT)))
+            emit_execution_graph(
+                ROOT,
+                job_id=job_id,
+                run_id=run_id,
+                phase="finished",
+                status=status,
+                receipts=receipt_paths,
+            )
+
     lock_path = ROOT / "data/processed/weekly/.pipeline.lock"
     lock_path.parent.mkdir(parents=True, exist_ok=True)
     with lock_path.open("w", encoding="utf-8") as lock:
         try:
             fcntl.flock(lock.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
         except BlockingIOError:
+            run_id = dt.datetime.now().astimezone().strftime("%Y%m%dT%H%M%S%z")
+            emit_execution_graph(
+                ROOT,
+                job_id="weekly_collect" if args.mode == "collect" else "weekly_report",
+                run_id=run_id,
+                phase="started",
+                status="started",
+            )
+            emit_execution_graph(
+                ROOT,
+                job_id="weekly_collect" if args.mode == "collect" else "weekly_report",
+                run_id=run_id,
+                phase="finished",
+                status="already_running",
+            )
             print("weekly intelligence pipeline is already running", file=sys.stderr)
             return 3
         if args.mode in {"collect", "all"}:
-            collect(collection_date, args.force)
+            run_with_execution_event("weekly_collect", lambda: collect(collection_date, args.force))
         if args.mode in {"report", "all"}:
-            report(collection_date)
+            run_with_execution_event("weekly_report", lambda: report(collection_date))
     return 0
 
 

@@ -1,0 +1,15 @@
+import fs from 'node:fs';
+import assert from 'node:assert/strict';
+import {execFileSync} from 'node:child_process';
+const base='analysis/tada_pp_app_h5_actual_2026_09_08/',dir=base+'revisions/2026-09-09-game-table-colors/';fs.mkdirSync(dir,{recursive:true});
+const call=args=>{const r=JSON.parse(execFileSync('/Users/robin/.local/node/bin/lark-cli',['docs',...args,'--doc','MUmUdKO7ko3hKIxY822lBXJQggg','--as','user','--format','json'],{encoding:'utf8',timeout:45000,maxBuffer:8e6}));assert(r.ok);return r.data;};
+const fetch=()=>call(['+fetch','--detail','full']).document;
+const before=fetch();fs.writeFileSync(dir+'lark.before.json',JSON.stringify(before,null,2));
+const match=s=>s.includes('平均每款下注额（万）')&&s.includes('游戏数（款）');
+const targets=[...before.content.matchAll(/<table\b[^>]*id="([^"]+)"[^>]*>[\s\S]*?<\/table>/g)].filter(m=>match(m[0]));assert.equal(targets.length,1);
+const original=targets[0][0];let patched=original.replace(/\s+id="[^"]+"/g,'');
+patched=patched.replace(/<tbody>[\s\S]*?<\/tbody>/,body=>body.replace(/<tr>[\s\S]*?<\/tr>/g,row=>{const groupColor=row.includes('APP')?'light-blue':'light-purple',vendor=row.includes('Tada')?'light-blue':'light-orange';let col=0;return row.replace(/<td\b([^>]*)>([\s\S]*?)<\/td>/g,(_,attrs,content)=>{const index=col++;let inner=content;if(index>=3)inner=inner.replace(/<p([^>]*)>([\s\S]*?)<\/p>/g,(_,a,t)=>'<p'+a+'><b>'+t.replace(/<\/?b>/g,'')+'</b></p>');return '<td'+attrs.replace(/\s+background-color="[^"]*"/g,'')+' background-color="'+(index===1?vendor:groupColor)+'">'+inner+'</td>';});}));
+const result=call(['+update','--command','block_replace','--block-id',targets[0][1],'--revision-id',String(before.revision_id),'--content',patched]);assert.equal(result.result,'success');assert.equal((result.warnings||[]).length,0);
+const after=fetch();fs.writeFileSync(dir+'lark.after.json',JSON.stringify(after,null,2));const targetAfter=[...after.content.matchAll(/<table\b[^>]*>[\s\S]*?<\/table>/g)].find(m=>match(m[0]))[0];assert.equal(targetAfter.replace(/<[^>]*>/g,''),original.replace(/<[^>]*>/g,''));
+const xml=targetAfter.match(/<tbody>([\s\S]*?)<\/tbody>/)[1],colors=[...xml.matchAll(/<tr>[\s\S]*?<\/tr>/g)].map(m=>[...m[0].matchAll(/background-color="([^"]+)"/g)].map(v=>v[1]));assert.equal(colors.length,8);assert.notEqual(colors[0][0],colors[4][0]);assert.notEqual(colors[0][1],colors[1][1]);assert((xml.match(/<b>/g)||[]).length>=24);
+fs.writeFileSync(dir+'lark-receipt.json',JSON.stringify({status:'full_readback_verified',revision:after.revision_id,colors,cell_text_unchanged:true},null,2));console.log(JSON.stringify({status:'full_readback_verified',revision:after.revision_id}));

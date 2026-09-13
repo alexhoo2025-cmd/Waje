@@ -1,0 +1,4 @@
+{"kind": "batch_resumed", "batch_id": "6001-fast-connectivity-batch-01", "at": "2026-09-10T06:48:38.183221+00:00", "completed": 4, "total": 37, "receipt": "/Users/robin/Documents/wajetan_analyst/analysis/whot_test_experience_2026_09_07/v4_1/batch-run-1f36cf7a42.jsonl"}
+{"kind": "session_start", "batch_id": "6001-fast-connectivity-batch-01", "at": "2026-09-10T06:48:38.184137+00:00", "remaining": 6, "strategy": "fast_connectivity_v1", "bet": 1000}
+{"kind": "session_recorded", "batch_id": "6001-fast-connectivity-batch-01", "at": "2026-09-10T06:51:10.452002+00:00", "source": "native-8ffaae706c.jsonl", "new_completed": 0, "batch_completed": 4, "overall_completed": 37}
+{"kind": "paused_execution", "batch_id": "6001-fast-connectivity-batch-01", "at": "2026-09-10T06:51:10.453034+00:00", "reasons": ["invalid(\"witness_changed\")"], "no_new_completed": true}

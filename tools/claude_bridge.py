@@ -123,12 +123,12 @@ def credentials():
 
 def route(task, config):
     # Task type alone (data/report/review) never justifies another model call.
-    if task.get("origin", "interactive") != "interactive":
+    if task.get("origin") != "interactive":
         return None
     workflow = task.get("workflow", str(task.get("parent_task_id", "")).split(":", 1)[0])
     if workflow in config.get("excluded_workflows", []):
         return None
-    if task.get("parent_complexity", task.get("complexity")) != "complex":
+    if task.get("parent_complexity") != "complex":
         return None
     if not str(task.get("delegation_reason", "")).strip():
         return None

@@ -1,0 +1,2 @@
+{"kind": "stopped", "session_id": "native-ae54aee2c7", "at": "2026-09-10T01:34:27.117625+00:00", "monotonic_ms": 250694819.413041, "reason": "test_window_not_unique"}
+{"kind": "closed", "session_id": "native-ae54aee2c7", "at": "2026-09-10T01:34:27.118043+00:00", "monotonic_ms": 250694819.50233302, "submitted_actions": 0}

@@ -1,0 +1,11 @@
+import {readFileSync} from 'node:fs';
+import {createRequire} from 'node:module';
+import {dirname,resolve} from 'node:path';
+import {fileURLToPath} from 'node:url';
+const base=dirname(fileURLToPath(import.meta.url));
+const require=createRequire(import.meta.url);
+const sharp=require('/Users/robin/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/sharp/dist/index.cjs');
+const output=resolve(base,'old-vs-phase1.png');
+await sharp(Buffer.from(readFileSync(resolve(base,'old-vs-phase1.svg'),'utf8')),{density:180}).flatten({background:'#ffffff'}).png().toFile(output);
+const meta=await sharp(output).metadata();
+console.log(JSON.stringify({output,width:meta.width,height:meta.height}));

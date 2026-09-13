@@ -1,0 +1,2 @@
+{"at": "2026-09-10T05:46:50.906547+00:00", "kind": "play_again_intent", "expected_bet": 1000, "point": [0.6312499982826065, 0.8380281683004681], "accepted_by_game": null}
+{"kind": "play_again_submitted", "ack": {"acknowledged": false, "clicked": true, "clicked_at_ms": 265786294.096916, "fresh_frame_age_ms": 64.674458, "native_ms": 311.191666, "request_id": "eed5b22a21334c4cb28f797cd72daea4", "status": "ok"}}

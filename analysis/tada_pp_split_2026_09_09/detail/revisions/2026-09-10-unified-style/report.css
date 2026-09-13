@@ -1,0 +1,43 @@
+:root{--sp-new:#eaf3ff;--sp-old:#f2edfa;--sp-tada:#eaf3ff;--sp-pp:#fff1e5;--sp-neutral:#f5f6f8;--sp-peak:#fff1bd;}
+@media(prefers-color-scheme:dark){:root{--sp-new:#20384f;--sp-old:#382d4b;--sp-tada:#20384f;--sp-pp:#473323;--sp-neutral:#26313d;--sp-peak:#51451f;}}
+.chart-bar-value-label{font-size:10px!important;}
+:is(#depth-metrics,[data-artifact-block-id="depth-metrics"]) tbody tr:nth-child(1) td {background:var(--sp-neutral)!important;}
+:is(#depth-metrics,[data-artifact-block-id="depth-metrics"]) tbody tr:nth-child(2) td {background:var(--sp-neutral)!important;}
+:is(#depth-metrics,[data-artifact-block-id="depth-metrics"]) tbody tr:nth-child(3) td {background:var(--sp-neutral)!important;}
+:is(#depth-metrics,[data-artifact-block-id="depth-metrics"]) tbody tr:nth-child(4) td {background:var(--sp-neutral)!important;}
+:is(#depth-metrics,[data-artifact-block-id="depth-metrics"]) tbody tr:nth-child(5) td {background:var(--sp-new)!important;}
+:is(#depth-metrics,[data-artifact-block-id="depth-metrics"]) tbody tr:nth-child(6) td {background:var(--sp-new)!important;}
+:is(#depth-metrics,[data-artifact-block-id="depth-metrics"]) tbody tr:nth-child(7) td {background:var(--sp-new)!important;}
+:is(#depth-metrics,[data-artifact-block-id="depth-metrics"]) tbody tr:nth-child(8) td {background:var(--sp-new)!important;}
+:is(#depth-metrics,[data-artifact-block-id="depth-metrics"]) tbody tr:nth-child(9) td {background:var(--sp-old)!important;}
+:is(#depth-metrics,[data-artifact-block-id="depth-metrics"]) tbody tr:nth-child(10) td {background:var(--sp-old)!important;}
+:is(#depth-metrics,[data-artifact-block-id="depth-metrics"]) tbody tr:nth-child(11) td {background:var(--sp-old)!important;}
+:is(#depth-metrics,[data-artifact-block-id="depth-metrics"]) tbody tr:nth-child(12) td {background:var(--sp-old)!important;}
+:is(#depth-metrics,[data-artifact-block-id="depth-metrics"]) tbody td:has(strong) {background:var(--sp-peak)!important;}
+:is(#game-counts,[data-artifact-block-id="game-counts"]) tbody tr:nth-child(1) td {background:var(--sp-tada)!important;}
+:is(#game-counts,[data-artifact-block-id="game-counts"]) tbody tr:nth-child(2) td {background:var(--sp-tada)!important;}
+:is(#game-counts,[data-artifact-block-id="game-counts"]) tbody tr:nth-child(3) td {background:var(--sp-pp)!important;}
+:is(#game-counts,[data-artifact-block-id="game-counts"]) tbody tr:nth-child(4) td {background:var(--sp-pp)!important;}
+:is(#game-counts,[data-artifact-block-id="game-counts"]) tbody tr:nth-child(5) td {background:var(--sp-tada)!important;}
+:is(#game-counts,[data-artifact-block-id="game-counts"]) tbody tr:nth-child(6) td {background:var(--sp-tada)!important;}
+:is(#game-counts,[data-artifact-block-id="game-counts"]) tbody tr:nth-child(7) td {background:var(--sp-pp)!important;}
+:is(#game-counts,[data-artifact-block-id="game-counts"]) tbody tr:nth-child(8) td {background:var(--sp-pp)!important;}
+:is(#game-counts,[data-artifact-block-id="game-counts"]) tbody td:has(strong) {background:var(--sp-peak)!important;}
+:is(#game-profiles,[data-artifact-block-id="game-profiles"]) tbody tr:nth-child(1) td {background:var(--sp-tada)!important;}
+:is(#game-profiles,[data-artifact-block-id="game-profiles"]) tbody tr:nth-child(2) td {background:var(--sp-tada)!important;}
+:is(#game-profiles,[data-artifact-block-id="game-profiles"]) tbody tr:nth-child(3) td {background:var(--sp-tada)!important;}
+:is(#game-profiles,[data-artifact-block-id="game-profiles"]) tbody tr:nth-child(4) td {background:var(--sp-tada)!important;}
+:is(#game-profiles,[data-artifact-block-id="game-profiles"]) tbody tr:nth-child(5) td {background:var(--sp-tada)!important;}
+:is(#game-profiles,[data-artifact-block-id="game-profiles"]) tbody tr:nth-child(6) td {background:var(--sp-pp)!important;}
+:is(#game-profiles,[data-artifact-block-id="game-profiles"]) tbody tr:nth-child(7) td {background:var(--sp-pp)!important;}
+:is(#game-profiles,[data-artifact-block-id="game-profiles"]) tbody tr:nth-child(8) td {background:var(--sp-pp)!important;}
+:is(#game-profiles,[data-artifact-block-id="game-profiles"]) tbody tr:nth-child(9) td {background:var(--sp-pp)!important;}
+:is(#game-profiles,[data-artifact-block-id="game-profiles"]) tbody tr:nth-child(10) td {background:var(--sp-pp)!important;}
+:is(#game-profiles,[data-artifact-block-id="game-profiles"]) tbody td:has(strong) {background:var(--sp-peak)!important;}
+:is(#scatter-extremes,[data-artifact-block-id="scatter-extremes"]) tbody td:has(strong) {background:var(--sp-peak)!important;}
+:is(#sensitivity-table,[data-artifact-block-id="sensitivity-table"]) tbody td:has(strong) {background:var(--sp-peak)!important;}
+/* Provider labels: retain age-group backgrounds and readable light/dark colors. */
+:root{--detail-tada-text:#155ca8;--detail-pp-text:#a6440c;}
+@media(prefers-color-scheme:dark){:root{--detail-tada-text:#7cc4ff;--detail-pp-text:#ffb47a;}}
+:is(#depth-metrics,[data-artifact-block-id="depth-metrics"]) tbody tr:nth-child(odd) td:nth-child(2){color:var(--detail-tada-text)!important;font-weight:700;}
+:is(#depth-metrics,[data-artifact-block-id="depth-metrics"]) tbody tr:nth-child(even) td:nth-child(2){color:var(--detail-pp-text)!important;font-weight:700;}

@@ -45,9 +45,19 @@ const endDate = args["end-date"] || "2026-08-27";
 const freshStart = args["fresh-start"] || "2026-08-25";
 const freshEnd = args["fresh-end"] || "2026-08-27";
 const maturityColumn = Number(args["maturity-column"] ?? 6); // 3日 in the 43-field Origin result.
+// strict-d3 preserves the legacy batch behavior.  stratified writes every
+// complete source date and applies maturity only at the individual-field
+// level, which is appropriate for daily operational refreshes.
+const rowPolicy = args["row-policy"] || "strict-d3";
 const sourceColumns = 43;
 const workbookColumns = 44;
 const cutoff = args["history-cutoff"] || "2026-08-24";
+// The source-level 3-day gate decides whether a cohort date is publishable at
+// all.  This second, column-level cutoff prevents a mature cohort from
+// displaying later retention / lifecycle values before those windows close.
+// It intentionally preserves a genuine zero once the relevant window is
+// mature; only values whose window is still open are blanked.
+const maturityCutoff = args["maturity-cutoff"] || freshEnd;
 const sheets = [
   "WajeSpecial-facebook",
   "WajeSpecial-googleadwords_int",
@@ -63,6 +73,8 @@ assert(inputPath && outputPath && rawDir && priorSourcePath && runDir,
 assert(path.resolve(inputPath) !== path.resolve(outputPath), "输入和输出文件必须不同");
 assert(/^(20\d\d-\d\d-\d\d)$/.test(startDate) && /^(20\d\d-\d\d-\d\d)$/.test(endDate), "日期范围无效");
 assert(/^(20\d\d-\d\d-\d\d)$/.test(freshStart) && /^(20\d\d-\d\d-\d\d)$/.test(freshEnd), "新鲜数据范围无效");
+assert(/^(20\d\d-\d\d-\d\d)$/.test(maturityCutoff), "统计截止日无效");
+assert(["strict-d3", "stratified"].includes(rowPolicy), `未知行策略: ${rowPolicy}`);
 assert(!await fs.stat(outputPath).then(() => true).catch(() => false), `拒绝覆盖已有输出: ${outputPath}`);
 
 const headers = [
@@ -83,6 +95,24 @@ function isoDate(value) {
 
 function excelSerial(date) {
   return (Date.parse(`${date}T00:00:00Z`) - Date.UTC(1899, 11, 30)) / 86_400_000;
+}
+
+// Indexes are zero-based source columns.  These are cohort windows, not a
+// blanket "0 means invalid" rule.  终身 and 首日 remain source values; all
+// other commercial metrics are left untouched.
+const maturityDaysByColumn = new Map([
+  [5, 1], [6, 3], [7, 4], [8, 5], [9, 6], [10, 7], [11, 8], [12, 9], [13, 10], [14, 11], [15, 12], [16, 13], [17, 14], [18, 15], [19, 30], [20, 60],
+  [23, 1], [24, 3], [25, 7], [26, 15], [27, 30], [28, 60],
+  [34, 1], [35, 3], [36, 7], [37, 15], [38, 30], [39, 60],
+]);
+function addDays(date, days) {
+  return new Date(Date.parse(`${date}T00:00:00Z`) + days * 86_400_000).toISOString().slice(0, 10);
+}
+function maturityStatus(date, index) {
+  const days = maturityDaysByColumn.get(index);
+  if (days === undefined) return { mature: true, maturity_days: null, mature_on: null };
+  const matureOn = addDays(date, days);
+  return { mature: matureOn <= maturityCutoff, maturity_days: days, mature_on: matureOn };
 }
 
 function sourceValue(value, index, clearZero = false) {
@@ -110,6 +140,12 @@ function sourceValue(value, index, clearZero = false) {
   }
   if (clearZero && index >= 2 && typeof result === "number" && result === 0) return null;
   return result;
+}
+
+function outputValue(value, index, date) {
+  const status = maturityStatus(date, index);
+  if (!status.mature) return null;
+  return sourceValue(value, index, false);
 }
 
 function normalizedCell(value, index) {
@@ -190,12 +226,14 @@ function cloneRow(rowXml, oldRow, newRow) {
   clone = clone.replace(new RegExp(`r="([A-Z]+)${oldRow}"`, "g"), `r="$1${newRow}"`);
   return clone;
 }
-function updateRow(rowXml, rowNumber, sourceRow, cleanZeros, sourceStyles = null) {
+function updateRow(rowXml, rowNumber, sourceRow, sourceStyles = null) {
+  const date = isoDate(sourceRow[0]);
+  assert(date, `源日期无效: ${sourceRow[0]}`);
   let updated = rowXml;
   for (let index = 0; index < sourceColumns; index += 1) {
     if (index === 1) continue; // every Origin result is the same Waje Special region label.
     const column = alpha(index);
-    updated = replaceCell(updated, column, rowNumber, sourceValue(sourceRow[index], index, cleanZeros), sourceStyles?.[column]);
+    updated = replaceCell(updated, column, rowNumber, outputValue(sourceRow[index], index, date), sourceStyles?.[column]);
   }
   return updated;
 }
@@ -231,6 +269,7 @@ function parseOriginRaw(payload, label) {
 await fs.mkdir(runDir, { recursive: true });
 await fs.mkdir(path.join(runDir, "raw-snapshots"), { recursive: true });
 await fs.mkdir(path.join(runDir, "qa-previews"), { recursive: true });
+await fs.mkdir(path.dirname(outputPath), { recursive: true });
 const inputSha = await fileSha(inputPath);
 const priorSource = JSON.parse(await fs.readFile(priorSourcePath, "utf8"));
 const rawPayloads = {};
@@ -243,9 +282,9 @@ for (const sheet of sheets) {
   await fs.copyFile(rawPath, path.join(runDir, "raw-snapshots", `${sheet}.json`));
 }
 
-// Mature-date gate: for positive-size cohorts, the 3-day metric must be a real
-// returned value.  A zero on the newest cohort is treated as not mature, not as
-// a business zero; raw files remain untouched and are never zero-filled.
+// Row admission is independent from field maturity in stratified mode.  This
+// lets 9/5 and 9/6 publish their valid day-0 / day-1 commercial metrics while
+// later Dn windows remain blank until the required observation day closes.
 const freshDates = [...new Set(Object.values(rawMaps).flatMap((map) => [...map.keys()]))]
   .filter((date) => date >= freshStart && date <= freshEnd).sort();
 const maturityRows = [];
@@ -255,14 +294,40 @@ for (const date of freshDates) {
     const row = rawMaps[sheet].get(date);
     const newUsers = row ? Number(sourceValue(row[2], 2, false)) : NaN;
     const matureValue = row ? sourceValue(row[maturityColumn], maturityColumn, false) : null;
-    const passed = !!row && Number.isFinite(newUsers) && newUsers >= 0 && matureValue !== null && Number.isFinite(Number(matureValue)) && Number(matureValue) !== 0;
-    return { sheet, present: !!row, new_users: Number.isFinite(newUsers) ? newUsers : null, maturity_value: matureValue, passed };
+    const calendar = maturityStatus(date, maturityColumn);
+    const sourceComplete = !!row && Number.isFinite(newUsers) && newUsers >= 0;
+    const legacyD3Complete = calendar.mature && matureValue !== null && Number.isFinite(Number(matureValue)) && Number(matureValue) !== 0;
+    const passed = rowPolicy === "stratified" ? sourceComplete : sourceComplete && legacyD3Complete;
+    return {
+      sheet,
+      present: !!row,
+      new_users: Number.isFinite(newUsers) ? newUsers : null,
+      maturity_value: matureValue,
+      maturity_days: calendar.maturity_days,
+      mature_on: calendar.mature_on,
+      calendar_mature: calendar.mature,
+      source_complete: sourceComplete,
+      legacy_d3_complete: legacyD3Complete,
+      passed,
+    };
   });
   const passed = perSheet.every((item) => item.passed);
-  maturityRows.push({ date, gate: "3日字段非空且非0; 8个Sheet全部通过", status: passed ? "mature" : "not_mature", per_sheet: perSheet });
+  const pendingWindowFields = [...maturityDaysByColumn.entries()]
+    .filter(([index]) => !maturityStatus(date, index).mature)
+    .map(([index, days]) => ({ column_index: index + 1, header: headers[index], maturity_days: days, mature_on: maturityStatus(date, index).mature_on }));
+  maturityRows.push({
+    date,
+    row_policy: rowPolicy,
+    gate: rowPolicy === "stratified"
+      ? "8个Sheet均有完整43字段行且新增人数为有效非负数；Dn字段单独按成熟度留空"
+      : `3日字段非空且非0，并且 cohort+3日不晚于统计截止日${maturityCutoff}; 8个Sheet全部通过`,
+    status: passed ? (pendingWindowFields.length ? "write_with_pending_metrics" : "mature") : "source_incomplete",
+    pending_window_fields: pendingWindowFields,
+    per_sheet: perSheet,
+  });
   if (passed) acceptedDates.push(date);
 }
-assert(acceptedDates.length > 0, "本次没有日期通过成熟度门禁，拒绝生成更新副本");
+assert(acceptedDates.length > 0, "本次没有日期通过行级来源完整性门禁，拒绝生成更新副本");
 
 // Merge prior validated source rows for provenance, replacing any stale same-date
 // rows with the fresh raw result.  The workbook update itself only writes the
@@ -275,7 +340,10 @@ const mergedSource = { schema_version: 1, source: {
   tc_logic: "累计利润(C-T)",
   product: "Waje Special",
   collection_method: "Origin visible report DOM; exact filters, date inputs and stable result readback",
-  maturity_policy: `仅纳入${maturityColumn}列3日指标非空非0且8个Sheet均通过的日期`,
+  row_policy: rowPolicy,
+  maturity_policy: rowPolicy === "stratified"
+    ? `完整来源日期均写入；仅当 cohort+字段窗口晚于统计截止日${maturityCutoff}时将该字段留空`
+    : `仅纳入${maturityColumn}列3日指标非空非0、cohort+3日不晚于统计截止日${maturityCutoff}且8个Sheet均通过的日期`,
 }, sheets: {} };
 for (const sheet of sheets) {
   const prior = priorSource.sheets?.[sheet];
@@ -303,6 +371,8 @@ for (const sheet of sheets) {
 await fs.writeFile(path.join(runDir, "source-data.json"), JSON.stringify(mergedSource, null, 2));
 await fs.writeFile(path.join(runDir, "maturity-report.json"), JSON.stringify({
   status: acceptedDates.length === freshDates.length ? "ok" : "degraded",
+  row_policy: rowPolicy,
+  maturity_cutoff: maturityCutoff,
   maturity_column_index: maturityColumn + 1,
   maturity_column_header: headers[maturityColumn],
   fresh_dates: freshDates,
@@ -350,7 +420,8 @@ let workbookXml = await inputZip.file("xl/workbook.xml").async("string");
 const relsXml = await inputZip.file("xl/_rels/workbook.xml.rels").async("string");
 const paths = sheetPaths(workbookXml, relsXml);
 const zeroLedger = [];
-const writePlan = { input: inputPath, output: outputPath, source_run: runDir, accepted_dates: acceptedDates, excluded_not_mature_dates: freshDates.filter((date) => !acceptedDates.includes(date)), sheets: {} };
+const maturityLedger = [];
+const writePlan = { input: inputPath, output: outputPath, source_run: runDir, row_policy: rowPolicy, accepted_dates: acceptedDates, excluded_not_mature_dates: freshDates.filter((date) => !acceptedDates.includes(date)), sheets: {} };
 for (const sheetName of sheets) {
   const sheetPath = paths[sheetName];
   assert(sheetPath && inputZip.file(sheetPath), `${sheetName}: XML工作表缺失`);
@@ -390,18 +461,20 @@ for (const sheetName of sheets) {
       // Existing rows are refreshed in place using their own complete style map;
       // only source values change, so dates before the update boundary remain
       // byte-for-byte protected and row formatting does not drift.
-      replacements.set(rowNumber, updateRow(currentXml, rowNumber, sourceRow, true, styleMap(currentXml)));
+      replacements.set(rowNumber, updateRow(currentXml, rowNumber, sourceRow, styleMap(currentXml)));
     } else {
       const clonedRowXml = cloneRow(templateXml, lastDataRowNumber, rowNumber);
-      const cleaned = updateRow(clonedRowXml, rowNumber, sourceRow, true, templateStyles);
+      const cleaned = updateRow(clonedRowXml, rowNumber, sourceRow, templateStyles);
       if (blankRows[appendIndex] !== undefined) replacements.set(rowNumber, cleaned);
       else appended.push(cleaned);
       appendIndex += 1;
     }
     rowAssignments[date] = rowNumber;
-    for (let col = 2; col < sourceColumns; col += 1) {
-      const parsed = sourceValue(sourceRow[col], col, false);
-      if (typeof parsed === "number" && parsed === 0) zeroLedger.push({ sheet: sheetName, date, cell: `${alpha(col)}${rowNumber}`, column_index: col + 1, header: headers[col], original_value: sourceRow[col], parsed_value: 0, action: "cleared_to_blank", number_format_preserved_by_style_clone: true });
+    for (let col = 0; col < sourceColumns; col += 1) {
+      const status = maturityStatus(date, col);
+      if (!status.mature && sourceRow[col] !== null && sourceRow[col] !== undefined && String(sourceRow[col]).trim() !== "") {
+        maturityLedger.push({ sheet: sheetName, date, cell: `${alpha(col)}${rowNumber}`, column_index: col + 1, header: headers[col], original_value: sourceRow[col], maturity_days: status.maturity_days, mature_on: status.mature_on, maturity_cutoff: maturityCutoff, action: "cleared_unmatured_window", number_format_preserved_by_style_clone: true });
+      }
     }
   }
   let updated = xml.replace(/<(?:x:)?row\b[^>]*\br="(\d+)"[^>]*>[\s\S]*?<\/(?:x:)?row>/g, (match, rawRowNumber) => replacements.get(Number(rawRowNumber)) ?? match);
@@ -414,7 +487,8 @@ for (const sheetName of sheets) {
 await inputZip.file("xl/workbook.xml", workbookXml);
 await fs.writeFile(outputPath, await inputZip.generateAsync({ type: "nodebuffer", compression: "DEFLATE", compressionOptions: { level: 6 } }));
 await fs.writeFile(path.join(runDir, "write-plan.json"), JSON.stringify(writePlan, null, 2));
-await fs.writeFile(path.join(runDir, "zero-ledger.json"), JSON.stringify({ scope: "accepted fresh dates; metric columns only; raw source zeros retained", count: zeroLedger.length, entries: zeroLedger }, null, 2));
+await fs.writeFile(path.join(runDir, "zero-ledger.json"), JSON.stringify({ scope: "not applied; mature source zeroes are preserved", count: zeroLedger.length, entries: zeroLedger }, null, 2));
+await fs.writeFile(path.join(runDir, "maturity-ledger.json"), JSON.stringify({ scope: "written fresh dates; cohort metric windows only", row_policy: rowPolicy, maturity_cutoff: maturityCutoff, count: maturityLedger.length, entries: maturityLedger }, null, 2));
 
 const outputWorkbook = await SpreadsheetFile.importXlsx(await FileBlob.load(outputPath));
 assert(JSON.stringify(outputWorkbook.worksheets.items.map((sheet) => sheet.name)) === JSON.stringify(sheets), "输出Sheet顺序发生变化");
@@ -436,23 +510,19 @@ for (const sheet of outputWorkbook.worksheets.items) {
     const actual = values[dm.get(date)];
     const expected = rawMaps[sheet.name].get(date);
     for (let col = 0; col < sourceColumns; col += 1) {
-      const expectedClean = sourceValue(expected[col], col, true);
+      const expectedClean = outputValue(expected[col], col, date);
       assert(sameCell(actual[col], expectedClean, col), `${sheet.name} ${date} ${headers[col]}: 输出值不一致`);
-    }
-    for (let col = 2; col < sourceColumns; col += 1) {
-      const parsed = sourceValue(actual[col], col, false);
-      assert(!(typeof parsed === "number" && parsed === 0), `${sheet.name} ${date} ${headers[col]}: 清零失败`);
     }
   }
   const excludedDates = freshDates.filter((date) => !acceptedDates.includes(date));
   for (const excludedDate of excludedDates) assert(!dm.has(excludedDate), `${sheet.name}: 未成熟${excludedDate}错误写入`);
   after.sheets[sheet.name] = { used_range: used?.address, rows: values.length, columns: values[0]?.length, first_date: [...dm.keys()][0] || null, last_date: [...dm.keys()].at(-1) || null, formula_count: formulaCount, history_hash_before_cutoff: outputHistoryHash[sheet.name] };
-  validation.sheets[sheet.name] = { accepted_dates_present: acceptedDates.every((date) => dm.has(date)), excluded_dates_absent: excludedDates.every((date) => !dm.has(date)), history_hash_unchanged: outputHistoryHash[sheet.name] === beforeHistoryHash[sheet.name], values_verified: true, zero_cleared: true };
+  validation.sheets[sheet.name] = { accepted_dates_present: acceptedDates.every((date) => dm.has(date)), excluded_dates_absent: excludedDates.every((date) => !dm.has(date)), history_hash_unchanged: outputHistoryHash[sheet.name] === beforeHistoryHash[sheet.name], values_verified: true, maturity_fields_cleared: true, mature_zeroes_preserved: true };
 }
 assert(after.formulas === 0, `输出发现公式${after.formulas}个`);
 const formulaErrors = await outputWorkbook.inspect({ kind: "match", searchTerm: "#REF!|#DIV/0!|#VALUE!|#NAME\\?|#N/A", options: { useRegex: true, maxResults: 100 }, summary: "new-user workbook formula error scan" });
 assert(!formulaErrors.ndjson.includes('"kind":"match"'), `输出包含公式错误: ${formulaErrors.ndjson}`);
-validation.checks.push({ name: "headers_43_plus_AR", status: "passed" }, { name: "accepted_dates_unique", status: "passed" }, { name: "pre_cutoff_history_hash", status: "passed" }, { name: "zero_ledger_reconciled", status: "passed", count: zeroLedger.length }, { name: "formula_error_scan", status: "passed" });
+validation.checks.push({ name: "headers_43_plus_AR", status: "passed" }, { name: "accepted_dates_unique", status: "passed" }, { name: "pre_cutoff_history_hash", status: "passed" }, { name: "maturity_windows_reconciled", status: "passed", count: maturityLedger.length, cutoff: maturityCutoff }, { name: "mature_source_zeroes_preserved", status: "passed" }, { name: "formula_error_scan", status: "passed" });
 await fs.writeFile(path.join(runDir, "workbook-after.json"), JSON.stringify(after, null, 2));
 await fs.writeFile(path.join(runDir, "validation-report.json"), JSON.stringify(validation, null, 2));
 
@@ -482,7 +552,7 @@ if (skipRender) {
 await fs.writeFile(path.join(runDir, "render-receipt.json"), JSON.stringify(previewReceipt, null, 2));
 
 const status = acceptedDates.length === freshDates.length && (skipRender || previewReceipt.status === "passed") ? "ok" : "degraded";
-const receipt = { status, generated_at: new Date().toISOString(), input: { path: inputPath, sha256: inputSha, unchanged: true }, output: { path: outputPath, sha256: after.sha256 }, requested_date_range: { start: startDate, end: endDate }, fresh_query_range: { start: freshStart, end: freshEnd }, accepted_dates: acceptedDates, excluded_not_mature_dates: freshDates.filter((date) => !acceptedDates.includes(date)), zero_ledger_count: zeroLedger.length, source_raw_dir: rawDir, run_dir: runDir, maturity_report: path.join(runDir, "maturity-report.json"), validation_report: path.join(runDir, "validation-report.json"), render_status: previewReceipt.status, note: status === "degraded" ? "仅因未成熟日期或渲染器降级；未成熟数据未写入，历史值未改变。" : "全部通过。" };
+const receipt = { status, generated_at: new Date().toISOString(), input: { path: inputPath, sha256: inputSha, unchanged: true }, output: { path: outputPath, sha256: after.sha256 }, requested_date_range: { start: startDate, end: endDate }, fresh_query_range: { start: freshStart, end: freshEnd }, row_policy: rowPolicy, accepted_dates: acceptedDates, excluded_not_mature_dates: freshDates.filter((date) => !acceptedDates.includes(date)), maturity_cutoff: maturityCutoff, maturity_ledger_count: maturityLedger.length, zero_ledger_count: zeroLedger.length, source_raw_dir: rawDir, run_dir: runDir, maturity_report: path.join(runDir, "maturity-report.json"), maturity_ledger: path.join(runDir, "maturity-ledger.json"), validation_report: path.join(runDir, "validation-report.json"), render_status: previewReceipt.status, note: status === "degraded" ? "仅因来源行不完整或渲染器降级；未成熟窗口字段留空，历史值未改变，已成熟的真实零值保留。" : "全部通过。" };
 await fs.writeFile(path.join(runDir, "run-receipt.json"), JSON.stringify(receipt, null, 2));
-await fs.writeFile(path.join(runDir, "manifest.json"), JSON.stringify({ schema_version: 1, status, source: "Origin BQ-新增付费用户分析", source_url: mergedSource.source.source_url, input: { path: inputPath, sha256: inputSha }, output: { path: outputPath, sha256: after.sha256 }, dates: { requested: { start: startDate, end: endDate }, accepted: acceptedDates, excluded_not_mature: freshDates.filter((date) => !acceptedDates.includes(date)) }, artifacts: { source_data: path.join(runDir, "source-data.json"), filter_receipts: path.join(runDir, "filter-receipts.json"), maturity_report: path.join(runDir, "maturity-report.json"), zero_ledger: path.join(runDir, "zero-ledger.json"), validation_report: path.join(runDir, "validation-report.json"), run_receipt: path.join(runDir, "run-receipt.json") } }, null, 2));
+await fs.writeFile(path.join(runDir, "manifest.json"), JSON.stringify({ schema_version: 1, status, source: "Origin BQ-新增付费用户分析", source_url: mergedSource.source.source_url, input: { path: inputPath, sha256: inputSha }, output: { path: outputPath, sha256: after.sha256 }, dates: { requested: { start: startDate, end: endDate }, accepted: acceptedDates, excluded_not_mature: freshDates.filter((date) => !acceptedDates.includes(date)), maturity_cutoff: maturityCutoff }, artifacts: { source_data: path.join(runDir, "source-data.json"), filter_receipts: path.join(runDir, "filter-receipts.json"), maturity_report: path.join(runDir, "maturity-report.json"), maturity_ledger: path.join(runDir, "maturity-ledger.json"), zero_ledger: path.join(runDir, "zero-ledger.json"), validation_report: path.join(runDir, "validation-report.json"), run_receipt: path.join(runDir, "run-receipt.json") } }, null, 2));
 console.log(JSON.stringify(receipt, null, 2));

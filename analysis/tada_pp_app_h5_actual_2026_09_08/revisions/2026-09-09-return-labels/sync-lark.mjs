@@ -1,0 +1,19 @@
+import fs from 'node:fs';
+import assert from 'node:assert/strict';
+import {execFileSync} from 'node:child_process';
+const dir='analysis/tada_pp_app_h5_actual_2026_09_08/revisions/2026-09-09-return-labels/';
+const call=args=>{const r=JSON.parse(execFileSync('/Users/robin/.local/node/bin/lark-cli',['docs',...args,'--doc','MUmUdKO7ko3hKIxY822lBXJQggg','--as','user','--format','json'],{encoding:'utf8',timeout:60000,maxBuffer:10e6}));assert(r.ok);return r.data;};
+const fetch=()=>call(['+fetch','--detail','full']).document,num=s=>Number(s.replace(/[,％%]/g,'')),strip=s=>s.replace(/<[^>]*>/g,'');
+const before=fetch();fs.writeFileSync(dir+'lark.before.json',JSON.stringify(before,null,2));const receipts=[];
+for(const age of [false,true]){
+ const current=fetch(),match=s=>age?s.includes('起点人数')&&s.includes('注册未满30天的下注用户')&&s.includes('第14日'):s.includes('成熟样本')&&s.includes('第2日')&&s.includes('第30日');
+ const targets=[...current.content.matchAll(/<table\b[^>]*id="([^"]+)"[^>]*>[\s\S]*?<\/table>/g)].filter(m=>match(m[0]));assert.equal(targets.length,1);const original=targets[0][0];const rows=[...original.match(/<tbody>([\s\S]*?)<\/tbody>/)[1].matchAll(/<tr>[\s\S]*?<\/tr>/g)].map(m=>[...m[0].matchAll(/<td[^>]*>([\s\S]*?)<\/td>/g)].map(c=>strip(c[1])));
+ const start=age?4:2,groups=age?[...new Set(rows.map(r=>r[1]))]:['all'];const maxima={};for(const g of groups)maxima[g]=rows[0].slice(start).map((_,j)=>Math.max(...rows.filter(r=>!age||r[1]===g).map(r=>num(r[start+j]))));
+ let rowIndex=0,peakCount=0;let xml=original.replace(/\s+id="[^"]+"/g,'');xml=xml.replace(/<tbody>[\s\S]*?<\/tbody>/,body=>body.replace(/<tr>[\s\S]*?<\/tr>/g,row=>{const r=rows[rowIndex++],group=age?r[1]:'all';let col=0;return row.replace(/<td\b([^>]*)>([\s\S]*?)<\/td>/g,(_,attrs,content)=>{const i=col++,peak=i>=start&&num(r[i])===maxima[group][i-start];if(peak)peakCount++;const vendor=r[0].includes('Tada')?'light-blue':'light-orange';const bg=peak?'light-yellow':age&&i>0?(r[1].includes('未满')?'light-blue':'light-purple'):vendor;let inner=content;if(peak)inner=inner.replace(/<p([^>]*)>([\s\S]*?)<\/p>/g,(_,a,t)=>'<p'+a+'><b>'+t.replace(/<\/?b>/g,'')+'</b></p>');return '<td'+attrs.replace(/\s+background-color="[^"]*"/g,'')+' background-color="'+bg+'">'+inner+'</td>';});}));
+ const result=call(['+update','--command','block_replace','--block-id',targets[0][1],'--revision-id',String(current.revision_id),'--content',xml]);assert.equal(result.result,'success');assert.equal((result.warnings||[]).length,0);
+ const after=fetch(),updated=[...after.content.matchAll(/<table\b[^>]*>[\s\S]*?<\/table>/g)].find(m=>match(m[0]))[0];assert.equal(strip(updated),strip(original));assert.equal(peakCount,age?6:4);receipts.push({table:age?'new_old':'all',peakCount,revision:after.revision_id});
+}
+const current=fetch(),imgs=[...current.content.matchAll(/<img\b[^>]*>/g)].filter(m=>m[0].includes('相同成熟批次的厂商再次下注率'));assert.equal(imgs.length,1);const id=imgs[0][0].match(/id="([^"]+)"/)[1];
+const result=call(['+update','--command','block_replace','--block-id',id,'--revision-id',String(current.revision_id),'--content','<img path="@./analysis/tada_pp_app_h5_actual_2026_09_08/lark-assets/return-chart-block.png" width="1136" height="356" caption="相同成熟批次的厂商再次下注率（逐柱标注百分比）"/>']);assert.equal(result.result,'success');assert.equal((result.warnings||[]).length,0);
+const after=fetch();fs.writeFileSync(dir+'lark.after.json',JSON.stringify(after,null,2));assert(after.content.includes('逐柱标注百分比'));const count=(s,t)=>(s.match(new RegExp('<'+t+'\\b','g'))||[]).length;for(const tag of ['table','img','source','whiteboard'])assert.equal(count(before.content,tag),count(after.content,tag));
+fs.writeFileSync(dir+'lark-receipt.json',JSON.stringify({status:'full_readback_verified',revision:after.revision_id,tables:receipts,chart_label_count:20,existing_resource_counts_preserved:true},null,2));console.log(JSON.stringify({status:'full_readback_verified',revision:after.revision_id}));

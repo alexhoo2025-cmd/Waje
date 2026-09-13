@@ -9,6 +9,7 @@ the portable report builder.
 
 from __future__ import annotations
 
+import csv
 import hashlib
 import json
 import math
@@ -286,6 +287,7 @@ def rtp(cash: int | float, bet: int | float) -> float | None:
 
 def source_hash() -> str:
     paths = sorted(ANALYSIS.glob("sql/*.sql")) + [
+        ROOT / "analysis/game_code_dictionary_2026_08_31/game_code_name_mapping.csv",
         ROOT / "knowledge/02-数据/Waje-游戏代码与名称统一映射表-2026-08-31.md",
         ROOT / "knowledge/02-数据/Waje埋点事件与属性字典-2026-08-11.md",
     ]
@@ -478,6 +480,130 @@ def write_json(name: str, value: object) -> None:
     (ANALYSIS / name).write_text(json.dumps(value, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
+def write_csv(name: str, rows: list[dict], fieldnames: list[str]) -> None:
+    with (ANALYSIS / name).open("w", newline="", encoding="utf-8") as handle:
+        writer = csv.DictWriter(handle, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerows(rows)
+
+
+def build_game_platform_mapping() -> dict:
+    """Build the platform-aware view without pretending the source has a full platform field."""
+    source_path = ROOT / "analysis/game_code_dictionary_2026_08_31/game_code_name_mapping.csv"
+    source_rows = list(csv.DictReader(source_path.open(encoding="utf-8")))
+    app_core = [
+        ("捕鱼", "3001"), ("Whot", "6001"), ("新转盘", "2002"),
+        ("拼奈拉", "2008"), ("转盘", "2001"), ("转瓶子", "2003"),
+        ("五张牌", "2006"), ("百人Whot", "6005"), ("对决", "6007"),
+        ("骰子", "6002"), ("红绿", "1003"), ("足球", "1004"), ("21点", "2004"),
+    ]
+    h5_core = [
+        ("Whot-h5", "9006", "gochopbig", "技术部技术映射；产品轻量化表待补录"),
+        ("ColorDice", "9003", "自研", "轻量化游戏表/技术映射"),
+        ("CoinFlip", "9001", "自研", "轻量化游戏表/技术映射"),
+        ("Limbo", "9008", "自研", "以技术部映射为准；产品表存在反置"),
+        ("Keno", "9010", "自研", "以技术部映射为准；产品表存在反置"),
+    ]
+    app_rows = [
+        {"platform_scope": "App/自研主游戏", "game_name": name, "game_id": game_id, "game_id_display": f"ID {game_id}", "provider": "自研", "provider_channel_id": "", "mapping_basis": "自研游戏清单", "mapping_status": "confirmed", "highlight": False, "highlight_label": ""}
+        for name, game_id in app_core
+    ]
+    h5_rows = [
+        {"platform_scope": "H5/轻量化", "game_name": name, "game_id": game_id, "game_id_display": f"ID {game_id}", "provider": provider, "provider_channel_id": "", "mapping_basis": basis, "mapping_status": "confirmed_with_scope_note", "highlight": False, "highlight_label": ""}
+        for name, game_id, provider, basis in h5_core
+    ]
+    x7 = next((row for row in source_rows if row["game_name"].strip().casefold() == "x7 hot"), None)
+    if x7:
+        h5_rows.append({
+            "platform_scope": "第三方外接（App/H5端待核）",
+            "game_name": "★ X7 HOT（重点）",
+            "game_id": x7["game_id"],
+            "game_id_display": f"ID {x7['game_id']}",
+            "provider": x7["provider"],
+            "provider_channel_id": "680",
+            "mapping_basis": "游戏总表；Tada 渠道ID=680；当前字典未提供端归属",
+            "mapping_status": "highlight_platform_pending",
+            "highlight": True,
+            "highlight_label": "重点高亮",
+        })
+    app_ids = {game_id for _, game_id in app_core}
+    h5_ids = {game_id for _, game_id, _, _ in h5_core}
+    master = []
+    for row in source_rows:
+        game_id = row["game_id"].strip()
+        name = row["game_name"].strip()
+        if name.casefold() == "x7 hot":
+            scope = "第三方外接（App/H5端待核）"
+            status = "highlight_platform_pending"
+            highlight = True
+            display_name = "★ X7 HOT（重点）"
+            provider_channel_id = "680"
+        elif game_id in h5_ids:
+            scope = "H5/轻量化"
+            status = "confirmed_with_scope_note"
+            highlight = False
+            display_name = name
+            provider_channel_id = ""
+        elif game_id in app_ids and row["game_source"] == "自研":
+            scope = "App/自研主游戏"
+            status = "confirmed"
+            highlight = False
+            display_name = name
+            provider_channel_id = ""
+        elif row["game_source"] == "三方":
+            scope = "第三方外接（端待核）"
+            status = "platform_pending"
+            highlight = False
+            display_name = name
+            provider_channel_id = ""
+        else:
+            scope = "自研非包内（端待核）"
+            status = "platform_pending"
+            highlight = False
+            display_name = name
+            provider_channel_id = ""
+        master.append({
+            "platform_scope": scope,
+            "game_name": display_name,
+            "game_id": game_id,
+            "game_id_display": f"ID {game_id}",
+            "provider": row["provider"],
+            "provider_channel_id": provider_channel_id,
+            "game_source": row["game_source"],
+            "link_type": row["link_type"],
+            "in_package": row["in_package"],
+            "mapping_basis": "游戏代码与名称统一映射表 revision 609",
+            "mapping_status": status,
+            "highlight": highlight,
+        })
+    columns = ["platform_scope", "game_name", "game_id", "game_id_display", "provider", "provider_channel_id", "mapping_basis", "mapping_status", "highlight"]
+    write_csv("game_platform_mapping.csv", master, columns + ["game_source", "link_type", "in_package"])
+    write_json("game_platform_mapping.json", {
+        "schema_version": 1,
+        "generated_at": RUN_AT,
+        "status": "partial_platform_field_not_present_in_master_dictionary",
+        "source": "analysis/game_code_dictionary_2026_08_31/game_code_name_mapping.csv; knowledge/02-数据/Waje-游戏代码与名称统一映射表-2026-08-31.md",
+        "app_core": app_rows,
+        "h5_core": h5_rows,
+        "x7_hot": next((row for row in h5_rows if row["highlight"]), None),
+        "master_summary": {
+            "total_rows": len(master),
+            "app_core_rows": len(app_rows),
+            "h5_core_rows": len(h5_rows) - 1,
+            "third_party_platform_pending_rows": sum(1 for row in master if row["platform_scope"].startswith("第三方外接")),
+            "highlight_rows": sum(1 for row in master if row["highlight"]),
+        },
+        "master": master,
+        "notes": [
+            "App/自研主游戏与H5/轻量化清单是当前资料可确认的核心列表。",
+            "第三方全量行保留在 master 与 CSV，但当前字典没有统一 App/H5 端字段，不能强行归类。",
+            "X7 HOT 的 Waje 内部映射为 40163，Tada 厂商渠道 ID 为 680；两者不是同一字段。",
+            "Limbo=9008、Keno=9010 采用技术部映射，产品表中的反置值不用于当前清单。",
+        ],
+    })
+    return {"app_core": app_rows, "h5_core": h5_rows, "master": master}
+
+
 def source_definitions() -> list[dict]:
     return [
         {
@@ -510,6 +636,12 @@ def source_definitions() -> list[dict]:
             "path": "analysis/whot_hourly_analysis_2026_09_04/quality_checks.json",
             "query": {"engine": "local_validation", "sql": "SELECT check_id, status, actual, reason FROM local_whot_quality_checks WHERE run_id = 'whot_hourly_analysis_2026_09_04';", "tables_used": ["analysis/whot_hourly_analysis_2026_09_04/quality_checks.json", "analysis/whot_hourly_analysis_2026_09_04/formula_checks.json"], "description": "本地对线上聚合结果执行的日期、公式、金额闭环、隐私和展示状态校验；不是生产事实源。"},
         },
+        {
+            "id": "src_game_mapping",
+            "label": "Waje App/H5 游戏名称与编号映射",
+            "path": "analysis/whot_hourly_analysis_2026_09_04/game_platform_mapping.csv",
+            "query": {"engine": "local_reference", "sql": "SELECT platform_scope, game_name, game_id, provider, provider_channel_id, mapping_status FROM local_game_platform_mapping WHERE mapping_version = '609';", "tables_used": ["analysis/game_code_dictionary_2026_08_31/game_code_name_mapping.csv", "knowledge/02-数据/Waje-游戏代码与名称统一映射表-2026-08-31.md"], "description": "根据游戏字典与技术映射生成的 App/H5 核心清单；第三方游戏没有统一端字段时保留待核状态。"},
+        },
     ]
 
 
@@ -518,6 +650,7 @@ def build_artifact(datasets: dict, sources: list[dict]) -> dict:
     source_start = "src_bq_gamestart_whot"
     source_entry = "src_bq_client_entry"
     source_mapping = "src_local_mapping"
+    source_game_mapping = "src_game_mapping"
     return {
         "surface": "report",
         "manifest": {
@@ -545,6 +678,8 @@ def build_artifact(datasets: dict, sources: list[dict]) -> dict:
                 {"id": "chart_rtp_band_share", "title": "用户 RTP 区间分布（合格用户时段）", "subtitle": "每个用户-小时至少 3 个有效结算局；低于 10 人的分组不展示可识别小群体。", "type": "bar", "dataset": "rtp_bands", "sourceId": source_server, "encodings": {"x": {"field": "rtp_band", "type": "ordinal", "label": "用户 RTP 区间"}, "y": {"field": "rtp_band_share", "type": "quantitative", "label": "占比", "format": "percent"}}, "xAxisTitle": "用户 RTP 区间", "yAxisTitle": "占合格用户时段比例", "valueFormat": "percent"},
             ],
             "tables": [
+                {"id": "table_app_game_mapping", "title": "App 游戏名称与编号", "subtitle": "当前资料可确认的 App/自研主游戏清单；编号为 Waje game_id。", "dataset": "app_game_mapping", "sourceId": source_game_mapping, "columns": [{"field": "game_name", "label": "游戏名称", "type": "text"}, {"field": "game_id_display", "label": "Waje game_id", "type": "text"}, {"field": "provider", "label": "归属", "type": "text"}, {"field": "mapping_status", "label": "映射状态", "type": "text"}]},
+                {"id": "table_h5_game_mapping", "title": "H5 游戏名称与编号", "subtitle": "H5/轻量化技术映射；X7 HOT 为第三方外接，端归属仍待配置事实核验。", "dataset": "h5_game_mapping", "sourceId": source_game_mapping, "columns": [{"field": "game_name", "label": "游戏名称", "type": "text"}, {"field": "game_id_display", "label": "Waje game_id", "type": "text"}, {"field": "provider", "label": "归属/厂商", "type": "text"}, {"field": "provider_channel_id", "label": "厂商渠道 ID", "type": "text"}, {"field": "highlight_label", "label": "标记", "type": "text"}, {"field": "mapping_status", "label": "映射状态", "type": "text"}]},
                 {"id": "table_daily_metrics", "title": "每日 Whot 服务端汇总", "subtitle": "7/7 完整业务日；真人与机器人分列，金额为源整数单位。", "dataset": "daily_metrics", "sourceId": source_server, "defaultSort": {"field": "metric_date_lagos", "direction": "asc"}, "columns": [{"field": "metric_date_lagos", "label": "业务日", "type": "text"}, {"field": "gamestart_users", "label": "GAMESTART 真人用户", "type": "number", "format": "number"}, {"field": "bet_users", "label": "下注真人用户", "type": "number", "format": "number"}, {"field": "bet_rounds", "label": "下注局代理", "type": "number", "format": "number"}, {"field": "bet_amount", "label": "下注额（源单位）", "type": "number", "format": "number"}, {"field": "house_profit_amount", "label": "盈利代理（源单位）", "type": "number", "format": "number"}, {"field": "weighted_rtp", "label": "RTP（临时）", "type": "number", "format": "percent"}, {"field": "robot_bet_share", "label": "机器人下注占比", "type": "number", "format": "percent"}]},
                 {"id": "table_hour_profile_00_11", "title": "分时窗口汇总｜00:00—11:00", "subtitle": "同一小时跨 7 日去重用户与金额汇总；低谷/高峰判断采用窗口分布。", "dataset": "hour_profile_00_11", "sourceId": source_server, "columns": [{"field": "hour_label", "label": "小时", "type": "text"}, {"field": "bet_users", "label": "窗口去重下注用户", "type": "number", "format": "number"}, {"field": "bet_amount_b", "label": "下注额（10亿源单位）", "type": "number", "format": "number"}, {"field": "house_profit_b", "label": "盈利代理（10亿源单位）", "type": "number", "format": "number"}, {"field": "weighted_rtp", "label": "RTP（临时）", "type": "number", "format": "percent"}]},
                 {"id": "table_hour_profile_12_23", "title": "分时窗口汇总｜12:00—23:00", "subtitle": "同一小时跨 7 日去重用户与金额汇总；高峰策略同时看用户数与金额。", "dataset": "hour_profile_12_23", "sourceId": source_server, "columns": [{"field": "hour_label", "label": "小时", "type": "text"}, {"field": "bet_users", "label": "窗口去重下注用户", "type": "number", "format": "number"}, {"field": "bet_amount_b", "label": "下注额（10亿源单位）", "type": "number", "format": "number"}, {"field": "house_profit_b", "label": "盈利代理（10亿源单位）", "type": "number", "format": "number"}, {"field": "weighted_rtp", "label": "RTP（临时）", "type": "number", "format": "percent"}]},
@@ -558,6 +693,10 @@ def build_artifact(datasets: dict, sources: list[dict]) -> dict:
                 {"id": "title", "type": "markdown", "body": "# Whot 最近一周分时运营与 RTP 分析｜2026-08-28—2026-09-03\n\n**统计范围：**精确 `Whot`（game_id `6001`，server play_id `9116001`），业务时区 `Africa/Lagos`，完整业务日 `7/7`。\n\n**报告状态：**`partial`。服务端 GAMESTART/GAMEEND 聚合已完成；PV 进入信号稀疏，金额字段仍是源整数单位，RTP 为结算现金代理值，实时并发未具备可靠 Whot 维度。"},
                 {"id": "executive_summary", "type": "markdown", "body": "## Executive Summary\n\n**先给结论：Whot 的需求主峰在 16—17 点和 22—23 点，金额峰值落在 23 点；低谷集中在 04—06 点。**按 7 日窗口同一小时汇总，23:00 下注额最高（约 6.23B 源单位），22:00 和 00:00 次之；下注用户峰值在 17:00、16:00、10:00。\n\n**规模与回报：**7 日真人下注额 `121.44B` 源整数单位，真人结算现金字段 `115.62B`，按 `cash_settlement ÷ bet_num` 的金额加权 RTP 为 `95.21%`，平台盈利代理为 `5.82B` 源单位。以上不是币种金额，也不是已签字的最终派奖口径。\n\n**人群结构：**机器人下注 `52.09B`，约占真人+机器人下注 `30.02%`，已从真人主表分离。每日约 `2,994` 个机器人用户是观测到的机器人池规模，不能解释为实时并发。\n\n**运营含义：**高峰时段应优先保证匹配响应、可用房间和首局速度；04—06 点可在不牺牲成局率的前提下适度扩大同层级房间池或等待窗口。不要仅凭单小时 RTP 调整数值，先核查结算字段、版本和时段规则。"},
                 {"id": "summary_metrics", "type": "metric-strip", "cardIds": ["card_status", "card_human_bet", "card_rtp", "card_robot_share", "card_peak", "card_entry", "card_concurrency"]},
+                {"id": "game_mapping_intro", "type": "markdown", "body": "## App / H5 游戏名称与编号对照\n\n下面列出当前资料可确认的自研 App 主游戏和 H5/轻量化游戏。`X7 HOT` 已在字典中确认 Waje 内部 game_id=`40163`，Tada 厂商渠道 ID=`680`，但当前资料没有把它明确绑定到 App 或 H5，因此单独标为 **重点高亮｜第三方外接（端待核）**。不要把 `680` 当成 Waje game_id。完整 596 行主字典另保存在本地分析目录。"},
+                {"id": "x7_highlight", "type": "markdown", "body": "> **重点游戏：★ X7 HOT｜Waje game_id 40163｜Tada 渠道 ID 680**\n> 当前资料尚未确认它具体落在哪个端，先保留为“第三方外接（App/H5 端待核）”，不把厂商渠道 ID 680 当成 Waje 内部游戏编号。"},
+                {"id": "app_mapping_table", "type": "table", "tableId": "table_app_game_mapping", "layout": "half"},
+                {"id": "h5_mapping_table", "type": "table", "tableId": "table_h5_game_mapping", "layout": "half"},
                 {"id": "demand_intro", "type": "markdown", "body": "## 1. 分时需求结构\n\n服务端 GAMEEND 在 7 个业务日、每个日期的 24 小时均有返回。这里的 `bet_users` 是小时内发生有效下注的真人去重用户；它是活跃/下注用户指标，不是实时在线人数。GAMESTART 另做日级核验，不把开局人数当作进入人数。\n\n颜色越深表示下注额越高。热力图按 `server_time → Africa/Lagos` 转换日期和小时，跨日不合并。"},
                 {"id": "heatmap", "type": "chart", "chartId": "chart_hourly_bet_heatmap"},
                 {"id": "hour_amount", "type": "chart", "chartId": "chart_hour_profile_amount", "layout": "half"},
@@ -607,6 +746,7 @@ def main() -> None:
     periods = enrich_three_hour()
     hour_profile = build_hour_profile()
     bands = build_bands()
+    game_mapping = build_game_platform_mapping()
     total_bet = sum(row["bet_amount"] for row in DAILY_GAMEEND)
     total_cash = sum(row["player_payout_amount"] for row in DAILY_GAMEEND)
     total_robot_bet = sum(row["robot_bet_amount"] for row in DAILY_GAMEEND)
@@ -679,6 +819,8 @@ def main() -> None:
             {"metric": "weighted_rtp", "definition": "金额加权 RTP", "formula": "cash_settlement / bet_num", "data_state": "provisional"},
             {"metric": "concurrency_proxy", "definition": "无会话区间时仅为下注/活跃用户代理", "formula": "not real-time concurrency", "data_state": "blocked_no_whot_scoped_online_fact"},
         ],
+        "app_game_mapping": game_mapping["app_core"],
+        "h5_game_mapping": game_mapping["h5_core"],
     }
     checks = formula_checks(daily_metrics, hourly, periods, bands)
     write_json("server_daily_gameend.json", daily_metrics)

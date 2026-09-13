@@ -1,0 +1,63 @@
+/* Scoped fixed-order cohort table: color denotes age group, not performance. */
+:is(#finance-table-block,[data-artifact-block-id="finance-table-block"]) {--fin-gray:#f5f6f8;--fin-blue:#eaf3ff;--fin-purple:#f2edfa;--fin-orange:#fff1e5;}
+:is(#finance-table-block,[data-artifact-block-id="finance-table-block"]) tbody tr:is(:nth-child(1),:nth-child(4)) td {background:var(--fin-gray)!important;}
+:is(#finance-table-block,[data-artifact-block-id="finance-table-block"]) tbody tr:is(:nth-child(2),:nth-child(5)) td {background:var(--fin-blue)!important;}
+:is(#finance-table-block,[data-artifact-block-id="finance-table-block"]) tbody tr:is(:nth-child(3),:nth-child(6)) td {background:var(--fin-purple)!important;}
+:is(#finance-table-block,[data-artifact-block-id="finance-table-block"]) tbody tr:nth-child(-n+3) td:first-child {background:var(--fin-blue)!important;}
+:is(#finance-table-block,[data-artifact-block-id="finance-table-block"]) tbody tr:nth-child(n+4) td:first-child {background:var(--fin-orange)!important;}
+@media(prefers-color-scheme:dark){:is(#finance-table-block,[data-artifact-block-id="finance-table-block"]){--fin-gray:#26313d;--fin-blue:#20384f;--fin-purple:#382d4b;--fin-orange:#473323;}}
+:is(#return-max-block,[data-artifact-block-id="return-max-block"]) {--max-blue:#eaf3ff;--max-orange:#fff1e5;--max-peak:#fff1bd;}
+:is(#return-max-block,[data-artifact-block-id="return-max-block"]) tbody tr:nth-child(odd) td {background:var(--max-blue)!important;}
+:is(#return-max-block,[data-artifact-block-id="return-max-block"]) tbody tr:nth-child(even) td {background:var(--max-orange)!important;}
+:is(#return-max-block,[data-artifact-block-id="return-max-block"]) tbody td:has(strong) {background:var(--max-peak)!important;}
+@media(prefers-color-scheme:dark){:is(#return-max-block,[data-artifact-block-id="return-max-block"]){--max-blue:#20384f;--max-orange:#473323;--max-peak:#51451f;}}
+:is(#return-chart-block,[data-artifact-block-id="return-chart-block"]) .chart-bar-value-label {font-size:10px!important;}
+:is(#return-common-block,[data-artifact-block-id="return-common-block"],#return-age,[data-artifact-block-id="return-age"]) {--return-blue:#eaf3ff;--return-purple:#f2edfa;--return-orange:#fff1e5;--return-peak:#fff1bd;}
+:is(#return-common-block,[data-artifact-block-id="return-common-block"]) tbody tr:nth-child(odd) td {background:var(--return-blue)!important;}
+:is(#return-common-block,[data-artifact-block-id="return-common-block"]) tbody tr:nth-child(even) td {background:var(--return-orange)!important;}
+:is(#return-age,[data-artifact-block-id="return-age"]) tbody tr:is(:nth-child(1),:nth-child(2),:nth-child(5),:nth-child(6)) td {background:var(--return-blue)!important;}
+:is(#return-age,[data-artifact-block-id="return-age"]) tbody tr:is(:nth-child(3),:nth-child(4),:nth-child(7),:nth-child(8)) td {background:var(--return-purple)!important;}
+:is(#return-age,[data-artifact-block-id="return-age"]) tbody tr:nth-child(-n+4) td:first-child {background:var(--return-blue)!important;}
+:is(#return-age,[data-artifact-block-id="return-age"]) tbody tr:nth-child(n+5) td:first-child {background:var(--return-orange)!important;}
+:is(#return-common-block,[data-artifact-block-id="return-common-block"],#return-age,[data-artifact-block-id="return-age"]) tbody td:has(strong) {background:var(--return-peak)!important;}
+@media(prefers-color-scheme:dark){:is(#return-common-block,[data-artifact-block-id="return-common-block"],#return-age,[data-artifact-block-id="return-age"]){--return-blue:#20384f;--return-purple:#382d4b;--return-orange:#473323;--return-peak:#51451f;}}
+:is(#top-games-block,[data-artifact-block-id="top-games-block"]) {--vendor-blue:#eaf3ff;--vendor-orange:#fff1e5;--peak-yellow:#fff1bd;}
+:is(#top-games-block,[data-artifact-block-id="top-games-block"]) tbody tr:nth-child(-n+5) td {background:var(--vendor-blue)!important;}
+:is(#top-games-block,[data-artifact-block-id="top-games-block"]) tbody tr:nth-child(n+6) td {background:var(--vendor-orange)!important;}
+:is(#top-games-block,[data-artifact-block-id="top-games-block"]) tbody td:has(strong) {background:var(--peak-yellow)!important;font-weight:700;}
+@media(prefers-color-scheme:dark){:is(#top-games-block,[data-artifact-block-id="top-games-block"]){--vendor-blue:#20384f;--vendor-orange:#473323;--peak-yellow:#51451f;}}
+:is(#games,[data-artifact-block-id="games"]) {--channel-blue:#eaf3ff;--channel-purple:#f2edfa;--vendor-orange:#fff1e5;}
+:is(#games,[data-artifact-block-id="games"]) tbody tr:nth-child(-n+4) td {background:var(--channel-blue)!important;}
+:is(#games,[data-artifact-block-id="games"]) tbody tr:nth-child(n+5) td {background:var(--channel-purple)!important;}
+:is(#games,[data-artifact-block-id="games"]) tbody tr:nth-child(odd) td:nth-child(2) {background:var(--channel-blue)!important;}
+:is(#games,[data-artifact-block-id="games"]) tbody tr:nth-child(even) td:nth-child(2) {background:var(--vendor-orange)!important;}
+:is(#games,[data-artifact-block-id="games"]) tbody td:nth-child(n+4) {font-weight:700;}
+@media(prefers-color-scheme:dark){:is(#games,[data-artifact-block-id="games"]){--channel-blue:#20384f;--channel-purple:#382d4b;--vendor-orange:#473323;}}
+:is(#age-overview-block,[data-artifact-block-id="age-overview-block"]) {--age-blue:#eaf3ff;--age-purple:#f2edfa;--provider-orange:#fff1e5;}
+:is(#age-overview-block,[data-artifact-block-id="age-overview-block"]) tbody tr:is(:nth-child(1),:nth-child(2),:nth-child(5),:nth-child(6)) td {background:var(--age-blue)!important;}
+:is(#age-overview-block,[data-artifact-block-id="age-overview-block"]) tbody tr:is(:nth-child(3),:nth-child(4),:nth-child(7),:nth-child(8)) td {background:var(--age-purple)!important;}
+:is(#age-overview-block,[data-artifact-block-id="age-overview-block"]) tbody tr:nth-child(odd) td:first-child {background:var(--age-blue)!important;}
+:is(#age-overview-block,[data-artifact-block-id="age-overview-block"]) tbody tr:nth-child(even) td:first-child {background:var(--provider-orange)!important;}
+:is(#age-overview-block,[data-artifact-block-id="age-overview-block"]) tbody td:is(:nth-child(3),:nth-child(5),:nth-child(6)){font-weight:700;}
+@media(prefers-color-scheme:dark){:is(#age-overview-block,[data-artifact-block-id="age-overview-block"]){--age-blue:#20384f;--age-purple:#382d4b;--provider-orange:#473323;}}
+/* Provider and channel colors have separate legends; no performance semantics. */
+:is(#depth-block,[data-artifact-block-id="depth-block"],#app-detail-block,[data-artifact-block-id="app-detail-block"]) {--group-blue:#eaf3ff;--group-orange:#fff1e5;--group-purple:#f2edfa;}
+:is(#depth-block,[data-artifact-block-id="depth-block"]) tbody tr:nth-child(odd) td {background:var(--group-blue)!important;}
+:is(#depth-block,[data-artifact-block-id="depth-block"]) tbody tr:nth-child(even) td {background:var(--group-orange)!important;}
+:is(#app-detail-block,[data-artifact-block-id="app-detail-block"]) tbody tr:nth-child(-n+2) td {background:var(--group-blue)!important;}
+:is(#app-detail-block,[data-artifact-block-id="app-detail-block"]) tbody tr:nth-child(n+3) td {background:var(--group-purple)!important;}
+@media(prefers-color-scheme:dark){:is(#depth-block,[data-artifact-block-id="depth-block"],#app-detail-block,[data-artifact-block-id="app-detail-block"]){--group-blue:#20384f;--group-orange:#473323;--group-purple:#382d4b;}}
+:is(#per-bettor-table-block,[data-artifact-block-id="per-bettor-table-block"]) { --cohort-new:#eaf3ff; --cohort-old:#f2edfa; --cohort-all:#f5f6f8; }
+:is(#per-bettor-table-block,[data-artifact-block-id="per-bettor-table-block"]) tbody tr:nth-child(-n+2) td {background:var(--cohort-all)!important;}
+:is(#per-bettor-table-block,[data-artifact-block-id="per-bettor-table-block"]) tbody tr:nth-child(n+3):nth-child(-n+4) td {background:var(--cohort-new)!important;}
+:is(#per-bettor-table-block,[data-artifact-block-id="per-bettor-table-block"]) tbody tr:nth-child(n+5) td {background:var(--cohort-old)!important;}
+:is(#per-bettor-table-block,[data-artifact-block-id="per-bettor-table-block"]) tbody td:first-child {font-weight:600;}
+@media(prefers-color-scheme:dark){:is(#per-bettor-table-block,[data-artifact-block-id="per-bettor-table-block"]){--cohort-new:#20384f;--cohort-old:#382d4b;--cohort-all:#26313d;}}
+
+/* Same semantic groups in the twelve-row RTP comparison. */
+:is(#rtp-age-table-block,[data-artifact-block-id="rtp-age-table-block"]) {--cohort-new:#eaf3ff;--cohort-old:#f2edfa;--cohort-all:#f5f6f8;}
+:is(#rtp-age-table-block,[data-artifact-block-id="rtp-age-table-block"]) tbody tr:nth-child(-n+4) td {background:var(--cohort-all)!important;}
+:is(#rtp-age-table-block,[data-artifact-block-id="rtp-age-table-block"]) tbody tr:nth-child(n+5):nth-child(-n+8) td {background:var(--cohort-new)!important;}
+:is(#rtp-age-table-block,[data-artifact-block-id="rtp-age-table-block"]) tbody tr:nth-child(n+9) td {background:var(--cohort-old)!important;}
+:is(#rtp-age-table-block,[data-artifact-block-id="rtp-age-table-block"]) tbody td:nth-child(2) {font-weight:600;}
+@media(prefers-color-scheme:dark){:is(#rtp-age-table-block,[data-artifact-block-id="rtp-age-table-block"]){--cohort-new:#20384f;--cohort-old:#382d4b;--cohort-all:#26313d;}}

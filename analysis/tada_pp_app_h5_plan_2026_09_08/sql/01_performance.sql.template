@@ -1,0 +1,45 @@
+-- NON-EXECUTABLE DESIGN TEMPLATE. Bind only approved, certified read-only CTEs.
+-- {{NORMALIZED_BETS_CTE}} must implement the input contract and source partitions.
+-- net_stake is accepted amount net of effective refunds, at bet_uid x asset grain.
+-- final_payout NULL means pending/unresolved, not zero. Human/test flags certified.
+-- @asset_scope for THIS template is cash or bonus. Same-currency combined totals
+-- need a separate reaggregation by bet_uid, not a fabricated asset='total' filter.
+-- window_id/cohort_group come from the locked parameters and registration facts.
+WITH bets AS ({{NORMALIZED_BETS_CTE}}),
+filtered AS (
+ SELECT metric_date, window_id, cohort_group, host_platform, provider,
+        currency, asset, user_key, bet_uid, net_stake, settlement_complete, final_payout
+ FROM bets
+ WHERE metric_date BETWEEN @window_start AND @window_end
+   AND currency = @currency AND asset = @asset_scope
+   AND is_human = TRUE AND is_test = FALSE AND net_stake > 0
+), provider_totals AS (
+ SELECT window_id, cohort_group, host_platform, provider, currency, asset,
+        SUM(net_stake) AS effective_stake,
+        COUNT(DISTINCT user_key) AS bet_users,
+        COUNT(DISTINCT bet_uid) AS bet_count,
+        SUM(IF(settlement_complete, net_stake, 0)) AS settled_stake,
+        SUM(IF(settlement_complete, final_payout, 0)) AS settled_payout
+ FROM filtered
+ GROUP BY window_id, cohort_group, host_platform, provider, currency, asset
+), denominators AS (
+ SELECT window_id, cohort_group, host_platform, currency, asset,
+        SUM(effective_stake) AS all_provider_stake,
+        SUM(IF(provider IN ('Tada','PP'), effective_stake, 0)) AS pair_stake
+ FROM provider_totals
+ GROUP BY window_id, cohort_group, host_platform, currency, asset
+)
+SELECT p.window_id, p.cohort_group, p.host_platform, p.provider, p.currency, p.asset,
+       p.effective_stake, p.bet_users, p.bet_count, p.settled_stake, p.settled_payout,
+       d.all_provider_stake, d.pair_stake,
+       SAFE_DIVIDE(p.effective_stake,d.all_provider_stake) AS site_share,
+       SAFE_DIVIDE(p.effective_stake,d.pair_stake) AS pair_share,
+       SAFE_DIVIDE(p.settled_payout,p.settled_stake) AS rtp,
+       IF(p.settled_stake>0,p.settled_stake-p.settled_payout,NULL) AS ggr,
+       SAFE_DIVIDE(p.settled_stake,p.effective_stake) AS settlement_coverage
+FROM provider_totals p JOIN denominators d
+USING(window_id,cohort_group,host_platform,currency,asset)
+WHERE p.provider IN ('Tada','PP');
+-- Apply >=10-user suppression AND complementary-cell safeguards before export.
+-- Unknown platform/provider reconciliation, daily outputs and all-cohort totals
+-- are separate aggregations of base rows, not sums of period UV subtotals.

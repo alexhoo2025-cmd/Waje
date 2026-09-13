@@ -1,0 +1,135 @@
+"""Two new source-backed reports; does not overwrite the original report."""
+from pathlib import Path
+from datetime import datetime,timezone
+import json,copy,statistics,csv
+ROOT=Path(__file__).resolve().parents[2];P=Path(__file__).resolve().parent
+D=json.loads((P/'data.json').read_text());ORIGINAL=json.loads((ROOT/'analysis/tada_pp_app_h5_actual_2026_09_08/artifact.json').read_text())
+NOW=datetime.now(timezone.utc).isoformat()
+def fmt(v,n=2):return 'N/A' if v is None else f'{v:,.{n}f}'
+def pct(v):return fmt(v*100)+'%'
+def ov(p,v,age='all_ages'):return next(r for r in D['overview'] if r['platform']==p and r['provider']==v and r['age']==age)
+def rt(p,v,d=30,age='all_ages'):return next(r for r in D['returns'] if r['platform']==p and r['provider']==v and r['age_segment']==age and r['sample_mode']=='common_30d' and r['observation_day']==d)
+class Report:
+ def __init__(self,slug,title,description):
+  self.slug=slug;self.title=title;self.dir=P/slug;self.dir.mkdir(exist_ok=True);self.ds={};self.chart_map=[];self.css=[]
+  self.m={'version':1,'surface':'report','title':title,'description':description,'generatedAt':NOW,'sources':copy.deepcopy(ORIGINAL['manifest']['sources']),'cards':[],'charts':[],'tables':[],'blocks':[],'reportContract':{'type':'business','language':'zh','population':'Waje真金产品；按注册渠道归属APP/H5；新为行为日注册0—29天，老30天及以上；回访按起点固定账号龄，不按付费状态筛选。','period':'2026-08-01至2026-09-07；38个完整业务日；回访共同起点2026-08-01至2026-08-09','timezone':'Africa/Lagos','metrics':[],'assertions':[],'decisions':{},'openQuestions':[]}}
+  self.m['sources'].append({'id':'split','label':'双报告独立复算与关联分析','path':'analysis/tada_pp_split_2026_09_09/analyze.py','query':{'engine':'Python standard-library aggregate recomputation','description':'读取冻结的核心、游戏、回访聚合与重复扣减结果。新统计与相关系数由analyze.py复算；非新增线上查询。游戏关联按渠道厂商分层、无用户级因果解释。','tables_used':['analysis/tada_pp_app_h5_actual_2026_09_08/core-corrected.json','analysis/tada_pp_app_h5_actual_2026_09_08/analysis-results.json','analysis/tada_pp_app_h5_actual_2026_09_08/queries/18_full_return.result.json'],'metric_definitions':['人均下注额=有效下注额/去重下注人数；有效局次不等于原始下注笔数','RTP=对应结算派奖/有效下注额；现金奖励未分离','Spearman为游戏级等权秩相关；100名下注者与14个观察到下注的业务日为主筛选阈值','下注活跃天数/下注人数是复玩强度代理，不是定日回访率'],'executed_at':NOW}})
+  original_query=next(s['query'] for s in ORIGINAL['manifest']['sources'] if s['id']=='src-analysis')
+  self.m['sources'][-1]['query'].update(sql=original_query['sql'],language='sql',supporting_queries=original_query.get('supporting_queries',[]),transformation_path='analysis/tada_pp_split_2026_09_09/analyze.py')
+  self.m['sources'][-1]['query']['description']+=' 所附SQL为原期真实执行的核心聚合与支持查询；新增表和关联由Python对这些结果复算，主SQL不单独包含全部后续变换。'
+  self.ds['calculation_core']=[{'group':r['platform']+'·'+r['provider']+'·'+r['age'],'stake':r['stake'],'bettors':r['bettors'],'active':r['active_accounts'],'penetration':r['penetration'],'per_bettor':r['stake']/r['bettors'],'payout':r['payout'],'rtp':r['payout']/r['stake']} for r in D['overview']]
+  self.m['reportContract']['metrics']=[{'dataset':'calculation_core','field':'penetration','unit':'%','definition':'同组厂商去重下注人数÷同组平台活跃人数','kind':'ratio','denominator':'同渠道同年龄组平台活跃人数','scale':'fraction','min':0,'max':1},{'dataset':'calculation_core','field':'rtp','unit':'%','definition':'对应派奖÷有效下注额','kind':'ratio','denominator':'有效下注额','scale':'fraction','min':0}]
+  self.m['reportContract']['assertions']=[{'kind':'ratio','dataset':'calculation_core','numerator':'bettors','denominator':'active','actual':'penetration'},{'kind':'ratio','dataset':'calculation_core','numerator':'payout','denominator':'stake','actual':'rtp'},{'kind':'ratio','dataset':'calculation_core','numerator':'stake','denominator':'bettors','actual':'per_bettor'}]
+  self.md('title','# '+title,None)
+ def md(self,id,body,source='split'):
+  b={'id':id,'type':'markdown','body':body};
+  if source:b['sourceId']=source
+  self.m['blocks'].append(b)
+ def table(self,id,title,rows,group=None,peak_cols=(),subtitle=''):
+  self.ds[id]=rows;cols=list(rows[0]);header='### '+title+'\n\n'+(subtitle+'\n\n' if subtitle else '')
+  maxima={c:max(float(str(r[c]).replace(',','').replace('%','')) for r in rows if r[c]!='N/A') for c in peak_cols}
+  body=header+'| '+' | '.join(cols)+' |\n| '+' | '.join('---' for _ in cols)+' |\n'
+  body+='\n'.join('| '+' | '.join('**'+str(r[c])+'**' if c in maxima and r[c]!='N/A' and float(str(r[c]).replace(',','').replace('%',''))==maxima[c] else str(r[c]) for c in cols)+' |' for r in rows)
+  self.md(id,body)
+  if group:
+   for i,r in enumerate(rows,1):
+    val=r[group];color='var(--sp-new)' if '新' in val else 'var(--sp-old)' if '老' in val else 'var(--sp-tada)' if 'Tada' in val else 'var(--sp-pp)' if 'PP' in val else 'var(--sp-neutral)'
+    self.css.append(f':is(#{id},[data-artifact-block-id="{id}"]) tbody tr:nth-child({i}) td {{background:{color}!important;}}')
+  self.css.append(f':is(#{id},[data-artifact-block-id="{id}"]) tbody td:has(strong) {{background:var(--sp-peak)!important;}}')
+ def chart(self,id,title,rows,x,ys,unit,kind='bar',subtitle='',intent='comparison',label=True):
+  self.ds[id]=rows;c={'id':id,'title':title,'subtitle':subtitle,'showDescription':True,'type':kind,'dataset':id,'sourceId':'split','layout':'full','intent':intent,'question':title,'rationale':'按本报告同口径聚合展示；数据保留对应分子分母，正文紧邻解释。','encodings':{'x':{'field':x,'type':'temporal' if kind=='line' else 'nominal','label':x},'y':{'fields':ys,'type':'quantitative','format':'number','label':unit}},'palette':{'kind':'categorical','name':'blue-gold-orange-olive'},'labels':{'values':'endpoints' if kind=='line' else 'all' if label else 'none'},'legend':{'position':'bottom','sort':'spec'},'settings':{'sort':'none','categoryLabelPolicy':'wrap'}}
+  if unit.endswith('（%）'):c.update(valueFormat='number',unit='%')
+  if kind=='scatter':
+   c['encodings']={'x':{'field':x,'type':'quantitative','label':'RTP−100%（百分点）' if x=='RTP差值' else '结算RTP（%）'},'y':{'field':ys[0],'type':'quantitative','label':unit},'label':{'field':'标注','type':'text'}};c['labels']={'values':'auto'}
+   if x=='RTP差值':c['referenceLines']=[{'axis':'x','value':0,'label':'RTP=100%','color':'neutral','lineStyle':'dashed'}]
+  self.m['charts'].append(c);self.m['blocks'].append({'id':id+'-block','type':'chart','chartId':id});self.chart_map.append({'id':id,'title':title,'type':kind,'rows':len(rows),'fields':[x]+ys,'unit':unit,'scope':subtitle,'source':'split'})
+ def finish(self):
+  used={b.get('sourceId') for b in self.m['blocks']}|{c['sourceId'] for c in self.m['charts']}|{t['sourceId'] for t in self.m['tables']};self.m['sources']=[s for s in self.m['sources'] if s['id'] in used]
+  a={'surface':'report','manifest':self.m,'snapshot':{'version':1,'generatedAt':NOW,'status':'ready' if self.slug=='macro' else 'partial','datasets':self.ds}}
+  (self.dir/'artifact.json').write_text(json.dumps(a,ensure_ascii=False,indent=2,allow_nan=False)+'\n')
+  md=[]
+  for b in self.m['blocks']:
+   if b['type']=='markdown':md.append(b['body'])
+   elif b['type']=='chart':
+    c=next(c for c in self.m['charts'] if c['id']==b['chartId']);md.append('### '+c['title']+'\n\n'+c['subtitle']+'\n\n图表见同名HTML；精确数据保存在artifact.json的'+c['dataset']+'中。')
+   else:md.append('### 完整游戏明细\n\n完整逐游戏数据见HTML交互表及上级目录“游戏明细.csv”。')
+  (self.dir/'报告.md').write_text('\n\n'.join(md)+'\n');(self.dir/'chart-map.json').write_text(json.dumps(self.chart_map,ensure_ascii=False,indent=2))
+  (self.dir/'report.css').write_text(':root{--sp-new:#eaf3ff;--sp-old:#f2edfa;--sp-tada:#eaf3ff;--sp-pp:#fff1e5;--sp-neutral:#f5f6f8;--sp-peak:#fff1bd;}\n@media(prefers-color-scheme:dark){:root{--sp-new:#20384f;--sp-old:#382d4b;--sp-tada:#20384f;--sp-pp:#473323;--sp-neutral:#26313d;--sp-peak:#51451f;}}\n.chart-bar-value-label{font-size:10px!important;}\n'+ '\n'.join(self.css))
+  return {'slug':self.slug,'title':self.title,'charts':len(self.m['charts']),'blocks':len(self.m['blocks'])}
+
+def macro():
+ r=Report('macro','Tada与PP宏观对比｜新老用户、下注与回访','宏观篇：只看规模、参与与回访；2026年8月1日—9月7日')
+ r.md('summary','## 执行摘要\n\n**Tada的下注规模在APP、H5都更大。** 全体下注额分别为PP的28.7倍、19.4倍；只比较Tada与PP，PP占两家合计下注额的比例在H5为4.90%，高于APP的3.37%。\n\n**新老用户不能用一个平均值解释。** PP新用户在H5的渗透率略低于APP，老用户则相反；Tada老用户的两端渗透率均约22%，新用户差异更明显。\n\n**优先关注两家H5新下注用户的首周回访。** 第7日Tada为8.21%，PP为6.68%，均低于各自APP；老用户应单独评估。')
+ r.md('scope','## 01｜先看全体：规模和份额是两件事\n\n统计期为2026年8月1日—9月7日，共38个完整业务日，拉各斯时间。APP／H5按已核对的注册渠道归属，不是逐笔实际运行端；金额沿用报表单位，排除WajeCoin。\n\n新用户为行为日注册0—29天，老用户为30天及以上，不按充值筛选。局次是已去重的有效下注用户游戏局回合记录，不能当作原始下注笔数。两项份额分别使用同渠道同人群的全部游戏、Tada＋PP下注额作分母。\n\nTada占同端全部游戏下注额，APP为35.78%、H5为42.42%；这与APP绝对下注规模更大并不矛盾。')
+ rows=[{'组合':p+'·'+v,'下注额（亿）':fmt(ov(p,v)['stake_yi']),'有效局次（万）':fmt(ov(p,v)['rounds_wan']),'下注人数':fmt(ov(p,v)['bettors'],0),'占全部游戏':pct(ov(p,v)['all_game_share']),'占两厂商':pct(ov(p,v)['pair_share'])} for p in ['APP','H5'] for v in ['Tada','PP']]
+ r.table('macro-all','全体用户四组合',rows,'组合',('下注额（亿）',),subtitle='全体含注册日期未知者；峰值仅比较当前列。')
+ r.chart('macro-share','厂商占同渠道全部游戏的下注份额',[{'渠道':p,**{v:ov(p,v)['all_game_share']*100 for v in ['Tada','PP']}} for p in ['APP','H5']],'渠道',['Tada','PP'],'下注份额（%）',subtitle='同渠道全部Waje游戏下注额为100%；全体用户。')
+ for age,label,number,insight in [('new_30d','新用户',2,'PP在H5的两厂商金额份额为7.57%，高于APP的2.96%；但下注渗透率为1.23%，略低于APP的1.36%。金额份额高，不等于参与人数比例高。'),('old_over_30d','老用户',3,'PP在H5的下注渗透率为8.86%，高于APP的6.00%；Tada为22.50%和22.27%，两端接近。新老用户的渠道差异方向不同。')]:
+  r.md(age,f'## 0{number}｜{label}：'+('金额份额与参与比例分开读' if age=='new_30d' else 'H5的PP参与比例更高')+'\n\n'+insight+'\n\n'+f'同组平台活跃人数：APP {fmt(ov("APP","Tada",age)["active_accounts"],0)}人，H5 {fmt(ov("H5","Tada",age)["active_accounts"],0)}人。渗透率使用同组活跃人数作分母。')
+  rr=[]
+  for p in ['APP','H5']:
+   for v in ['Tada','PP']:
+    x=ov(p,v,age);rr.append({'组合':p+'·'+v,'下注额（亿）':fmt(x['stake_yi']),'有效局次（万）':fmt(x['rounds_wan']),'下注人数':fmt(x['bettors'],0),'占同组全部游戏':pct(x['all_game_share']),'占同组两厂商':pct(x['pair_share']),'下注渗透率':pct(x['penetration'])})
+  r.table('table-'+age,label+'下注对照',rr,'组合')
+  r.css.append(f':is(#table-{age},[data-artifact-block-id="table-{age}"]) tbody td:nth-child(n+2) {{background:var({"--sp-new" if age=="new_30d" else "--sp-old"})!important;}}')
+  r.chart('pen-'+age,label+'下注渗透率',[{'渠道':p,**{v:ov(p,v,age)['penetration']*100 for v in ['Tada','PP']}} for p in ['APP','H5']],'渠道',['Tada','PP'],'下注渗透率（%）',subtitle='厂商去重下注人数÷同渠道同年龄组平台活跃人数。')
+ r.md('returns','## 04｜回访：新用户差距更值得优先排查\n\n回访起点是窗口内首次有效下注该厂商的当天（第1日），第N日再次下注同厂商才计入。这里不是全部新增注册用户留存，也不是新增付费用户留存。\n\n下图统一使用8月1—9日起点批次；每组第7、14、30日采用同一分母。新老年龄在起点固定，不把各日留存率之差当作真实流失人数。')
+ for age,label in [('new_30d','新用户'),('old_over_30d','老用户')]:
+  r.md('ret-note-'+age,('**新下注用户：两家H5均低于APP。** 第30日Tada为APP 7.33%、H5 4.45%；PP为4.66%、3.24%。' if age=='new_30d' else '**老下注用户：Tada第30日两端接近。** APP 18.48%、H5 18.57%；PP为10.04%、11.53%。不能将新用户的渠道差距直接套用到老用户。'))
+  cr=[{'观察日':f'第{d}日',**{p+'·'+v:rt(p,v,d,age)['return_pct'] for p in ['APP','H5'] for v in ['Tada','PP']}} for d in [7,14,30]]
+  r.chart('ret-'+age,label+'同厂商再次下注率',cr,'观察日',['APP·Tada','H5·Tada','APP·PP','H5·PP'],'回访率（%）',subtitle='8月1—9日起点；不是实际端内回访；百分比逐柱显示。')
+ retrows=[]
+ for age,label in [('new_30d','新用户'),('old_over_30d','老用户')]:
+  for p in ['APP','H5']:
+   for v in ['Tada','PP']:retrows.append({'人群':label,'组合':p+'·'+v,'成熟起点人数':fmt(rt(p,v,30,age)['eligible_accounts'],0),**{f'第{d}日':fmt(rt(p,v,d,age)['return_pct'])+'%' for d in [7,14,30]}})
+ r.table('ret-exact','同批回访精确值与分母',retrows,'人群')
+ r.md('actions','## 05｜先做什么\n\n1. 新用户：同时排查Tada、PP在H5的首周进入与持续下注路径，按游戏和入口继续细分。\n2. 老用户：分别评估PP在H5的较高参与比例，以及Tada两端相近的回访；不只看全体平均。\n3. 游戏、头部集中度、人均深度及RTP关联，转到《Tada与PP细分诊断》阅读，宏观篇不据此直接调整推荐或RTP。\n\n新老用户可在期内跨组，人数不相加；金额中注册日期未知部分保留在全体口径。原报告与原飞书保留，本篇为独立拆分稿。')
+ return r.finish()
+
+def detail():
+ r=Report('detail','Tada与PP细分诊断｜游戏深度、回访与RTP','细分篇：游戏差异与可验证关联；2026年8月1日—9月7日')
+ r.md('summary','## 执行摘要\n\n**Tada的优势不限于游戏数量或头部。** APP有下注游戏161款，PP 415款；剔除各自前5款后，Tada剩余下注总额仍为PP的32.1倍，但不是每款游戏都领先32.1倍。\n\n**人均深度与RTP必须分开解读。** 全体APP人均下注额Tada约26.64万、PP约3.80万；结算RTP为96.94%、95.99%。这不是“RTP差一点带来下注差很多”的因果证明。\n\n**关联线索最值得在H5的Tada游戏中复核。** 主样本110款游戏中，RTP与下注额的秩相关约0.46，与下注活跃天数约0.40；日级联系更弱，不能据此直接调参。')
+ r.md('depth','## 01｜先拆参与深度，再看结算回报\n\n统计期为2026年8月1日—9月7日，拉各斯时间；APP／H5为注册渠道归属。新为行为日注册0—29天、老为30天及以上，未按充值筛选。\n\n全体人均下注额之比，APP约7.02倍、H5约6.39倍，小于总下注额之比28.7倍、19.4倍。人数和人均深度共同影响总量。人均＝同组金额或局次÷去重下注人数，不是每日人均的平均值。')
+ chartrows=[];dr=[]
+ for age,label in [('all_ages','全体'),('new_30d','新用户'),('old_over_30d','老用户')]:
+  for p in ['APP','H5']:
+   chartrows.append({'渠道与人群':p+'·'+label,**{v:ov(p,v,age)['per_bettor_wan'] for v in ['Tada','PP']}})
+   for v in ['Tada','PP']:
+    x=ov(p,v,age);dr.append({'人群':label,'组合':p+'·'+v,'人均下注（万）':fmt(x['per_bettor_wan']),'人均局次':fmt(x['avg_rounds_per_bettor'],1),'局均金额':fmt(x['avg_stake_per_round']),'结算RTP':pct(x['settlement_rtp'])})
+ r.chart('mean-stake','全期人均下注额',chartrows,'渠道与人群',['Tada','PP'],'人均下注（万报表单位／人）',subtitle='按同组厂商去重下注人数计算；金额不是净投入或收益。')
+ r.table('depth-metrics','新老用户下注深度与RTP',dr,'人群')
+ r.md('rtp-boundary','RTP＝对应结算派奖÷有效下注额，已扣退款和已确认的重复记录；现金与奖励尚未分开，不能当作理论RTP或净利润。原始下注笔数缺少可靠字段，因此只报告已核验的有效局次，不用局次冒充笔数。')
+ r.md('heads','## 02｜少量游戏还是更广泛的游戏组合优势\n\nTada游戏更少，但平均每款下注额更高。APP剔除各自前5款后，剩余156款／410款，平均每款下注额之比约84.4倍；这仍是不同游戏组合的均值，不是逐款胜出。\n\n下图的前5款分别在各渠道、各厂商内部按下注额排名。PP对头部略更集中，剔除头部后分母下降更大，因此剩余总额倍数反而提高。')
+ r.chart('concentration','前5款与其余游戏的下注构成',[{'组合':c['platform']+'·'+c['provider'],'前5款':c['top5_pct'],'其余游戏':100-c['top5_pct']} for c in D['counts']],'组合',['前5款','其余游戏'],'下注构成（%）',kind='stackedBar100',subtitle='各组合自身下注额为100%；全量游戏数来自完整聚合，不按已展示行数计算。',label=False)
+ rr=[]
+ for c in D['counts']:
+  for head in [False,True]:rr.append({'组合':c['platform']+'·'+c['provider'],'范围':'剔除前5' if head else '全量','游戏数':c['remaining_count'] if head else c['game_count'],'下注总额（亿）':fmt((c['remaining_stake'] if head else c['stake'])/1e8),'平均每款（万）':fmt((c['remaining_avg'] if head else c['avg_game_stake'])/1e4)})
+ r.table('game-counts','游戏数量与平均每款下注',rr,'组合')
+ r.md('paired','## 03｜同款游戏在APP与H5的权重也不同\n\n以下每厂商5款，按两渠道合计下注额选择。它不是上一节各端各自的前5榜。用厂商内份额比较，可以避免PP的绝对金额在图上被淹没。\n\nX7 HOT更偏APP，Fortune Garuda 500更偏H5；PP中Fire Strike在H5权重突出。应核对同款游戏的入口、用户构成与实际可玩天数，而非只比较厂商总榜。')
+ selected=[]
+ for v in ['Tada','PP']:selected+=sorted([g for g in D['paired'] if g['provider']==v],key=lambda g:g['app_stake']+g['h5_stake'],reverse=True)[:5]
+ r.chart('top-games','重点游戏在厂商内部的下注份额',[{'游戏':g['provider']+' · '+g['game_name'],'APP':g['app_stake']/ov('APP',g['provider'])['stake']*100,'H5':g['h5_stake']/ov('H5',g['provider'])['stake']*100} for g in selected],'游戏',['APP','H5'],'厂商内下注份额（%）',kind='horizontalBar',subtitle='分母为该渠道该厂商下注总额；当前表10款，不代表全部单游戏排名。')
+ r.table('game-profiles','重点游戏：深度与RTP', [{'厂商':g['provider'],'游戏':g['game_name'],'APP人均（万）':fmt(g['app_per_bettor']/1e4),'H5人均（万）':fmt(g['h5_per_bettor']/1e4),'APP下注天数／人':fmt(g['app_days']),'H5下注天数／人':fmt(g['h5_days']),'APP RTP':fmt(g['app_rtp'])+'%','H5 RTP':fmt(g['h5_rtp'])+'%'} for g in selected],'厂商')
+ r.md('association','## 04｜下注与RTP：有相关线索，没有因果结论\n\n主样本要求每款游戏至少100名下注者、且至少14个业务日观察到下注；按APP／H5与厂商分别计算，不把四组混成一条相关线。使用Spearman秩相关（−1到1）：越接近1，排名越同向，0附近代表单调关系弱。\n\nH5·Tada的下注额、下注活跃天数与RTP相关约0.46、0.40；其余组更弱。RTP与下注额共享分母、游戏间用户重叠、曝光与品类未完全控制，因此不报告因果效应或用显著性包装结论。')
+ corr=[c for c in D['correlations'] if c['min_bettors']==100 and c['scope']=='全部已展示品类']
+ cr=[{'组合':c['platform']+'·'+c['provider'],'下注额':c['rho_stake_rtp'],'人均下注额':c['rho_per_bettor_rtp'],'人均局次':c['rho_rounds_rtp'],'下注活跃天数':c['rho_days_rtp'],'样本游戏数':c['n']} for c in corr]
+ r.chart('correlation','游戏层指标与RTP的秩相关系数',cr,'组合',['下注额','人均下注额','人均局次','下注活跃天数'],'Spearman相关系数（−1至1）',subtitle='游戏级等权，100名下注者与14个下注日门槛；样本156／195／110／54款。')
+ r.md('scatter-note','**复玩强度可以观察，但不能代替留存。** 下图聚焦H5·Tada的110款游戏，人均下注活跃天数＝下注用户日数÷去重下注人数。它说明在38天内平均参与了多少天，不是第7日或第30日回访率。\n\n横轴显示RTP相对100%的差值，−5个百分点即RTP 95%；这样可看清实际分布。0仅为派奖与下注等额的参照，不是现金净利润的盈亏线。')
+ sample=[g for g in D['scatter'] if g['platform']=='H5' and g['provider']=='Tada'];extremes={min(sample,key=lambda g:g[f])['game_id'] for f in ['rtp_pct','days_per_bettor']}|{max(sample,key=lambda g:g[f])['game_id'] for f in ['rtp_pct','days_per_bettor']}
+ sr=[{'游戏':g['game_name'],'游戏ID':g['game_id'],'RTP':g['rtp_pct'],'RTP差值':g['rtp_pct']-100,'下注天数':g['days_per_bettor'],'下注人数':g['bettors'],'下注额':g['stake'],'人均下注额':g['per_bettor'],'品类':g['family'],'标注':g['game_name'] if g['game_id'] in extremes else ''} for g in sample]
+ r.chart('rtp-replay','H5·Tada：RTP与下注活跃天数',sr,'RTP差值',['下注天数'],'人均下注活跃天数（天／人）',kind='scatter',intent='relationship',subtitle='110款；横轴为RTP减100%的百分点差。极值点标注名称，完整值见下表；未按曝光、上线时长或用户偏好配平。')
+ r.table('scatter-extremes','散点图边界点', [{'游戏':g['game_name'],'结算RTP':fmt(g['rtp_pct'])+'%','下注天数／人':fmt(g['days_per_bettor']),'下注人数':fmt(g['bettors'],0)} for g in sample if g['game_id'] in extremes])
+ sens=[c for c in D['correlations'] if c['platform']=='H5' and c['provider']=='Tada' and ((c['scope']=='全部已展示品类') or c['min_bettors']==100)]
+ r.md('sensitivity','**方向在部分复核中保留，强度并不稳定。** H5·Tada仅Slot、剔除前5款后，下注额与RTP相关仍约0.45、0.47；将人数门槛从30提高到300时，相关约0.32—0.46，下注天数相关约0.27—0.40。\n\n日级再次核对更弱：38天H5·Tada下注额与RTP相关约0.32，APP·Tada接近0；游戏横截面不能直接推成“某天提高RTP就增加下注”。')
+ r.table('sensitivity-table','H5·Tada关联敏感性', [{'最低下注人数':c['min_bettors'],'比较范围':c['scope'],'游戏数':c['n'],'下注额↔RTP':fmt(c['rho_stake_rtp']),'下注天数↔RTP':fmt(c['rho_days_rtp'])} for c in sens])
+ r.md('game-return','## 05｜游戏回访：先把可以证明的关系分开\n\n同厂商回访不等于回到最初玩的游戏。第30日，Tada的首日游戏集合再次下注率为APP 10.50%、H5 8.94%，低于同厂商的14.84%、12.32%；PP为4.40%、5.31%，也低于同厂商的8.48%、8.38%。\n\n两项指标使用同一批起点用户、同一观察日和同一分母。差额对应“回到同厂商、但未回到首日游戏集合”的用户比例；它不是任意单款游戏的独立留存。')
+ r.chart('return-layers','第30日：同厂商与首日游戏集合回访',[{'组合':p+'·'+v,'同厂商':rt(p,v)['return_pct'],'首日游戏集合':rt(p,v)['initial_games_pct'],'分母':rt(p,v)['eligible_accounts']} for p in ['APP','H5'] for v in ['Tada','PP']],'组合',['同厂商','首日游戏集合'],'回访率（%）',subtitle='共同起点8月1—9日；第30日；首日游戏集合是每位用户起点当天玩过的游戏集合。')
+ r.md('relation-boundary','**下注—回访—RTP尚不能组成用户级因果链。** 已有游戏级下注与RTP、厂商批次回访，但没有同批用户×单游戏的起点RTP与后续定日回访联表。当前仅将下注活跃天数作为复玩强度代理，不把它改名为留存。\n\n后续需按用户在游戏内的窗口首次下注固定起点，仅使用起点日已发生的下注与结算特征，再聚合第7／14／30日同游戏回访；按渠道、新老、品类及人数档位对照。补充查询目前未取得授权连接，本篇不填猜测值。')
+ r.md('game-details','## 06｜完整游戏明细与下一步\n\n优先核验H5·Tada关联较明显的游戏组，再比较两端同款游戏入口与玩法路径；对PP先区分人数少、参与浅和回到其他游戏，不能直接调整RTP。\n\n下表提供已展示的游戏×渠道明细，可排序、翻页和查阅。部分少于10用户的游戏未单列，覆盖下注额为APP两厂商超过99.99%、H5·Tada超过99.99%、H5·PP约99.59%。游戏数与平均每款总额使用完整汇总，不用这张明细的行数代替。')
+ fields={'provider':'厂商','platform':'渠道','game_name':'游戏','game_id':'游戏ID','bettors':'下注人数','stake_yi':'下注额（亿）','per_bettor_wan':'人均下注（万）','rounds_per_bettor':'人均局次','days_per_bettor':'下注天数／人','rtp_pct':'结算RTP（%）'}
+ full=[{label:g[key] for key,label in fields.items()} for g in sorted(D['games'],key=lambda g:g['stake'],reverse=True)]
+ r.ds['all-games']=full;r.m['tables'].append({'id':'all-games','title':'完整游戏×渠道明细','dataset':'all-games','sourceId':'split','layout':'full','defaultSort':{'field':'下注额（亿）','direction':'desc'},'columns':[{'field':v,'label':v,'type':'text' if k in ['provider','platform','game_name','game_id'] else 'number','format':'number'} for k,v in fields.items()]});r.m['blocks'].append({'id':'all-games-block','type':'table','tableId':'all-games'})
+ return r.finish()
+
+if __name__=='__main__':
+ output=[macro(),detail()];(P/'reports.json').write_text(json.dumps(output,ensure_ascii=False,indent=2));print(json.dumps(output,ensure_ascii=False))

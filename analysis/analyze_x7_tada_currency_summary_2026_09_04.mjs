@@ -1,4 +1,5 @@
 import fs from "node:fs/promises";
+import { execFileSync } from "node:child_process";
 import { FileBlob, SpreadsheetFile } from "/Users/robin/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/@oai/artifact-tool/dist/artifact_tool.mjs";
 
 const root = "/Users/robin/Documents/wajetan_analyst";
@@ -204,11 +205,15 @@ const slotWin = slotRows.reduce((s, r) => s + r.total_win, 0);
 const slotWeightedRtp = slotWin / slotBet;
 const x7Peers = slotRows
   .sort((a, b) => b.total_bet - a.total_bet)
-  .slice(0, 7);
+  .slice(0, 7)
+  .map((row) => ({ ...row,
+    bet_share_display: `${(row.bet_share * 100).toFixed(2)}%`,
+    net_share_display: `${(row.net_share * 100).toFixed(2)}%`,
+  }));
 const x7ExpectedNetPortfolioMargin = x7.total_bet * total.net_margin;
 const x7ExpectedNetSlotMargin = x7.total_bet * (1 - slotWeightedRtp);
-const x7RtpSensitivity = [0.95, 0.96, 0.97, x7.reported_rtp, 0.98].map((rtp) => ({
-  scenario: rtp === x7.reported_rtp ? "X7 HOT实际RTP" : `假设RTP ${(rtp * 100).toFixed(2)}%`,
+const x7RtpSensitivity = [0.95, 0.96, 0.97, x7.calculated_rtp, 0.98].map((rtp) => ({
+  scenario: rtp === x7.calculated_rtp ? "X7 HOT实际RTP" : `假设RTP ${(rtp * 100).toFixed(2)}%`,
   rtp,
   expected_net_win: x7.total_bet * (1 - rtp),
   delta_vs_actual: x7.total_bet * (1 - rtp) - x7.net_win,
@@ -348,7 +353,7 @@ const x7NetShare = pct(x7.net_share);
 const x7RtpDelta = `${((x7.reported_rtp - total.calculated_rtp) * 100).toFixed(2)} 个百分点`;
 const rtpEquation = `Net Win = ${num(netWinRtpRegression.intercept)} + ${num(netWinRtpRegression.slope)} × RTP（百分点）`;
 
-const peerRows = x7Peers.map((r) => `| ${r.game_id} | ${num(r.total_bet)} | ${pct(r.bet_share)} | ${num(r.net_win)} | ${pct(r.reported_rtp)} | ${num(r.total_count)} | ${r.bet_rank} | ${r.net_rank} |`).join("\n");
+const peerRows = x7Peers.map((r) => `| ${r.game_id} | ${num(r.total_bet)} | ${pct(r.bet_share)} | ${num(r.net_win)} | ${pct(r.net_share)} | ${pct(r.reported_rtp)} | ${num(r.total_count)} | ${r.bet_rank} | ${r.net_rank} |`).join("\n");
 const rtpRangeRows = rtpRanges.map((r) => `| ${r.rtp_range} | ${r.games} | ${num(r.total_bet)} | ${pct(r.bet_share)} | ${num(r.net_win)} | ${pct(r.net_share)} | ${pct(r.weighted_rtp)} |`).join("\n");
 const x7SensitivityRows = x7RtpSensitivity.map((r) => `| ${r.scenario} | ${pct(r.rtp)} | ${num(r.expected_net_win)} | ${num(r.delta_vs_actual)} |`).join("\n");
 const topRows = enriched.sort((a, b) => b.total_bet - a.total_bet).slice(0, 10).map((r) => `| ${r.game_id} | ${r.game_type} | ${num(r.total_bet)} | ${num(r.net_win)} | ${pct(r.reported_rtp)} | ${pct(r.bet_share)} | ${pct(r.net_share)} |`).join("\n");
@@ -442,9 +447,13 @@ ${betQuartiles.map((r) => `| ${r.bucket} | ${r.games} | ${pct(r.bet_share)} | ${
 
 对照样本扩展为 **7 款主要 Slot 游戏**，按第三方快照 Total Bet 排名前 7 选取，便于同时比较规模、投注占比、RTP和盈利贡献。
 
-| 游戏 | Total Bet | 下注额占比 | Net Win | RTP | Total Count | 下注排名 | 盈利排名 |
-|---|---:|---:|---:|---:|---:|---:|---:|
+| 游戏 | Total Bet | 占总下注 | Net Win | 占总净收入 | RTP | Total Count | 下注排名 | 盈利排名 |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
 ${peerRows}
+
+占总下注 = 单游戏 Total Bet ÷ 全表161款游戏 Total Bet合计 **${num(total.total_bet)}**；占总净收入 = 单游戏 Net Win ÷ 全表 Net Win合计 **${num(total.net_win)}**（保留负值）。这里“净收入”沿用源表Net Win定义，不等同于充值减提现或最终财务收入。
+
+这7款合计下注 **${num(x7Peers.reduce((s,r)=>s+r.total_bet,0))}**，占总下注 **${pct(x7Peers.reduce((s,r)=>s+r.total_bet,0)/total.total_bet)}**；合计净赢 **${num(x7Peers.reduce((s,r)=>s+r.net_win,0))}**，占总净收入 **${pct(x7Peers.reduce((s,r)=>s+r.net_win,0)/total.net_win)}**。
 
 X7 HOT 与 \`696_Fortune Garuda 500\` 处在最接近的规模区间：X7 HOT Total Bet 约高 **${(((x7.total_bet / x7Peers.find((r) => r.game_id === "696_Fortune Garuda 500")?.total_bet) - 1) * 100).toFixed(1)}%**，但两者 RTP 接近、Net Win 也接近。7 款样本用于说明头部游戏的规模贡献结构，不代表完整 Top Game 排名算法。
 
@@ -699,8 +708,8 @@ const artifact = {
       },
       {
         id: "x7-peers",
-        title: "X7 HOT 与主要 Slot 游戏（7款）",
-        subtitle: "按第三方快照 Total Bet 排名前7选取；用于规模、下注占比、RTP和盈利对照。",
+        title: "Slot下注额前7款：下注与净收入贡献",
+        subtitle: "分母均为全表161款游戏：总下注36,565,535,095.20；总Net Win 1,181,015,488.91（含负值）。",
         dataset: "x7_peers",
         sourceId: "src-currency-summary",
         source: { path: "analysis/x7_hot_tada_currency_summary_2026_09_04/sql/01_currency_summary_correlation.sql" },
@@ -709,8 +718,9 @@ const artifact = {
         columns: [
           { field: "game_id", label: "游戏", type: "text" },
           { field: "total_bet", label: "Total Bet", type: "number", format: "number" },
-          { field: "bet_share", label: "下注额占比", type: "number", format: "percent" },
+          { field: "bet_share_display", label: "占总下注", type: "text" },
           { field: "net_win", label: "Net Win", type: "number", format: "number" },
+          { field: "net_share_display", label: "占总净收入", type: "text" },
           { field: "reported_rtp", label: "RTP", type: "number", format: "percent" },
           { field: "total_count", label: "Total Count", type: "number", format: "number" },
         ],
@@ -757,7 +767,7 @@ const artifact = {
       { id: "rtp-range-chart", type: "chart", chartId: "rtp-range-net" },
       { id: "rtp-line-chart", type: "chart", chartId: "peer-rtp-line" },
       { id: "rtp-sensitivity", type: "table", tableId: "x7-rtp-sensitivity" },
-      { id: "peers", type: "markdown", body: "## 3. X7 HOT 与主要 Slot 游戏对比\n\n对照样本扩展为 7 款，按 Total Bet 排名前 7 展示，并增加下注额占比。" },
+      { id: "peers", type: "markdown", body: `## 3. X7 HOT 与主要 Slot 游戏对比\n\n按Slot游戏Total Bet降序列出前7款。占总下注＝单游戏Total Bet÷全表161款Total Bet合计${num(total.total_bet)}；占总净收入＝单游戏Net Win÷全表Net Win合计${num(total.net_win)}（含负值）。净收入沿用源表Net Win口径。\n\n7款合计下注${num(x7Peers.reduce((s,r)=>s+r.total_bet,0))}，占${pct(x7Peers.reduce((s,r)=>s+r.total_bet,0)/total.total_bet)}；净赢${num(x7Peers.reduce((s,r)=>s+r.net_win,0))}，占${pct(x7Peers.reduce((s,r)=>s+r.net_win,0)/total.net_win)}。`, sourceId: "src-currency-summary" },
       { id: "peer-table", type: "table", tableId: "x7-peers" },
       { id: "top-bet", type: "markdown", body: "## 4. 全表头部规模与盈利\n\n头部游戏集中贡献大部分下注额与 Net Win，X7 HOT位于头部规模集群。" },
       { id: "top-bet-chart", type: "chart", chartId: "top-bet-games" },
@@ -786,5 +796,7 @@ const artifact = {
   },
 };
 await fs.writeFile(`${runDir}/artifact.json`, JSON.stringify(artifact, null, 2), "utf8");
+// Apply the reviewed identity/favorite evidence on every regeneration.
+execFileSync("python3", [`${runDir}/extend_product_favorite_audit.py`], { cwd: root, stdio: "inherit" });
 
 console.log(JSON.stringify({ status: analysisResults.status, runDir, games: rows.length, x7: { game_id: x7.game_id, total_bet: x7.total_bet, net_win: x7.net_win, rtp: x7.reported_rtp, bet_rank: x7.bet_rank, net_rank: x7.net_rank, count_rank: x7.count_rank, rtp_rank: x7.rtp_rank }, correlations }, null, 2));

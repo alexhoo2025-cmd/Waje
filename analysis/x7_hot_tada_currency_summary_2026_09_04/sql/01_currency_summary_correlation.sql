@@ -58,23 +58,18 @@ relationship AS (
     AVG(net_win) - (COVAR_POP(net_win, rtp * 100) / NULLIF(VAR_POP(rtp * 100), 0)) * AVG(rtp * 100) AS net_win_rtp_intercept
   FROM derived
 )
-SELECT
-  game_id,
-  game_type,
-  total_bet,
-  total_win,
-  net_win,
-  rtp,
-  net_margin,
-  total_count,
-  bet_per_count,
-  net_win_per_count
+-- One statement keeps all three CTEs in scope. The snapshot table is a
+-- development input contract, not an asserted existing production table.
+SELECT 'game' AS result_type,
+  TO_JSON_STRING(STRUCT(game_id, game_type, total_bet, total_win, net_win,
+                       rtp, net_margin, total_count, bet_per_count,
+                       net_win_per_count)) AS aggregate_result
 FROM derived
-ORDER BY total_bet DESC;
-
--- RTP-band view for the report's second chart/table.
-SELECT * FROM rtp_range ORDER BY rtp_range;
-
--- Direct Net Win ↔ RTP relationship. The equation is:
--- Net Win = net_win_rtp_intercept + net_win_rtp_slope_per_rtp_pp × RTP_percentage_points.
-SELECT * FROM relationship;
+UNION ALL
+SELECT 'rtp_range', TO_JSON_STRING(STRUCT(rtp_range, games, total_bet,
+  total_win, net_win, weighted_rtp, bet_share, net_share))
+FROM rtp_range
+UNION ALL
+SELECT 'relationship', TO_JSON_STRING(STRUCT(games, net_win_rtp_pearson,
+  net_win_rtp_slope_per_rtp_pp, net_win_rtp_intercept))
+FROM relationship;

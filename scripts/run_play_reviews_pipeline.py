@@ -15,6 +15,9 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 PYTHON = sys.executable
+sys.path.insert(0, str(ROOT / "tools"))
+
+from execution_graph_hook import emit as emit_execution_graph
 
 
 def run(command: list[str], allow_returncodes: set[int] | None = None) -> int:
@@ -65,12 +68,30 @@ def main() -> int:
     lock_path = ROOT / "data/processed/play_reviews/.pipeline.lock"
     lock_path.parent.mkdir(parents=True, exist_ok=True)
     started_at = dt.datetime.now().astimezone().isoformat(timespec="seconds")
+    execution_run_id = dt.datetime.now().astimezone().strftime("%Y%m%dT%H%M%S%z")
+    execution_job_id = "google_play_reviews_daily" if args.period == "daily" else "google_play_reviews_weekly"
+    execution_graph: dict = {"status": "not_run", "reason": "skip_graph"} if args.skip_graph else emit_execution_graph(
+        ROOT,
+        job_id=execution_job_id,
+        run_id=execution_run_id,
+        phase="started",
+        status="started",
+    )
+    report_dir = ROOT / "data/outputs/play_reviews" / ("weekly/" if args.period == "weekly" else "") / args.date
     stages: list[dict] = []
     status = "error"
     with lock_path.open("w", encoding="utf-8") as lock:
         try:
             fcntl.flock(lock.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
         except BlockingIOError:
+            if not args.skip_graph:
+                emit_execution_graph(
+                    ROOT,
+                    job_id=execution_job_id,
+                    run_id=execution_run_id,
+                    phase="finished",
+                    status="already_running",
+                )
             print("Play review pipeline is already running", file=sys.stderr)
             return 3
         try:
@@ -109,7 +130,6 @@ def main() -> int:
             else:
                 stages.append({"stage": "collect", "status": "skipped"})
             report_rc = run([PYTHON, "scripts/build_play_reviews_report.py", "--date", args.date, "--period", args.period])
-            report_dir = ROOT / "data/outputs/play_reviews" / ("weekly/" if args.period == "weekly" else "") / args.date
             stages.append({"stage": "report", "status": read_json(report_dir / "report-receipt.json").get("status", "degraded"), "returncode": report_rc})
             if not args.skip_graph:
                 graph_rc = run([PYTHON, "tools/build_graph.py"])
@@ -133,6 +153,21 @@ def main() -> int:
                 "stages": stages,
             }
             (output_dir / "run-log.json").write_text(json.dumps(log, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+            if not args.skip_graph:
+                receipt_paths = [str((output_dir / "run-log.json").relative_to(ROOT))]
+                report_receipt = report_dir / "report-receipt.json"
+                if report_receipt.exists():
+                    receipt_paths.append(str(report_receipt.relative_to(ROOT)))
+                execution_graph = emit_execution_graph(
+                    ROOT,
+                    job_id=execution_job_id,
+                    run_id=execution_run_id,
+                    phase="finished",
+                    status=status,
+                    receipts=receipt_paths,
+                )
+                log["execution_graph"] = execution_graph
+                (output_dir / "run-log.json").write_text(json.dumps(log, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(f"Play review pipeline completed: {args.period} {args.date} ({status})")
     return 0
 

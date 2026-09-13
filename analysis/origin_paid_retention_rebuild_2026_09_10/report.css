@@ -1,0 +1,9 @@
+:root{--app:#eaf3ff;--h5:#fff1e5;--pwa:#f1edfa;--peak:#fff0bf;}@media(prefers-color-scheme:dark){:root{--app:#20384f;--h5:#453426;--pwa:#342d46;--peak:#5b4520;}}
+.chart-bar-value-label{font-size:10px!important;}
+[data-artifact-id="scale"] table{width:100%!important;}
+[data-artifact-id="new-vs-paid"] table{width:100%!important;}
+[data-artifact-id="new-paid"] table{width:100%!important;}
+[data-artifact-id="first-paid"] table{width:100%!important;}
+[data-artifact-id="decay-detail"] table{width:100%!important;}
+[data-artifact-id="ct-detail"] table{width:100%!important;}
+#summary{border:1px solid #82a7fc;border-left:5px solid #4e96da;border-radius:14px;}

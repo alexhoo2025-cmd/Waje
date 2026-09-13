@@ -31,6 +31,10 @@ def unique(rows: list[dict[str, Any]], fields: list[str]) -> bool:
 
 
 def main() -> int:
+    current = load(ARTIFACT)
+    if any(s['id'] == 'paid-cohorts' for s in current['manifest']['sources']):
+        from validate_paid_focus import main as validate_payer_report
+        return validate_payer_report()
     findings: list[dict[str, Any]] = []
     failures: list[str] = []
     freshness = load(RESULTS / "01_source_freshness.json")["aggregate_rows"]
@@ -91,6 +95,51 @@ def main() -> int:
     if not artifact_ok:
         failures.append("Artifact contract is incomplete.")
 
+    datasets = artifact["snapshot"]["datasets"]
+    summary = load(ANALYSIS / 'analysis_summary.json')
+    platform_rows = datasets.get("platform_retention_display", [])
+    app_rows = datasets.get("app_payment_visible", [])
+    source_platform = {(r['cohort_month'], r['platform']): r for r in summary['platform_retention_monthly']}
+    scope_months_ok = (
+        {(r['cohort_month'], r['platform']) for r in platform_rows}
+        == {(m, p) for m in ('2026-06', '2026-07', '2026-08') for p in ('Android', 'iOS', 'H5')}
+        and {(r['period'], r['platform']) for r in app_rows}
+        == {(m, p) for m in ('2026-06', '2026-07') for p in ('Android', 'iOS')}
+        and all(r['cohort_users'] == source_platform[r['cohort_month'], r['platform']]['cohort_users']
+                and all(r[f'day_{d}_retention'] == source_platform[r['cohort_month'], r['platform']][f'day_{d}_retention']
+                        for d in (2, 7, 14, 30, 60, 90)) for r in platform_rows)
+        and all(abs(r['payer_arppu'] - r['pay_amount']/r['unique_paying_users']) < 1e-8 for r in app_rows)
+        and all('＊' in r['retention_2_display'] for r in platform_rows if r['cohort_month'] == '2026-06')
+        and {'platform-table', 'platform-long-table', 'app-payment-table'} <= {b['id'] for b in manifest['blocks']}
+    )
+    findings.append({'check': '三个月全平台与APP付费展示及源值一致性', 'status': 'passed' if scope_months_ok else 'failed',
+                     'evidence': {'platform_month_rows': len(platform_rows), 'app_payment_month_rows': len(app_rows)}})
+    if not scope_months_ok:
+        failures.append('Full-platform monthly scope or source consistency failed.')
+
+    matched = datasets.get('long_retention_matched', [])
+    long_ok = len(matched) == 6
+    for row in matched:
+        day = row['day']
+        expected_days = [f'{d:02d}' for d in range(1, 7 if day == 30 else 8)]
+        long_ok &= row['matched_days'] == ','.join(expected_days)
+        months = [('2026-06', 'june'), ('2026-07', 'july')]
+        if day == 30:
+            months.append(('2026-08', 'august'))
+        else:
+            long_ok &= row['august'] is None and row['august_display'] == '未到观察日'
+        for month, label in months:
+            selected = [r for r in platform_daily if r['platform'] == row['platform']
+                        and r['cohort_date'].startswith(month) and r['cohort_date'][-2:] in expected_days]
+            den = sum(r['cohort_users'] for r in selected)
+            num = sum(round(r['cohort_users']*r[f'day_{day}_retention']) for r in selected)
+            long_ok &= den == row[f'{label}_cohort_users'] and num == row[f'{label}_retained_users']
+            long_ok &= abs(num/den - row[label]) < 1e-12
+    findings.append({'check': '30与60日同注册日期范围加权长留复算', 'status': 'passed' if long_ok else 'failed',
+                     'evidence': {'comparison_rows': len(matched), 'day30_scope': '各月1—6日', 'day60_scope': '6、7月1—7日'}})
+    if not long_ok:
+        failures.append('Matched long-retention comparisons failed independent recomputation.')
+
     scope_ok = not re.search(r"phoenix|phenix|firebase|h5phx", json.dumps(artifact), re.I)
     findings.append({"check": "专题范围清理", "status": "passed" if scope_ok else "failed"})
     if not scope_ok:
@@ -106,7 +155,7 @@ def main() -> int:
         failures.append("Required LTV comparison values are missing.")
 
     html = HTML.read_text(encoding="utf-8") if HTML.exists() else ""
-    html_ok = bool(html) and "<html" in html.lower() and not re.search(r"https?://", html, flags=re.I)
+    html_ok = bool(html) and "<html" in html.lower() and not re.search(r"https?://", html, flags=re.I) and 'long-retention-matched' in html
     findings.append({"check": "HTML自包含性", "status": "passed" if html_ok else "failed", "evidence": {"exists": HTML.exists(), "bytes": len(html), "external_http_reference": bool(re.search(r"https?://", html, flags=re.I))}})
     if not html_ok:
         failures.append("HTML is missing or has an external HTTP(S) dependency.")
@@ -122,7 +171,8 @@ def main() -> int:
         "source_cutoff": {"server_aggregate": "2026-09-04"},
         "findings": findings,
         "caveats": [
-            "8月完整月度首充/老付费/复充已可用；新增注册付费仅有不相加的半月去重窗口。",
+            "H5指定包8月完整月度首充/老付费/复充已可用；APP8月完整月度去重付费汇总未就绪。",
+            "6月短期留存仅覆盖部分晚注册批次，不与7、8月整月短期留存直接比较。",
             "Dn Day按第N个自然日解释；未成熟窗口为N/A。",
         ],
         "failures": failures,

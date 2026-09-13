@@ -77,7 +77,7 @@ def render_report(root: Path, end_date: dt.date, articles: list[dict], missing: 
         "",
         "> 本周报只纳入授权只读 API 或授权导出文件；未获得正文的文章不做内容推断。启发性结论需结合 Waje 自有数据二次验证。",
         "",
-        "## 1. 本周摘要",
+        "## 1. 执行摘要",
         "",
         f"- 采集文章：{len(articles)} 篇。",
         f"- 高频指标主题：{', '.join(f'{key}（{value}）' for key, value in metric_counts.most_common(8)) or '暂无可用文章'}。",

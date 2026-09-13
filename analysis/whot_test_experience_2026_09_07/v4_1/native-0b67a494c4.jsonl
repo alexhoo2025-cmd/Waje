@@ -1,0 +1,2 @@
+{"kind": "stopped", "session_id": "native-0b67a494c4", "match_seq": 1, "expected_bet": 1000, "strategy_version": "fast_connectivity_v1", "at": "2026-09-10T06:42:21.113872+00:00", "monotonic_ms": 269116314.286875, "reason": "test_window_not_unique"}
+{"kind": "closed", "session_id": "native-0b67a494c4", "match_seq": 1, "expected_bet": 1000, "strategy_version": "fast_connectivity_v1", "at": "2026-09-10T06:42:21.114139+00:00", "monotonic_ms": 269116314.384875, "submitted_actions": 0}

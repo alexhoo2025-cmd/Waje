@@ -1,0 +1,12 @@
+/* Presentation only: one native table; no changes to rates, ordering or source controls. */
+:root{--dh-low:#eef4fa;--dh-low-ink:#355875;--dh-mid:#fff0d3;--dh-mid-ink:#765010;--dh-high:#ffdfa8;--dh-high-ink:#6a3b08;--dh-top:#f6c174;--dh-top-ink:#542801;--dh-edge:#aa620e;--dh-rebound:#e3f3f6;--dh-rebound-ink:#15576b}
+@media(prefers-color-scheme:dark){:root{--dh-low:#22364a;--dh-low-ink:#d5e7f8;--dh-mid:#443920;--dh-mid-ink:#f7dfa4;--dh-high:#67451f;--dh-high-ink:#ffe0a5;--dh-top:#87501e;--dh-top-ink:#fff0cb;--dh-edge:#ffc86d;--dh-rebound:#1e414d;--dh-rebound-ink:#b8e9f2}}
+:is(#data-analytics-portable-reader-root,#data-analytics-portable-fallback) .waje-decay-heatmap td[data-decay-band]{font-weight:700!important;font-variant-numeric:tabular-nums;white-space:nowrap!important;vertical-align:middle!important}
+:is(#data-analytics-portable-reader-root,#data-analytics-portable-fallback) .waje-decay-heatmap td[data-decay-band="low"]{background:var(--dh-low)!important;color:var(--dh-low-ink)!important}
+:is(#data-analytics-portable-reader-root,#data-analytics-portable-fallback) .waje-decay-heatmap td[data-decay-band="mid"]{background:var(--dh-mid)!important;color:var(--dh-mid-ink)!important}
+:is(#data-analytics-portable-reader-root,#data-analytics-portable-fallback) .waje-decay-heatmap td[data-decay-band="high"]{background:var(--dh-high)!important;color:var(--dh-high-ink)!important}
+:is(#data-analytics-portable-reader-root,#data-analytics-portable-fallback) .waje-decay-heatmap td[data-decay-band="top"]{background:var(--dh-top)!important;color:var(--dh-top-ink)!important}
+:is(#data-analytics-portable-reader-root,#data-analytics-portable-fallback) .waje-decay-heatmap td[data-decay-band="rebound"]{background:var(--dh-rebound)!important;color:var(--dh-rebound-ink)!important}
+:is(#data-analytics-portable-reader-root,#data-analytics-portable-fallback) .waje-decay-heatmap td[data-decay-peak]{box-shadow:inset 0 0 0 2px var(--dh-edge);font-weight:800!important}
+.waje-decay-heatmap td[data-decay-peak]::after{content:"峰值";display:inline-block;margin-left:7px;font-size:11px;font-weight:650;line-height:1.5}
+.waje-decay-heatmap caption{display:table-caption!important;position:static!important;width:auto!important;height:auto!important;clip:auto!important;clip-path:none!important;overflow:visible!important;margin:0!important;caption-side:top;text-align:left;font-size:13px;line-height:1.7;color:var(--wr-muted);padding:10px 14px;background:var(--wr-paper);white-space:normal}

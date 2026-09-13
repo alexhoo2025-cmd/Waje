@@ -1,0 +1,87 @@
+/* Reader-requested warm paper palette, independent of desktop dark appearance. */
+:root, :root[data-theme], [data-theme="dark"], [data-theme="light"] {
+  color-scheme: light !important;
+  --topic-ink:#303b3c!important; --topic-muted:#626f70!important;
+  --topic-blue:#608b88!important; --topic-panel:#edf3f0!important;
+  --topic-line:#d9e1db!important; --topic-header:#e9eeea!important;
+  --topic-warning:#f5eedc!important; --topic-positive:#eaf2ea!important;
+  --codex-bg:#f3f2ec!important; --codex-bg-under:#eeeee7!important;
+  --codex-panel:#fcfbf7!important; --codex-raised:#fcfbf7!important;
+  --codex-control:#e9eeea!important; --codex-control-hover:#e0e8e2!important;
+  --codex-text:#303b3c!important; --codex-text-secondary:#5c696a!important;
+  --codex-text-tertiary:#667474!important; --codex-accent:#416f79!important;
+  --codex-border:#d9e1db!important; --codex-border-light:#e3e7e0!important;
+  --codex-border-heavy:#bfcfc5!important;
+  --ds-bg:#f3f2ec!important; --ds-surface:#fcfbf7!important;
+  --ds-surface-secondary:#eef2ed!important; --ds-surface-tertiary:#e9eeea!important;
+  --ds-text:#303b3c!important; --ds-text-primary:#303b3c!important;
+  --ds-text-secondary:#5c696a!important; --ds-text-muted:#5c696a!important;
+  --ds-text-tertiary:#667474!important; --ds-table-row-text:#3b494a!important;
+  --ds-border-subtle:#e1e6de!important; --ds-border:#d9e1db!important;
+  --ds-border-strong:#bfcfc5!important;
+  --ds-blue:#527e93!important; --ds-blue-bright:#416f79!important;
+  --ds-green:#487160!important; --ds-green-bg:#eaf2ea!important;
+  --ds-red:#885c49!important; --ds-red-bg:#f4e9df!important;
+  --ds-yellow:#79632f!important; --ds-yellow-bg:#f5eedc!important;
+  --ds-overlay-bg:#fcfbf7!important; --ds-menu-bg:#fcfbf7!important;
+  --ds-menu-text:#303b3c!important; --ds-menu-hover-bg:#edf3ef!important;
+  --ds-menu-selected-bg:#e4eeea!important; --ds-menu-border:#d9e1db!important;
+  --ds-chart-series-blue:#7195a3!important; --ds-chart-series-orange:#769889!important;
+  --ds-chart-series-green:#b59b69!important; --ds-chart-series-purple:#9893ac!important;
+  --ds-chart-text:#344344!important; --ds-chart-text-muted:#5c6b6d!important;
+  --ds-chart-grid:#e0e6df!important; --ds-chart-axis:#c5d0c7!important;
+  --ds-chart-tooltip-bg:#fcfbf7!important; --ds-chart-tooltip-border:#c5d0c7!important;
+  --ds-chart-hover-bg:#eaf0e9!important;
+  --portable-canvas:#f3f2ec!important; --portable-surface:#fcfbf7!important;
+  --portable-surface-subtle:#eef2ed!important; --portable-ink:#303b3c!important;
+  --portable-muted:#5c696a!important; --portable-tertiary:#667474!important;
+  --portable-table-text:#3b494a!important; --portable-border:#d9e1db!important;
+  --portable-accent:#416f79!important; --portable-warning-bg:#f5eedc!important;
+  --portable-warning-border:#d9c99e!important;
+}
+html,body,#data-analytics-portable-reader,#data-analytics-portable-reader-root {
+  background:#f3f2ec!important;color:#303b3c!important;
+}
+#data-analytics-portable-reader .report-shell {
+  background:#fcfbf7!important;max-width:1080px;padding:24px 52px 80px;
+  border-inline:1px solid #e2e5dc;
+}
+#data-analytics-portable-reader .analytics-top-bar {
+  background:transparent!important;color:#626f70!important;border-color:#e0e5dd!important;
+}
+#data-analytics-portable-reader .report-block-body,
+#data-analytics-portable-reader .rich-markdown,
+#data-analytics-portable-reader .rich-markdown p,
+#data-analytics-portable-reader .rich-markdown li {color:#303b3c!important;line-height:1.95!important;}
+#data-analytics-portable-reader .report-block-body h1 {font-size:30px;line-height:1.5;letter-spacing:.01em;}
+#data-analytics-portable-reader .report-block-body h2 {
+  font-size:23px;border-left:3px solid #75978c;padding-left:14px;color:#304d50!important;
+}
+#data-analytics-portable-reader .report-block-body h3 {color:#466462!important;font-size:19px;line-height:1.65;}
+#data-analytics-portable-reader .rich-markdown strong {color:#27484c!important;font-weight:650;}
+#data-analytics-portable-reader #summary {background:#edf3ef!important;border-color:#d3e0d6!important;padding:28px 30px;border-radius:12px;}
+#data-analytics-portable-reader #summary p {margin:14px 0 22px;}
+#data-analytics-portable-reader #summary p:last-child {margin-bottom:2px;}
+#data-analytics-portable-reader .chart-panel,
+#data-analytics-portable-reader .table-panel {background:#f8faf5!important;border:1px solid #dbe3d9!important;border-radius:10px;box-shadow:none!important;}
+#data-analytics-portable-reader .chart-panel {padding:22px 24px!important;}
+#data-analytics-portable-reader .panel-header h2,
+#data-analytics-portable-reader .panel-header h3 {color:#37585e!important;}
+#data-analytics-portable-reader .table-panel th {background:#e9eeea!important;color:#354d4b!important;font-weight:650;font-size:14px;padding:13px 14px!important;}
+#data-analytics-portable-reader .table-panel td {color:#3b494a!important;background:#fcfbf7!important;border-color:#e1e6de!important;padding:12px 14px!important;font-size:14px;}
+#data-analytics-portable-reader .table-panel tbody tr:nth-child(even) td {background:#f1f4ee!important;}
+#data-analytics-portable-reader .table-panel tbody tr:hover td {background:#e8efea!important;}
+#data-analytics-portable-reader a {color:#376d7a!important;}
+#data-analytics-portable-reader button {color:#4e6866;}
+#data-analytics-portable-reader :focus-visible {outline:2px solid #547f8c!important;outline-offset:3px;}
+::selection {background:#d6e6dc;color:#243d3c;}
+.portable-static-chart-light {display:block!important;}
+.portable-static-chart-dark {display:none!important;}
+@media(max-width:700px) {
+  #data-analytics-portable-reader .report-shell {padding:18px 16px 48px;border:0;}
+  #data-analytics-portable-reader #summary {padding:20px 18px;}
+  #data-analytics-portable-reader .report-block-body h1 {font-size:24px;}
+  #data-analytics-portable-reader .report-block-body h2 {font-size:20px;}
+  #data-analytics-portable-reader .chart-panel {padding:18px 10px!important;}
+}
+@media print {html,body {background:#fff!important;} #data-analytics-portable-reader .report-shell {border:0;}}

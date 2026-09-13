@@ -26,6 +26,13 @@ from typing import Any, Iterable
 from lark_common import project_root, redact_error, redact_text, sha256_text, write_json
 
 
+def emit_execution_graph(root: Path, **kwargs: Any) -> dict[str, Any]:
+    sys.path.insert(0, str(root / "tools"))
+    from execution_graph_hook import emit
+
+    return emit(root, **kwargs)
+
+
 TITLE_RE = re.compile(r"<title>(.*?)</title>", re.IGNORECASE | re.DOTALL)
 DOCX_URL_RE = re.compile(r"https?://[^\s)<>]+/docx/[A-Za-z0-9]+(?:\?[^\s)<>]*)?", re.IGNORECASE)
 DATE_CN_RE = re.compile(r"(20\d{2})年(\d{1,2})月(\d{1,2})日")
@@ -653,7 +660,25 @@ def main() -> int:
     root = project_root()
     config = load_config(root)
     run_date = dt.date.fromisoformat(args.date)
+    execution_run_id = dt.datetime.now().astimezone().strftime("%Y%m%dT%H%M%S%z")
+    emit_execution_graph(
+        root,
+        job_id="meeting_minutes_weekday",
+        run_id=execution_run_id,
+        phase="started",
+        status="started",
+    )
     code, log = run_pipeline(root, run_date, config)
+    receipt = f"data/outputs/meeting_minutes/{args.date}/run-log.json"
+    emit_execution_graph(
+        root,
+        job_id="meeting_minutes_weekday",
+        run_id=execution_run_id,
+        phase="finished",
+        status=str(log.get("status", "unknown")),
+        receipts=[receipt],
+        artifacts=[str(item) for item in log.get("reports_written", []) if isinstance(item, str)],
+    )
     print(
         f"lark meeting minutes: status={log.get('status')}; selected={log.get('selected_count', 0)}; "
         f"reports={len(log.get('reports_written', []))}; outbound_actions=0; "

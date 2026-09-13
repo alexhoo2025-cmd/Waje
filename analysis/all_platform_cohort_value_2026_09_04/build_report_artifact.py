@@ -797,14 +797,23 @@ def main() -> int:
             revised_blocks.append({"id": caption_id, "type": "markdown", "body": body, "sourceId": source_id})
     manifest["blocks"] = revised_blocks
     finalize_topic(manifest, snapshot, lifecycle)
+    from expand_platforms import expand_platforms
+    expand_platforms(manifest, snapshot, summary)
+    from long_retention import add_long_retention
+    platform_daily = json.loads((ROOT / 'analysis/all_platform_cohort_value_2026_09_04/results/04_platform_daily_retention.json').read_text())['aggregate_rows']
+    add_long_retention(manifest, snapshot, platform_daily)
+    from payer_focus import payer_focus
+    payer_focus(manifest, snapshot)
     artifact = {"surface": "report", "manifest": manifest, "snapshot": snapshot}
     ARTIFACT_PATH.write_text(json.dumps(artifact, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
     chart_map = [
         {"section": "H5 留存", "chart": "h5-retention-reference", "type": "line", "fields": "第2—14日 × 注册月 × 留存率", "takeaway": "严格 H5 自然 cohort 的 7—8 月留存稳定。", "palette": "渐进蓝色月度对照"},
         {"section": "H5 LTV", "chart": "h5-ltv-reference", "type": "line", "fields": "第1—14日 × 注册月 × 累计LTV", "takeaway": "8 月价值曲线低于 7 月。", "palette": "渐进蓝色月度对照"},
-        {"section": "支付覆盖", "chart": "h5-payment-reference", "type": "grouped bar", "fields": "第1/7/14日 × 注册月 × 成功支付率", "takeaway": "8 月支付覆盖低于 7 月。", "palette": "渐进蓝色月度对照"},
+        {"section": "付费率", "chart": "h5-payment-reference", "type": "grouped bar", "fields": "第1/7/14日 × 注册月 × 付费率", "takeaway": "8 月付费率低于 7 月。", "palette": "渐进蓝色月度对照"},
     ]
+    if any(s['id'] == 'paid-cohorts' for s in manifest['sources']):
+        chart_map = json.loads((ANALYSIS / 'payer_chart_map.json').read_text(encoding='utf-8'))
     CHART_MAP_PATH.write_text(json.dumps(chart_map, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
     knowledge = f"""# Waje 全平台用户生命周期与付费价值分析｜H5 自然新增重点（截至 2026-09-04）

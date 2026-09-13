@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "report_job_ids": [
+    "weekly_collect",
+    "weekly_report",
+    "google_play_reviews_daily",
+    "google_play_reviews_weekly",
+    "weekly_intelligence_html",
+    "meeting_minutes_weekday",
+    "waje_config_weekly"
+  ],
+  "manual_workflows": [
+    "waje-lifecycle-joint-weekly",
+    "waje-origin-new-user-analysis-update"
+  ],
+  "ad_hoc_inclusion": {
+    "root": "analysis",
+    "required_markers": [
+      "artifact.json",
+      "receipt.json",
+      "run-log.json",
+      "run_receipt.json",
+      "delivery-receipt.json",
+      "last-approved-version.json"
+    ]
+  },
+  "declared_schedules": [
+    {
+      "automation_id": "robin-2",
+      "expected_rrule": "FREQ=WEEKLY;BYDAY=FR;BYHOUR=17;BYMINUTE=0",
+      "source": "knowledge/05-运行/Agent协作周审计与自动优化SOP.md"
+    }
+  ]
+}

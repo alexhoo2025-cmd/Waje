@@ -1,0 +1,18 @@
+import fs from 'node:fs';
+import assert from 'node:assert/strict';
+import {execFileSync} from 'node:child_process';
+const base='analysis/tada_pp_app_h5_actual_2026_09_08/',dir=base+'revisions/2026-09-09-age-provider-colors/';fs.mkdirSync(dir,{recursive:true});
+const call=args=>{const r=JSON.parse(execFileSync('/Users/robin/.local/node/bin/lark-cli',['docs',...args,'--doc','MUmUdKO7ko3hKIxY822lBXJQggg','--as','user','--format','json'],{encoding:'utf8',timeout:45000,maxBuffer:8e6}));assert(r.ok);return r.data;};
+const fetch=()=>call(['+fetch','--detail','full']).document;
+const before=fetch();fs.writeFileSync(dir+'lark.before.json',JSON.stringify(before,null,2));
+const match=s=>s.includes('占两厂商')&&s.includes('30天内新用户')&&s.includes('下注渗透率');
+const targets=[...before.content.matchAll(/<table\b[^>]*id="([^"]+)"[^>]*>[\s\S]*?<\/table>/g)].filter(m=>match(m[0]));assert.equal(targets.length,1);
+const original=targets[0][0];let patched=original.replace(/\s+id="[^"]+"/g,'');
+patched=patched.replace(/<tbody>[\s\S]*?<\/tbody>/,body=>body.replace(/<tr>[\s\S]*?<\/tr>/g,row=>{const ageColor=row.includes('新用户')?'light-blue':'light-purple',providerColor=row.includes('Tada')?'light-blue':'light-orange';let col=0;return row.replace(/<td\b([^>]*)>([\s\S]*?)<\/td>/g,(_,attrs,content)=>{const index=col++;const color=index===0?providerColor:ageColor;let inner=content;if([2,4,5].includes(index))inner=inner.replace(/<p([^>]*)>([\s\S]*?)<\/p>/g,(_,a,t)=>'<p'+a+'><b>'+t.replace(/<\/?b>/g,'')+'</b></p>');return '<td'+attrs.replace(/\s+background-color="[^"]*"/g,'')+' background-color="'+color+'">'+inner+'</td>';});}));
+const result=call(['+update','--command','block_replace','--block-id',targets[0][1],'--revision-id',String(before.revision_id),'--content',patched]);assert.equal(result.result,'success');assert.equal((result.warnings||[]).length,0);
+const after=fetch();fs.writeFileSync(dir+'lark.after.json',JSON.stringify(after,null,2));const targetAfter=[...after.content.matchAll(/<table\b[^>]*>[\s\S]*?<\/table>/g)].find(m=>match(m[0]))[0];assert.equal(targetAfter.replace(/<[^>]*>/g,''),original.replace(/<[^>]*>/g,''));
+const rowXML=targetAfter.match(/<tbody>([\s\S]*?)<\/tbody>/)[1],rowColors=[...rowXML.matchAll(/<tr>[\s\S]*?<\/tr>/g)].map(m=>[...m[0].matchAll(/background-color="([^"]+)"/g)].map(v=>v[1]));assert.equal(rowColors.length,8);assert.notEqual(rowColors[0][0],rowColors[1][0]);assert.notEqual(rowColors[0][1],rowColors[2][1]);assert((rowXML.match(/<b>/g)||[]).length>=24);
+fs.writeFileSync(dir+'lark-receipt.json',JSON.stringify({status:'full_readback_verified',revision:after.revision_id,rowColors,cell_text_unchanged:true,highlighted_columns:['下注额（亿）','占两厂商','下注渗透率']},null,2));
+const a=JSON.parse(fs.readFileSync(base+'artifact.json')),t=a.manifest.tables.find(t=>t.id==='age-overview'),rows=a.snapshot.datasets[t.dataset];
+const body='### '+t.title+'\n\n数据区：新用户浅蓝、老用户浅紫；组合列：Tada浅蓝、PP浅橙。下注额、份额和渗透率加粗突出；颜色只区分类别，不表示表现好坏。固定分组顺序。\n\n'+t.subtitle+'\n\n| '+t.columns.map(c=>c.label).join(' | ')+' |\n| '+t.columns.map(()=> '---').join(' | ')+' |\n'+rows.map(r=>'| '+t.columns.map((c,i)=>[2,4,5].includes(i)?'**'+r[c.field]+'**':r[c.field]).join(' | ')+' |').join('\n');
+fs.writeFileSync(dir+'body.json',JSON.stringify(body));console.log(JSON.stringify({status:'full_readback_verified',revision:after.revision_id}));

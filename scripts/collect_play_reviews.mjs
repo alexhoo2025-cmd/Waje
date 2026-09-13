@@ -76,17 +76,71 @@ async function loadSeenIndex() {
 }
 
 async function selectNewest(page) {
-  if (await page.getByRole("button", { name: "Newest", exact: true }).count() === 1) return;
-  const relevant = page.getByRole("button", { name: "Most relevant", exact: true });
-  if (await relevant.count() !== 1) throw new Error("Sort control not found");
-  await relevant.click();
-  const visibleMenu = page.locator('[role="menu"]:visible');
-  await visibleMenu.waitFor({ state: "visible", timeout: 5000 });
-  if (await visibleMenu.count() !== 1) throw new Error("Sort menu not visible");
-  const newest = visibleMenu.getByRole("menuitemradio", { name: "Newest", exact: true });
-  if (await newest.count() !== 1) throw new Error("Newest sort option not found");
-  await newest.click();
-  await page.waitForTimeout(500);
+  const alreadyNewest = page.getByRole("button", { name: "Newest", exact: true });
+  if (await alreadyNewest.count() === 1) return;
+  const openSortMenu = async () => {
+    const relevant = page.getByRole("button", { name: "Most relevant", exact: true });
+    if (await relevant.count() === 1) {
+      await relevant.click();
+      return;
+    }
+    const legacy = page.locator("[role='button'][aria-haspopup='menu']:visible");
+    if (await legacy.count() >= 1) {
+      await legacy.first().click();
+      return;
+    }
+    throw new Error("Sort control not found");
+  };
+  const clickStable = async (locator, label) => {
+    const timeoutMs = 4000;
+    for (let attempt = 0; attempt < 3; attempt += 1) {
+      try {
+        await locator.click({ timeout: timeoutMs });
+        return true;
+      } catch (error) {
+        if (attempt === 2) {
+          throw new Error(`${label} click failed after retries: ${error?.message || error}`);
+        }
+        await page.waitForTimeout(300 + attempt * 200);
+      }
+    }
+    return false;
+  };
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    if (attempt > 0) {
+      await page.waitForTimeout(250 * attempt);
+    }
+    await openSortMenu();
+    const visibleMenu = page.locator('[role="menu"]:visible');
+    try {
+      await visibleMenu.waitFor({ state: "visible", timeout: 5000 });
+    } catch (_error) {
+      await page.keyboard.press("Escape").catch(() => {});
+      continue;
+    }
+    if (await visibleMenu.count() !== 1) {
+      await page.keyboard.press("Escape").catch(() => {});
+      continue;
+    }
+    const newest = [
+      visibleMenu.getByRole("menuitemradio", { name: "Newest", exact: true }),
+      visibleMenu.getByRole("menuitem", { name: "Newest", exact: true }),
+      visibleMenu.getByText("Newest", { exact: true }),
+    ];
+    let clicked = false;
+    for (const candidate of newest) {
+      if (await candidate.count() >= 1) {
+        clicked = await clickStable(candidate.first(), "Newest sort option");
+        if (clicked) break;
+      }
+    }
+    if (clicked) {
+      await page.waitForTimeout(500);
+      return;
+    }
+    await page.keyboard.press("Escape").catch(() => {});
+  }
+  throw new Error("Newest sort option not found or unstable");
 }
 
 async function selectPhone(page) {

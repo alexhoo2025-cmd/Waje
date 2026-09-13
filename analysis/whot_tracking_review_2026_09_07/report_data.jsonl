@@ -1,0 +1,80 @@
+{"dataset": "status", "p0_new_events": 8, "p1_new_events": 3, "reuse_or_extend_events": 8, "primary_metrics": 3, "open_decisions": 10, "first_load_mb": 1.5, "full_flow_mb": 2.5}
+{"dataset": "event_stage_counts", "stage": "入口与准备", "event_count": 4, "order": 1, "scope": "MC + H5 LOAD/READY/BET_READY"}
+{"dataset": "event_stage_counts", "stage": "匹配", "event_count": 6, "order": 2, "scope": "REQUEST/STATE/OFFER/RESPONSE/CANCEL/END"}
+{"dataset": "event_stage_counts", "stage": "开局", "event_count": 1, "order": 3, "scope": "GAMESTART"}
+{"dataset": "event_stage_counts", "stage": "玩法与恢复", "event_count": 5, "order": 4, "scope": "ACTION/LAST_CARD/TIE_BREAK/RECONNECT/TRACKER"}
+{"dataset": "event_stage_counts", "stage": "结束与资金", "event_count": 3, "order": 5, "scope": "GAMEEND/BETREWARD/ASSET"}
+{"dataset": "old_new", "area": "人数意图", "legacy": "系统决定 4/3/2 人", "new": "用户选择 2 或 4 人", "measurement": "requested_match_mode 必须独立记录"}
+{"dataset": "old_new", "area": "低峰开局", "legacy": "系统按阈值降到当前人数或机器人", "new": "N1/N2 建议并按真人共同同意降级", "measurement": "offer、响应集合、实际人数"}
+{"dataset": "old_new", "area": "付费分池", "legacy": "当前资料没有可比口径", "new": "付费只配付费，非付费只配非付费", "measurement": "payer_pool 分层"}
+{"dataset": "old_new", "area": "取消", "legacy": "客户端可退出匹配", "new": "取消与建桌按服务端先后裁决", "measurement": "取消请求和取消结果分开"}
+{"dataset": "old_new", "area": "Last Card", "legacy": "没有该规则", "new": "宣告、抓罚、罚抽 2、失效后重宣告", "measurement": "独立状态机"}
+{"dataset": "old_new", "area": "牌堆耗尽", "legacy": "记录耗尽与积分", "new": "最低分唯一或多轮同分决胜", "measurement": "决胜阶段和轮次"}
+{"dataset": "old_new", "area": "记牌器", "legacy": "已有功能", "new": "当局购买，下一局生效", "measurement": "购买局与生效局关联"}
+{"dataset": "old_new", "area": "H5体验", "legacy": "横版", "new": "竖版轻量化、弱网与低端机", "measurement": "资源字节与 LOAD→BET_READY"}
+{"dataset": "p0_events", "event": "WHOT_MATCH_REQUEST", "trigger": "服务端受理真人匹配请求", "business_use": "匹配率主分母", "minimum_keys": "match_attempt_id, requested_match_mode"}
+{"dataset": "p0_events", "event": "WHOT_MATCH_STATE", "trigger": "队列人员或状态发生变化", "business_use": "还原人数变化和重新判断", "minimum_keys": "match_attempt_id, queue_epoch, state"}
+{"dataset": "p0_events", "event": "WHOT_MATCH_OFFER", "trigger": "生成 N1/N2/尝试双人建议", "business_use": "建议曝光和低峰依赖", "minimum_keys": "offer_id, offer_stage, target_count"}
+{"dataset": "p0_events", "event": "WHOT_MATCH_RESPONSE", "trigger": "服务端确认同意/拒绝/等待/无响应", "business_use": "建议同意率和降级路径", "minimum_keys": "offer_id, response, result"}
+{"dataset": "p0_events", "event": "WHOT_MATCH_CANCEL_RESULT", "trigger": "取消请求获得服务端结果", "business_use": "取消与建桌竞争", "minimum_keys": "client_action_id, cancel_result"}
+{"dataset": "p0_events", "event": "WHOT_MATCH_END", "trigger": "一次 attempt 达到唯一终态", "business_use": "开局/取消/超时/失败", "minimum_keys": "match_attempt_id, terminal_reason"}
+{"dataset": "p0_events", "event": "WHOT_LAST_CARD", "trigger": "宣告和抓罚状态改变", "business_use": "宣告、抓罚和罚抽质量", "minimum_keys": "game_round_id, state, actor_type"}
+{"dataset": "p0_events", "event": "WHOT_TIE_BREAK", "trigger": "牌堆耗尽和决胜阶段改变", "business_use": "同分决胜完整性", "minimum_keys": "tie_break_id, round_no, state"}
+{"dataset": "other_events", "priority": "复用", "event": "MC", "use": "入口、2/4 人选择、房间、Quick Match、Rules"}
+{"dataset": "other_events", "priority": "复用设计", "event": "H5_GAME_LOAD", "use": "加载阶段、资源字节、缓存与错误"}
+{"dataset": "other_events", "priority": "复用设计", "event": "H5_GAME_READY", "use": "真实画面和配置 ready"}
+{"dataset": "other_events", "priority": "复用设计", "event": "H5_BET_READY", "use": "余额、币种、限额、连接和控件 ready"}
+{"dataset": "other_events", "priority": "扩展", "event": "GAMESTART", "use": "关联 match_attempt_id、实际人数和席位组成"}
+{"dataset": "other_events", "priority": "P1新增", "event": "WHOT_ACTION", "use": "服务端接受的出牌/摸牌/选图案/恢复动作"}
+{"dataset": "other_events", "priority": "P1新增", "event": "WHOT_RECONNECT_RESULT", "use": "快照恢复、耗时和重复动作抑制"}
+{"dataset": "other_events", "priority": "P1新增", "event": "WHOT_TRACKER_RESULT", "use": "购买局、计划生效局和实际生效局"}
+{"dataset": "other_events", "priority": "扩展", "event": "GAMEEND", "use": "唯一局终态、结束原因、点数和人机组成"}
+{"dataset": "other_events", "priority": "复用", "event": "BETREWARD", "use": "最终结算、币种和金额方向"}
+{"dataset": "other_events", "priority": "复用", "event": "ASSET", "use": "账本幂等和余额对账"}
+{"dataset": "key_contract", "key": "root_match_id", "job": "串联 Quick Match/Play Again 的匹配旅程", "rule": "一次明确发起产生；重试不换根键"}
+{"dataset": "key_contract", "key": "match_attempt_id", "job": "一次服务端受理的排队尝试", "rule": "主分析单位；重新入队新建"}
+{"dataset": "key_contract", "key": "queue_epoch", "job": "人员稳定的一段队列", "rule": "加入/离开/取消/断线重算时递增"}
+{"dataset": "key_contract", "key": "offer_id / offer_stage", "job": "一次降级建议", "rule": "N1/N2 独立，不继承响应"}
+{"dataset": "key_contract", "key": "client_action_id", "job": "客户端动作幂等", "rule": "取消、同意、宣告和抓罚使用"}
+{"dataset": "key_contract", "key": "game_round_id", "job": "实际牌局", "rule": "GAMESTART 到 ASSET 全链一致"}
+{"dataset": "key_contract", "key": "server_seq", "job": "状态顺序", "rule": "同一匹配/牌局单调递增"}
+{"dataset": "key_contract", "key": "event_uid / event_version", "job": "事件幂等和 schema", "rule": "同一事实重试复用 UID"}
+{"dataset": "core_metrics", "metric": "4 人原模式兑现率", "numerator": "请求 4 人并实际开 4 人的 attempts", "denominator": "成熟的服务端受理 4 人 attempts", "decision": "用户是否得到所选模式"}
+{"dataset": "core_metrics", "metric": "任意人数开局率", "numerator": "实际开 2/3/4 人的 attempts", "denominator": "全部成熟受理 attempts", "decision": "最终是否玩上"}
+{"dataset": "core_metrics", "metric": "降级挽回率", "numerator": "接受建议并实际开 2/3 人的 attempts", "denominator": "收到建议的成熟 attempts", "decision": "建议是否挽回开局"}
+{"dataset": "core_metrics", "metric": "超时率", "numerator": "terminal=timeout attempts", "denominator": "全部成熟受理 attempts", "decision": "匹配失败规模"}
+{"dataset": "core_metrics", "metric": "取消成功率", "numerator": "cancel_result=cancelled", "denominator": "有取消请求 attempts", "decision": "取消体验"}
+{"dataset": "core_metrics", "metric": "取消竞争失败率", "numerator": "建桌先完成、取消未生效", "denominator": "有取消请求 attempts", "decision": "被拉回牌局的风险"}
+{"dataset": "core_metrics", "metric": "匹配等待时长", "numerator": "match end - server accepted", "denominator": "P50/P90/P95", "decision": "真实等待体验"}
+{"dataset": "core_metrics", "metric": "机器人辅助开局率", "numerator": "开局且 robot_count>0", "denominator": "全部成熟受理 attempts", "decision": "系统对手依赖"}
+{"dataset": "comparison_rules", "rule": "同分析单位", "requirement": "使用服务端受理 match_attempt_id", "failure_if_missing": "旧版匹配率 blocked"}
+{"dataset": "comparison_rules", "rule": "同构成", "requirement": "固定付费池、房间、小时、端、包和版本权重", "failure_if_missing": "用户结构差异冒充版本效果"}
+{"dataset": "comparison_rules", "rule": "共享池干扰", "requirement": "按房间×时间块或分阶段放量", "failure_if_missing": "新旧版本互相改变真人供给"}
+{"dataset": "comparison_rules", "rule": "同时间读法", "requirement": "展示 P50/P90/P95 和共同 5/10/15 秒开局率", "failure_if_missing": "15 秒和 45 秒配置不可比"}
+{"dataset": "comparison_rules", "rule": "同终态", "requirement": "取消、超时、风险无桌、建桌失败、未知分别保留", "failure_if_missing": "空结果被混成失败或成功"}
+{"dataset": "gameplay", "topic": "Last Card", "measure": "pending、宣告、漏宣告、抓罚机会/成功、罚抽、失效", "guardrail": "多对手并发只允许一次成功"}
+{"dataset": "gameplay", "topic": "机器人公平性", "measure": "机器人宣告/抓罚率、真人被机器人抓罚率", "guardrail": "按 bot policy version 汇总"}
+{"dataset": "gameplay", "topic": "牌堆耗尽", "measure": "耗尽率、最低分唯一率、同分率", "guardrail": "结束原因由服务端确认"}
+{"dataset": "gameplay", "topic": "同分决胜", "measure": "决胜率、轮次分布、重复同分、恢复失败", "guardrail": "每轮 tie_break_id + round_no"}
+{"dataset": "gameplay", "topic": "托管", "measure": "进入/结束/恢复率、胜率、托管动作数", "guardrail": "事件级汇总替代日总数"}
+{"dataset": "gameplay", "topic": "重连", "measure": "成功率、恢复耗时P95、状态完整率、重复抑制", "guardrail": "以后端快照为准"}
+{"dataset": "gameplay", "topic": "记牌器", "measure": "购买成功、购买局→生效局、打开率", "guardrail": "定义下一局"}
+{"dataset": "gameplay", "topic": "H5轻量化", "measure": "首局/全流程字节、LOAD→BET_READY、弱网失败", "guardrail": "1.5MB / 2.5MB 产品门槛"}
+{"dataset": "gameplay", "topic": "局与资金", "measure": "完局、时长、实际人数、RTP、平台盈利", "guardrail": "GAMESTART→ASSET 对账"}
+{"dataset": "implementation", "priority": "P0-1", "action": "确认游戏映射、匹配状态机、终态枚举和结算公式", "owner": "策划+服务端+数据", "evidence": "签字版字段与状态机"}
+{"dataset": "implementation", "priority": "P0-2", "action": "实现 MATCH REQUEST/STATE/OFFER/RESPONSE/CANCEL/END", "owner": "服务端", "evidence": "确定性用例和入库样本"}
+{"dataset": "implementation", "priority": "P0-3", "action": "扩展 GAMESTART/GAMEEND 并打通 BETREWARD/ASSET", "owner": "服务端+数据", "evidence": "局和资金对账"}
+{"dataset": "implementation", "priority": "P0-4", "action": "实现 Last Card/Tie Break 状态事件", "owner": "服务端+客户端", "evidence": "并发抓罚、决胜和重连用例"}
+{"dataset": "implementation", "priority": "P1-1", "action": "接入 H5 LOAD/READY/BET_READY 和资源性能", "owner": "H5+数据", "evidence": "弱网/低端机报告"}
+{"dataset": "implementation", "priority": "P1-2", "action": "接入托管、重连和记牌器事件", "owner": "游戏端+服务端", "evidence": "状态恢复与权益用例"}
+{"dataset": "implementation", "priority": "上线前", "action": "回放、双端同服对账、查询预演和灰度", "owner": "测试+数据+策划", "evidence": "质量门槛全部通过"}
+{"dataset": "open_questions", "id": 1, "question": "H5 9006、APP/服务端 6001 与 play_id 的正式映射是什么？", "blocks": "跨端和新旧归因"}
+{"dataset": "open_questions", "id": 2, "question": "4 人队列已有 2/3 名真人时是否允许机器人补位？", "blocks": "4人模式兑现与超时"}
+{"dataset": "open_questions", "id": 3, "question": "队列只有本人时，跨 2 人真人与机器人候选谁优先？", "blocks": "机器人辅助率"}
+{"dataset": "open_questions", "id": 4, "question": "payer_pool 在哪个时点判定，机器人如何进入分池？", "blocks": "付费/非付费匹配"}
+{"dataset": "open_questions", "id": 5, "question": "X0/X1/X2、N1/N2、Y 的配置版本怎样记录？", "blocks": "等待和建议分析"}
+{"dataset": "open_questions", "id": 6, "question": "Last Card 的 3 秒与按对手回合机会采用哪套状态机？", "blocks": "宣告/抓罚指标"}
+{"dataset": "open_questions", "id": 7, "question": "记牌器购买后的“下一局”如何跨换房和断线定义？", "blocks": "权益生效"}
+{"dataset": "open_questions", "id": 8, "question": "赢家金额按玩家人数还是对手人数计算？", "blocks": "结算/RTP/资产"}
+{"dataset": "open_questions", "id": 9, "question": "机器人策略哪些字段进入受控审计，策略版本如何标识？", "blocks": "公平性和RTP"}
+{"dataset": "open_questions", "id": 10, "question": "旧版是否存在可重建的 request/terminal 服务端日志？", "blocks": "新旧匹配率比较"}

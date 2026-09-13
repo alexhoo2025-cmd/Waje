@@ -1,0 +1,30 @@
+:root{--sp-new:#eaf3ff;--sp-old:#f2edfa;--sp-tada:#eaf3ff;--sp-pp:#fff1e5;--sp-neutral:#f5f6f8;--sp-peak:#fff1bd;}
+@media(prefers-color-scheme:dark){:root{--sp-new:#20384f;--sp-old:#382d4b;--sp-tada:#20384f;--sp-pp:#473323;--sp-neutral:#26313d;--sp-peak:#51451f;}}
+.chart-bar-value-label{font-size:10px!important;}
+:is(#macro-all,[data-artifact-block-id="macro-all"]) tbody tr:nth-child(1) td {background:var(--sp-tada)!important;}
+:is(#macro-all,[data-artifact-block-id="macro-all"]) tbody tr:nth-child(2) td {background:var(--sp-pp)!important;}
+:is(#macro-all,[data-artifact-block-id="macro-all"]) tbody tr:nth-child(3) td {background:var(--sp-tada)!important;}
+:is(#macro-all,[data-artifact-block-id="macro-all"]) tbody tr:nth-child(4) td {background:var(--sp-pp)!important;}
+:is(#macro-all,[data-artifact-block-id="macro-all"]) tbody td:has(strong) {background:var(--sp-peak)!important;}
+:is(#table-new_30d,[data-artifact-block-id="table-new_30d"]) tbody tr:nth-child(1) td {background:var(--sp-tada)!important;}
+:is(#table-new_30d,[data-artifact-block-id="table-new_30d"]) tbody tr:nth-child(2) td {background:var(--sp-pp)!important;}
+:is(#table-new_30d,[data-artifact-block-id="table-new_30d"]) tbody tr:nth-child(3) td {background:var(--sp-tada)!important;}
+:is(#table-new_30d,[data-artifact-block-id="table-new_30d"]) tbody tr:nth-child(4) td {background:var(--sp-pp)!important;}
+:is(#table-new_30d,[data-artifact-block-id="table-new_30d"]) tbody td:has(strong) {background:var(--sp-peak)!important;}
+:is(#table-new_30d,[data-artifact-block-id="table-new_30d"]) tbody td:nth-child(n+2) {background:var(--sp-new)!important;}
+:is(#table-old_over_30d,[data-artifact-block-id="table-old_over_30d"]) tbody tr:nth-child(1) td {background:var(--sp-tada)!important;}
+:is(#table-old_over_30d,[data-artifact-block-id="table-old_over_30d"]) tbody tr:nth-child(2) td {background:var(--sp-pp)!important;}
+:is(#table-old_over_30d,[data-artifact-block-id="table-old_over_30d"]) tbody tr:nth-child(3) td {background:var(--sp-tada)!important;}
+:is(#table-old_over_30d,[data-artifact-block-id="table-old_over_30d"]) tbody tr:nth-child(4) td {background:var(--sp-pp)!important;}
+:is(#table-old_over_30d,[data-artifact-block-id="table-old_over_30d"]) tbody td:has(strong) {background:var(--sp-peak)!important;}
+:is(#table-old_over_30d,[data-artifact-block-id="table-old_over_30d"]) tbody td:nth-child(n+2) {background:var(--sp-old)!important;}
+:is(#ret-exact,[data-artifact-block-id="ret-exact"]) tbody tr:nth-child(1) td {background:var(--sp-new)!important;}
+:is(#ret-exact,[data-artifact-block-id="ret-exact"]) tbody tr:nth-child(2) td {background:var(--sp-new)!important;}
+:is(#ret-exact,[data-artifact-block-id="ret-exact"]) tbody tr:nth-child(3) td {background:var(--sp-new)!important;}
+:is(#ret-exact,[data-artifact-block-id="ret-exact"]) tbody tr:nth-child(4) td {background:var(--sp-new)!important;}
+:is(#ret-exact,[data-artifact-block-id="ret-exact"]) tbody tr:nth-child(5) td {background:var(--sp-old)!important;}
+:is(#ret-exact,[data-artifact-block-id="ret-exact"]) tbody tr:nth-child(6) td {background:var(--sp-old)!important;}
+:is(#ret-exact,[data-artifact-block-id="ret-exact"]) tbody tr:nth-child(7) td {background:var(--sp-old)!important;}
+:is(#ret-exact,[data-artifact-block-id="ret-exact"]) tbody tr:nth-child(8) td {background:var(--sp-old)!important;}
+:is(#ret-exact,[data-artifact-block-id="ret-exact"]) tbody td:has(strong) {background:var(--sp-peak)!important;}
+:is(#lark-summary,[data-artifact-block-id="lark-summary"]){background:#f0f4ff;border:1px solid #82a7fc;border-radius:12px;padding:24px!important;}

@@ -12,7 +12,7 @@ from tools import claude_pipeline as cp
 
 
 def task(**overrides):
-    t = {"goal": "summarize fixture", "role": "analyst", "parent_complexity": "complex", "delegation_reason": "独立核验复杂任务的一项结论", "window": "synthetic", "acceptance": ["引用原文"], "evidence": [{"id": "e1", "text": "这是完整的模拟证据，不代表生产数据。"}]}
+    t = {"goal": "summarize fixture", "role": "analyst", "origin": "interactive", "parent_complexity": "complex", "delegation_reason": "独立核验复杂任务的一项结论", "window": "synthetic", "acceptance": ["引用原文"], "evidence": [{"id": "e1", "text": "这是完整的模拟证据，不代表生产数据。"}]}
     t.update(overrides)
     return t
 
@@ -65,8 +65,9 @@ class BridgeTests(unittest.TestCase):
             with patch.object(cb.subprocess,"Popen") as p:
                 tid=self.submit(**kwargs)
             p.assert_not_called();self.assertEqual(self.b.get(tid)["status"],"skipped_direct")
-        minimal=task();minimal.pop("parent_complexity");minimal.pop("delegation_reason")
-        self.assertIsNone(cb.route(minimal,self.config))
+        for missing in ("origin", "parent_complexity", "delegation_reason"):
+            minimal=task();minimal.pop(missing)
+            self.assertIsNone(cb.route(minimal,self.config))
 
     def test_disabled_and_dedup(self):
         tid = self.submit()

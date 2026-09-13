@@ -11,7 +11,8 @@ const localPath = process.env.LOCAL_PATH || "/Users/robin/Desktop/waje data/新�
 const sourcePath = process.env.SOURCE_PATH || path.join(runDir, "source-data.json");
 const backupDir = path.resolve(process.env.BACKUP_DIR || path.join(runDir, "lark-backup", "cells"));
 const acceptedDates = String(process.env.ACCEPTED_DATES || Array.from({ length: 25 }, (_, i) => new Date(Date.parse("2026-08-06T00:00:00Z") + i * 86400000).toISOString().slice(0, 10)).join(",")).split(",").map((date) => date.trim()).filter(Boolean);
-const excludedDates = String(process.env.EXCLUDED_DATES || "2026-08-31").split(",").map((date) => date.trim()).filter(Boolean);
+const excludedDatesInput = process.env.EXCLUDED_DATES === undefined ? "2026-08-31" : process.env.EXCLUDED_DATES;
+const excludedDates = String(excludedDatesInput).split(",").map((date) => date.trim()).filter(Boolean);
 const expectedRevision = Number(process.env.EXPECTED_REVISION || "732");
 const sourceColumns = 43;
 const headers = ["日期", "区服", "新增人数", "终身", "首日", "次日", "3日", "4日", "5日", "6日", "7日", "8日", "9日", "10日", "11日", "12日", "13日", "14日", "15日", "30日", "60日", "新增付费率", "新增付费人数", "次留", "3日留", "7日留", "15日留", "30日留", "60日留", "tc比", "tx率", "人均tx金额", "首充付费率", "首充付费人数", "首充次留", "首充3日留", "首充7日留", "首充15日留", "首充30日留", "首充60日留", "首充tc比", "首充tx率", "首充人均tx金额"];
@@ -63,10 +64,11 @@ function consecutiveGroups(items) {
   return groups;
 }
 const source = JSON.parse(await fs.readFile(sourcePath, "utf8"));
+const maturityLedgerPath = process.env.MATURITY_LEDGER || path.join(runDir, "maturity-ledger.json");
+const maturityLedger = JSON.parse(await fs.readFile(maturityLedgerPath, "utf8"));
 const wb = await SpreadsheetFile.importXlsx(await FileBlob.load(localPath));
 const writes = [];
 const alias = {};
-const zeroLedger = [];
 for (const [localName, onlineName, sheetId, backupFile] of maps) {
   const localSheet = wb.worksheets.getItem(localName);
   const values = localSheet.getUsedRange(false).values;
@@ -99,18 +101,10 @@ for (const [localName, onlineName, sheetId, backupFile] of maps) {
   for (const group of consecutiveGroups(appendAssignments)) {
     writes.push({ sheet_id: sheetId, range: `A${group.start}:AQ${group.end}`, cells: group.items.map((item) => [[{ value: serial(item.date) }, ...item.local.slice(1, sourceColumns).map((value) => ({ value: isBlank(value) ? "" : value }))]][0]) });
   }
-  const rawRows = source.sheets[localName].rows;
-  const rawByDate = new Map(rawRows.map((r) => [iso(r[0]), r]));
-  for (const item of assignments) {
-    const raw = rawByDate.get(item.date); const local = item.local;
-    for (let col = 2; col < sourceColumns; col += 1) {
-      if (isZero(raw[col]) && isBlank(local[col])) zeroLedger.push({ local_sheet: localName, online_sheet: onlineName, sheet_id: sheetId, date: item.date, cell: `${alpha(col)}${item.row}`, column_index: col + 1, header: headers[col], source_value: raw[col], output_value: "", action: "clear_numeric_zero_to_blank" });
-    }
-  }
   alias[localName] = { online_sheet: onlineName, online_sheet_id: sheetId, source_mapping: source.sheets[localName].mapping, accepted_dates: acceptedDates, target_rows: assignments.map((x) => ({ date: x.date, row: x.row, existing: x.existing })), source_columns: sourceColumns, online_total_columns: backup.ranges?.[0]?.cells?.[0]?.length, extra_columns_preserved: true };
 }
 await fs.writeFile(path.join(runDir, "lark-writes.json"), JSON.stringify(writes, null, 2) + "\n");
 await fs.writeFile(path.join(runDir, "lark-alias-mapping.json"), JSON.stringify({ schema_version: 1, status: "validated_by_sheet_id_header_date_and_source_mapping", mappings: alias }, null, 2) + "\n");
-await fs.writeFile(path.join(runDir, "zero-ledger.json"), JSON.stringify({ schema_version: 1, status: "ready_for_online_clear", scope: "accepted_dates_metric_columns_only", count: zeroLedger.length, entries: zeroLedger }, null, 2) + "\n");
-await fs.writeFile(path.join(runDir, "lark-write-plan.json"), JSON.stringify({ schema_version: 1, status: "ready_for_execute", target_token: "At8gwdbXUiPa0WkXvKqlSUNKg5d", target_revision_before_write_expected: expectedRevision, source_workbook: localPath, source_json: sourcePath, accepted_dates: acceptedDates, excluded_not_mature_dates: excludedDates, insertions: maps.map(([localName, onlineName, id]) => ({ local_sheet: localName, online_sheet: onlineName, sheet_id: id, position: alias[localName].target_rows.filter((item) => !item.existing)[0]?.row || null, insert_count: alias[localName].target_rows.filter((item) => !item.existing).length })).filter((item) => item.insert_count > 0), write_regions: writes.map((w) => ({ sheet_id: w.sheet_id, range: w.range, rows: w.cells.length, columns: w.cells[0]?.length || 0 })), zero_ledger_count: zeroLedger.length, extra_columns_preserved: true }, null, 2) + "\n");
-console.log(JSON.stringify({ status: "ok", writes: writes.length, cells: writes.reduce((n, w) => n + w.cells.reduce((x, row) => x + row.length, 0), 0), zero_ledger_count: zeroLedger.length, accepted_dates: acceptedDates.length }, null, 2));
+await fs.writeFile(path.join(runDir, "lark-maturity-clear-ledger.json"), JSON.stringify({ schema_version: 1, status: "ready_for_online_write", scope: "accepted_dates; only cohort fields whose maturity windows exceed the cutoff are blank", maturity_cutoff: maturityLedger.maturity_cutoff, count: maturityLedger.count, entries: maturityLedger.entries }, null, 2) + "\n");
+await fs.writeFile(path.join(runDir, "lark-write-plan.json"), JSON.stringify({ schema_version: 1, status: "ready_for_execute", target_token: "At8gwdbXUiPa0WkXvKqlSUNKg5d", target_revision_before_write_expected: expectedRevision, source_workbook: localPath, source_json: sourcePath, accepted_dates: acceptedDates, excluded_not_mature_dates: excludedDates, insertions: maps.map(([localName, onlineName, id]) => ({ local_sheet: localName, online_sheet: onlineName, sheet_id: id, position: alias[localName].target_rows.filter((item) => !item.existing)[0]?.row || null, insert_count: alias[localName].target_rows.filter((item) => !item.existing).length })).filter((item) => item.insert_count > 0), write_regions: writes.map((w) => ({ sheet_id: w.sheet_id, range: w.range, rows: w.cells.length, columns: w.cells[0]?.length || 0 })), maturity_ledger_count: maturityLedger.count, zero_ledger_count: 0, mature_source_zeroes_preserved: true, extra_columns_preserved: true }, null, 2) + "\n");
+console.log(JSON.stringify({ status: "ok", writes: writes.length, cells: writes.reduce((n, w) => n + w.cells.reduce((x, row) => x + row.length, 0), 0), maturity_ledger_count: maturityLedger.count, accepted_dates: acceptedDates.length }, null, 2));
