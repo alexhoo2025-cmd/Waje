@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-09-11T17:03:06+08:00",
+  "generated_at": "2026-09-13T10:02:31+08:00",
   "root": "/Users/robin/Documents/wajetan_analyst",
-  "reason": "event:weekly_report:finished",
+  "reason": "event:report_delivery:finished",
   "coverage": {
     "scope": "report_chain_plus_receipted_ad_hoc",
     "excluded_dirs": [
@@ -21,8 +21,8 @@
       "tmp"
     ],
     "external_sources": "logical_redacted_nodes",
-    "node_count": 573,
-    "edge_count": 529
+    "node_count": 579,
+    "edge_count": 531
   },
   "status_counts": {
     "degraded": 3,
@@ -542,6 +542,12 @@
       "kind": "delivery",
       "label": "android_bq_api_validation_2026_08_27",
       "status": "unknown"
+    },
+    {
+      "id": "delivery:/Users/robin/Documents/wajetan_analyst/analysis/easywin_rtp_30d_2026_09_11",
+      "kind": "delivery",
+      "label": "easywin_rtp_30d_2026_09_11",
+      "status": "partial"
     },
     {
       "id": "delivery:/Users/robin/Documents/wajetan_analyst/analysis/kyc_metabase_schema_audit_2026_08_26",
@@ -1220,6 +1226,23 @@
       "sha256": "4c0135b36fc26f61577f442863b80efaa4dbd70bf63db748f8b7903dffc29b80"
     },
     {
+      "id": "receipt:analysis/easywin_rtp_30d_2026_09_11/artifact.json",
+      "kind": "receipt",
+      "label": "analysis/easywin_rtp_30d_2026_09_11/artifact.json",
+      "path": "analysis/easywin_rtp_30d_2026_09_11/artifact.json",
+      "status": "unknown",
+      "sha256": "3b67ac676a9f45ccab74aa02d394472cfd8e9a1b104553f94fdfcc492fc8211a"
+    },
+    {
+      "id": "receipt:analysis/easywin_rtp_30d_2026_09_11/report-receipt.json",
+      "kind": "receipt",
+      "label": "analysis/easywin_rtp_30d_2026_09_11/report-receipt.json",
+      "path": "analysis/easywin_rtp_30d_2026_09_11/report-receipt.json",
+      "status": "partial",
+      "observed_at": "2026-09-11T19:54:24+08:00",
+      "sha256": "08a74aa1543aa3cf19abb601c6bbf369919191c1fe8b2d88f059addd9f10ebf6"
+    },
+    {
       "id": "receipt:analysis/enterprise_bq_asset_device_performance_2026_08_27/artifact.json",
       "kind": "receipt",
       "label": "analysis/enterprise_bq_asset_device_performance_2026_08_27/artifact.json",
@@ -1545,7 +1568,7 @@
       "label": "analysis/lifecycle_rtp_14d_2026_09_11/artifact.json",
       "path": "analysis/lifecycle_rtp_14d_2026_09_11/artifact.json",
       "status": "unknown",
-      "sha256": "286d58798e1c16c99ce221a92e31a23d43a8f3f84732e6d80ef11bb944c006d3"
+      "sha256": "cab378d6b82a8c1ece523b8ec0325d61be1400d9b1df9994f60c927a12f85954"
     },
     {
       "id": "receipt:analysis/lifecycle_rtp_14d_2026_09_11/report-receipt.json",
@@ -1553,8 +1576,8 @@
       "label": "analysis/lifecycle_rtp_14d_2026_09_11/report-receipt.json",
       "path": "analysis/lifecycle_rtp_14d_2026_09_11/report-receipt.json",
       "status": "partial",
-      "observed_at": "2026-09-11T15:49:45+08:00",
-      "sha256": "65f603e759f78e38d3018872fb9dbccce51521b73707690677dceea80b46ca23"
+      "observed_at": "2026-09-11T19:57:31+08:00",
+      "sha256": "c8ffe37df06280f80c14acb5bd74ad69d76e9f0887a5ad68f47d5c5447bbf9c4"
     },
     {
       "id": "receipt:analysis/metabase_lifecycle_rawlog_model_2026_09_03/run_receipt.json",
@@ -2830,6 +2853,15 @@
       "sha256": "8ef47ee4f315d858e16d1a390888fb86660f5f99a30864ac9db0397f6272077a"
     },
     {
+      "id": "receipt:data/outputs/agent_collaboration/task-da1957298d5e7a27c5f3/receipt.json",
+      "kind": "receipt",
+      "label": "data/outputs/agent_collaboration/task-da1957298d5e7a27c5f3/receipt.json",
+      "path": "data/outputs/agent_collaboration/task-da1957298d5e7a27c5f3/receipt.json",
+      "status": "blocked",
+      "observed_at": "2026-09-11T12:06:27.911070+00:00",
+      "sha256": "18caf68ceffbbc3323b6f02d006fa8394a1d92aaef9003360d00c9ed7d136fa7"
+    },
+    {
       "id": "receipt:data/outputs/agent_collaboration/task-dcfd8a120a689e360f89/receipt.json",
       "kind": "receipt",
       "label": "data/outputs/agent_collaboration/task-dcfd8a120a689e360f89/receipt.json",
@@ -2864,6 +2896,15 @@
       "status": "unknown",
       "observed_at": "2026-09-04T08:56:11.873437+00:00",
       "sha256": "636e0b9816ce661fffc955329a32a5df6ef7658066ac776750d45ba6da6bb4a0"
+    },
+    {
+      "id": "receipt:data/outputs/agent_collaboration/weekly_audits/2026-09-11/20260911T171919+0800/receipt.json",
+      "kind": "receipt",
+      "label": "data/outputs/agent_collaboration/weekly_audits/2026-09-11/20260911T171919+0800/receipt.json",
+      "path": "data/outputs/agent_collaboration/weekly_audits/2026-09-11/20260911T171919+0800/receipt.json",
+      "status": "unknown",
+      "observed_at": "2026-09-11T17:19:19+08:00",
+      "sha256": "39bc1ad729d179cc07efa34bdab4c70b753cc31c3a94c50abb89159601f7ecb5"
     },
     {
       "id": "receipt:data/outputs/competitor/2026-08-19/delivery-receipt.json",
@@ -3748,8 +3789,8 @@
       "label": "data/outputs/weekly/2026-09-11/run-log.json",
       "path": "data/outputs/weekly/2026-09-11/run-log.json",
       "status": "degraded",
-      "observed_at": "2026-09-11T17:03:06+08:00",
-      "sha256": "35e008022fbc046deec2f6c40644a61b77ddbe5fefce364875c0e95a0698b24a"
+      "observed_at": "2026-09-11T17:04:37+08:00",
+      "sha256": "5977cfe71988d840cfc7808d463be30ec56fe6003ba0f383b01c2737fa0e3bf9"
     },
     {
       "id": "receipt:data/outputs/weekly/YYYY-MM-DD/delivery-receipt.json",
@@ -3893,6 +3934,12 @@
       "id": "report:analysis/device_performance_dashboard_v3_2026_09_02",
       "kind": "report",
       "label": "device_performance_dashboard_v3_2026_09_02",
+      "scope": "ad_hoc_receipted"
+    },
+    {
+      "id": "report:analysis/easywin_rtp_30d_2026_09_11",
+      "kind": "report",
+      "label": "easywin_rtp_30d_2026_09_11",
       "scope": "ad_hoc_receipted"
     },
     {
@@ -4710,6 +4757,11 @@
     {
       "source": "delivery:/Users/robin/Documents/wajetan_analyst/analysis/android_bq_api_validation_2026_08_27",
       "target": "receipt:analysis/android_bq_api_validation_2026_08_27/report-receipt.json",
+      "type": "observed_by"
+    },
+    {
+      "source": "delivery:/Users/robin/Documents/wajetan_analyst/analysis/easywin_rtp_30d_2026_09_11",
+      "target": "receipt:analysis/easywin_rtp_30d_2026_09_11/report-receipt.json",
       "type": "observed_by"
     },
     {
@@ -6088,6 +6140,11 @@
       "type": "observed_by"
     },
     {
+      "source": "report:analysis/easywin_rtp_30d_2026_09_11",
+      "target": "receipt:analysis/easywin_rtp_30d_2026_09_11/artifact.json",
+      "type": "observed_by"
+    },
+    {
       "source": "report:analysis/enterprise_bq_asset_device_performance_2026_08_27",
       "target": "receipt:analysis/enterprise_bq_asset_device_performance_2026_08_27/artifact.json",
       "type": "observed_by"
@@ -7037,5 +7094,5 @@
       "job_id": "graph"
     }
   ],
-  "refresh_receipt": "data/outputs/execution_graph/2026-09-11/20260911T170306+0800/refresh-receipt.json"
+  "refresh_receipt": "data/outputs/execution_graph/2026-09-13/20260913T100231+0800/refresh-receipt.json"
 }
